@@ -5,6 +5,8 @@ import cytoscape from 'cytoscape'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { ZoomIn, ZoomOut, Maximize2, RefreshCw } from 'lucide-vue-next'
 import GraphDetailCard from './GraphDetailCard.vue'
+import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
 
 // ─── Props / Emits ─────────────────────────────────────────────────────────────
 const props = defineProps<{
@@ -44,7 +46,7 @@ function themeTokens(dark: boolean) {
 }
 
 // ─── Stylesheet Builder ────────────────────────────────────────────────────────
-function buildStylesheet(dark: boolean): cytoscape.Stylesheet[] {
+function buildStylesheet(dark: boolean) {
   const t = themeTokens(dark)
   return [
     // ── 節點 ──────────────────────────────────────────────────────────────
@@ -85,7 +87,7 @@ function buildStylesheet(dark: boolean): cytoscape.Stylesheet[] {
         'text-background-color': t.labelBg,
         'text-background-opacity': 0.85,
         'text-background-padding': '2px',
-        'text-background-shape': 'round-rectangle',
+        'text-background-shape': 'roundrectangle' as cytoscape.Css.PropertyValue<cytoscape.EdgeSingular, 'circle' | 'rectangle' | 'roundrectangle'>,
         width: 1.5,
         'line-color': t.edgeColor,
         'target-arrow-color': t.edgeColor,
@@ -99,7 +101,7 @@ function buildStylesheet(dark: boolean): cytoscape.Stylesheet[] {
     // ── 有向邊 ────────────────────────────────────────────────────────────
     {
       selector: 'edge[directed="true"]',
-      style: { 'target-arrow-shape': 'triangle' },
+      style: { 'target-arrow-shape': 'triangle' as cytoscape.Css.PropertyValueEdge<cytoscape.Css.ArrowShape> },
     },
     // ── Highlight：主節點 ─────────────────────────────────────────────────
     {
@@ -255,7 +257,6 @@ function initCy() {
       name: 'cose',
       animate: false,
       padding: 60,
-      // @ts-expect-error cose 特有參數
       nodeOverlap: 20,
       idealEdgeLength: 140,
       nodeRepulsion: () => 10000,
@@ -264,7 +265,7 @@ function initCy() {
     userZoomingEnabled: true,
     userPanningEnabled: true,
     boxSelectionEnabled: false,
-    autoungrabifyNodes: false,
+    autoungrabify: false,
     minZoom: 0.2,
     maxZoom: 3,
   })
@@ -343,35 +344,39 @@ onBeforeUnmount(() => {
 
     <!-- 工具列 -->
     <div class="absolute top-3 left-3 z-10 flex flex-col gap-1.5">
-      <button
-        class="w-8 h-8 rounded-lg bg-card border shadow-sm flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+      <Button
+        variant="outline"
+        size="icon-sm"
         title="放大"
         @click="zoomIn"
       >
-        <ZoomIn :size="14" />
-      </button>
-      <button
-        class="w-8 h-8 rounded-lg bg-card border shadow-sm flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+        <ZoomIn class="size-3.5" />
+      </Button>
+      <Button
+        variant="outline"
+        size="icon-sm"
         title="縮小"
         @click="zoomOut"
       >
-        <ZoomOut :size="14" />
-      </button>
-      <div class="h-px bg-border mx-1" />
-      <button
-        class="w-8 h-8 rounded-lg bg-card border shadow-sm flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+        <ZoomOut class="size-3.5" />
+      </Button>
+      <Separator class="my-0.5" />
+      <Button
+        variant="outline"
+        size="icon-sm"
         title="全部顯示"
         @click="fitView"
       >
-        <Maximize2 :size="14" />
-      </button>
-      <button
-        class="w-8 h-8 rounded-lg bg-card border shadow-sm flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+        <Maximize2 class="size-3.5" />
+      </Button>
+      <Button
+        variant="outline"
+        size="icon-sm"
         title="重新排列"
         @click="resetLayout"
       >
-        <RefreshCw :size="14" />
-      </button>
+        <RefreshCw class="size-3.5" />
+      </Button>
     </div>
 
     <!-- 操作提示 -->
