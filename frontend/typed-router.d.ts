@@ -33,6 +33,48 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/login': RouteRecordInfo<
+      '/login',
+      '/login',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/register': RouteRecordInfo<
+      '/register',
+      '/register',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/rooms/': RouteRecordInfo<
+      '/rooms/',
+      '/rooms',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/rooms/[room_id]': RouteRecordInfo<
+      '/rooms/[room_id]',
+      '/rooms/:room_id',
+      { room_id: ParamValue<true> },
+      { room_id: ParamValue<false> },
+      | never
+    >,
+    '/scenarios/': RouteRecordInfo<
+      '/scenarios/',
+      '/scenarios',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/scenarios/[scenario_id]': RouteRecordInfo<
+      '/scenarios/[scenario_id]',
+      '/scenarios/:scenario_id',
+      { scenario_id: ParamValue<true> },
+      { scenario_id: ParamValue<false> },
+      | never
+    >,
   }
 
   /**
@@ -49,6 +91,42 @@ declare module 'vue-router/auto-routes' {
     'src/pages/index.vue': {
       routes:
         | '/'
+      views:
+        | never
+    }
+    'src/pages/login.vue': {
+      routes:
+        | '/login'
+      views:
+        | never
+    }
+    'src/pages/register.vue': {
+      routes:
+        | '/register'
+      views:
+        | never
+    }
+    'src/pages/rooms/index.vue': {
+      routes:
+        | '/rooms/'
+      views:
+        | never
+    }
+    'src/pages/rooms/[room_id].vue': {
+      routes:
+        | '/rooms/[room_id]'
+      views:
+        | never
+    }
+    'src/pages/scenarios/index.vue': {
+      routes:
+        | '/scenarios/'
+      views:
+        | never
+    }
+    'src/pages/scenarios/[scenario_id].vue': {
+      routes:
+        | '/scenarios/[scenario_id]'
       views:
         | never
     }
