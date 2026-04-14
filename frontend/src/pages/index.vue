@@ -2,12 +2,11 @@
   <div class="h-screen flex flex-col bg-background text-foreground overflow-hidden">
 
     <!-- ── 頂部導覽列 ──────────────────────────────────────────────────────── -->
-    <header class="flex-shrink-0 flex items-center gap-3 px-5 h-13 border-b bg-card/80 backdrop-blur-sm z-30">
+    <header class="shrink-0 flex items-center gap-3 px-5 h-13 border-b bg-card/80 backdrop-blur-sm z-30">
 
       <!-- Logo + 標題 -->
       <div class="flex items-center gap-2.5">
-        <!-- 八爪魚形 Logo（COC 主題） -->
-        <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-sm flex-shrink-0">
+        <div class="w-7 h-7 rounded-lg bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-sm shrink-0">
           <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
           </svg>
@@ -18,14 +17,13 @@
         </div>
       </div>
 
-      <!-- 分隔 -->
-      <div class="w-px h-5 bg-border mx-1" />
+      <div class="w-px h-5 bg-border mx-1 shrink-0" />
 
       <!-- 統計 Pills -->
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 shrink-0">
         <span class="inline-flex items-center gap-1.5 text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full">
           <span class="w-1.5 h-1.5 rounded-full bg-primary" />
-          {{ graph.nodes.length }} 節點
+          {{ visibleNodeCount }} / {{ graph.nodes.length }} 節點
         </span>
         <span class="inline-flex items-center gap-1.5 text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full">
           <span class="w-1.5 h-1.5 rounded-full bg-primary/50" />
@@ -33,49 +31,111 @@
         </span>
       </div>
 
-      <!-- 圖例（NodeType 色彩對照） -->
-      <div class="hidden md:flex items-center gap-3 ml-2">
-        <div class="w-px h-4 bg-border" />
-        <div class="flex items-center gap-3">
-          <div
+      <div class="w-px h-5 bg-border mx-1 shrink-0" />
+
+      <!-- 節點類型篩選 ToggleGroup -->
+      <div class="hidden lg:flex items-center">
+        <ToggleGroup
+          type="multiple"
+          variant="outline"
+          :model-value="visibleTypes"
+          class="gap-1"
+          @update:model-value="onVisibleTypesChange"
+        >
+          <ToggleGroupItem
             v-for="(label, type) in NODE_TYPE_LABELS"
             :key="type"
-            class="flex items-center gap-1.5 text-[11px] text-muted-foreground"
+            :value="type"
+            class="h-7 px-2.5 text-xs gap-1.5"
           >
             <span
-              class="inline-block w-2 h-2 rounded-full flex-shrink-0"
+              class="inline-block size-2 rounded-full shrink-0"
               :style="{ backgroundColor: NODE_COLORS[type as NodeType] }"
             />
             {{ label }}
-          </div>
-        </div>
+          </ToggleGroupItem>
+        </ToggleGroup>
       </div>
 
       <!-- 右側工具 -->
-      <div class="ml-auto flex items-center gap-2">
-        <!-- 暗色 / 亮色切換按鈕 -->
-        <button
-          class="w-8 h-8 rounded-lg border bg-background hover:bg-muted transition-colors flex items-center justify-center text-muted-foreground hover:text-foreground"
+      <div class="ml-auto flex items-center gap-2 shrink-0">
+        <!-- 搜尋按鈕 -->
+        <Button
+          variant="outline"
+          size="sm"
+          class="gap-2 text-muted-foreground hidden sm:inline-flex"
+          @click="searchOpen = true"
+        >
+          <Search class="size-3.5" />
+          <span class="text-xs">搜尋節點</span>
+          <Kbd class="ml-1">
+            <KbdGroup>
+              <span>⌘K</span>
+            </KbdGroup>
+          </Kbd>
+        </Button>
+        <Button
+          variant="outline"
+          size="icon-sm"
+          class="sm:hidden"
+          @click="searchOpen = true"
+        >
+          <Search class="size-3.5" />
+        </Button>
+
+        <!-- 暗色 / 亮色切換 -->
+        <Button
+          variant="outline"
+          size="icon-sm"
           :title="isDark ? '切換為亮色模式' : '切換為暗色模式'"
           @click="toggle"
         >
-          <!-- 亮色：顯示 Moon；暗色：顯示 Sun -->
           <Transition name="icon-swap" mode="out-in">
-            <Moon v-if="!isDark" :key="'moon'" :size="15" />
-            <Sun v-else :key="'sun'" :size="15" />
+            <Moon v-if="!isDark" :key="'moon'" class="size-3.5" />
+            <Sun v-else :key="'sun'" class="size-3.5" />
           </Transition>
-        </button>
+        </Button>
       </div>
     </header>
 
     <!-- ── 主體 ────────────────────────────────────────────────────────────── -->
     <main class="flex-1 p-4 min-h-0">
       <KnowledgeGraph
+        ref="graphRef"
         :graph="graph"
         :is-dark="isDark"
+        :hidden-types="hiddenTypes"
         @node-updated="onNodeUpdated"
       />
     </main>
+
+    <!-- ── Command 搜尋 Palette ─────────────────────────────────────────── -->
+    <CommandDialog v-model:open="searchOpen" title="搜尋節點" description="輸入節點名稱進行搜尋">
+      <CommandInput placeholder="搜尋節點名稱..." />
+      <CommandList>
+        <CommandEmpty>找不到符合的節點</CommandEmpty>
+        <CommandGroup
+          v-for="(label, type) in NODE_TYPE_LABELS"
+          :key="type"
+          :heading="label"
+        >
+          <CommandItem
+            v-for="node in nodesByType[type as NodeType]"
+            :key="node.id"
+            :value="`${node.label} ${node.description}`"
+            class="gap-2.5"
+            @select="onSearchSelect(node.id)"
+          >
+            <span
+              class="inline-block size-2.5 rounded-full shrink-0"
+              :style="{ backgroundColor: NODE_COLORS[type as NodeType] }"
+            />
+            <span class="font-medium">{{ node.label }}</span>
+            <span class="text-muted-foreground text-xs truncate">{{ node.description }}</span>
+          </CommandItem>
+        </CommandGroup>
+      </CommandList>
+    </CommandDialog>
 
   </div>
 </template>
@@ -85,11 +145,70 @@ import type { Graph, GraphNode, NodeType } from '@/types/graph'
 import { NODE_COLORS, NODE_TYPE_LABELS } from '@/types/graph'
 import KnowledgeGraph from '@/components/graph/KnowledgeGraph.vue'
 import { useColorMode } from '@/composables/useColorMode'
-import { Moon, Sun } from 'lucide-vue-next'
-import { ref } from 'vue'
+import { Moon, Sun, Search } from 'lucide-vue-next'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { Button } from '@/components/ui/button'
+import { Kbd, KbdGroup } from '@/components/ui/kbd'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import {
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command'
 
 // ─── 主題 ─────────────────────────────────────────────────────────────────────
 const { isDark, toggle } = useColorMode()
+
+// ─── Graph Ref（用於 focusNode）─────────────────────────────────────────────
+const graphRef = ref<InstanceType<typeof KnowledgeGraph> | null>(null)
+
+// ─── 搜尋 Palette ─────────────────────────────────────────────────────────────
+const searchOpen = ref(false)
+
+function onSearchSelect(nodeId: string) {
+  searchOpen.value = false
+  setTimeout(() => graphRef.value?.focusNode(nodeId), 100)
+}
+
+// Cmd+K 快捷鍵
+function onKeydown(e: KeyboardEvent) {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault()
+    searchOpen.value = !searchOpen.value
+  }
+}
+onMounted(() => window.addEventListener('keydown', onKeydown))
+onUnmounted(() => window.removeEventListener('keydown', onKeydown))
+
+// ─── 節點類型篩選 ─────────────────────────────────────────────────────────────
+const allTypes = Object.keys(NODE_TYPE_LABELS) as NodeType[]
+const visibleTypes = ref<string[]>([...allTypes])
+
+const hiddenTypes = computed<NodeType[]>(() =>
+  allTypes.filter((t) => !visibleTypes.value.includes(t)),
+)
+
+function onVisibleTypesChange(val: unknown) {
+  const arr = Array.isArray(val) ? (val as string[]) : []
+  visibleTypes.value = arr.length ? arr : [...allTypes]
+}
+
+const visibleNodeCount = computed(
+  () => graph.value.nodes.filter((n) => !hiddenTypes.value.includes(n.type)).length,
+)
+
+// 按類型分組（Command palette 用）
+const nodesByType = computed(() => {
+  const map: Partial<Record<NodeType, GraphNode[]>> = {}
+  for (const node of graph.value.nodes) {
+    if (!map[node.type]) map[node.type] = []
+    map[node.type]!.push(node)
+  }
+  return map
+})
 
 // ─── 示範資料：COC「失落的藝術家」劇本片段 ─────────────────────────────────────
 const graph = ref<Graph>({
@@ -195,7 +314,6 @@ function onNodeUpdated(node: GraphNode) {
 </script>
 
 <style scoped>
-/* 亮/暗切換按鈕圖示動畫 */
 .icon-swap-enter-active,
 .icon-swap-leave-active {
   transition: opacity 0.15s ease, transform 0.15s ease;

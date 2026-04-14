@@ -2,16 +2,26 @@
 import type { Graph, GraphNode, NodeType } from '@/types/graph'
 import { NODE_COLORS } from '@/types/graph'
 import cytoscape from 'cytoscape'
+import fcose from 'cytoscape-fcose'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { ZoomIn, ZoomOut, Maximize2, RefreshCw } from 'lucide-vue-next'
 import GraphDetailCard from './GraphDetailCard.vue'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
+
+cytoscape.use(fcose)
 
 // ─── Props / Emits ─────────────────────────────────────────────────────────────
 const props = defineProps<{
   graph: Graph
   isDark?: boolean
+  hiddenTypes?: NodeType[]
 }>()
 
 const emit = defineEmits<{
@@ -246,6 +256,25 @@ function bindEvents() {
   })
 }
 
+// ─── fcose 佈局設定 ────────────────────────────────────────────────────────────
+const fcoseLayout = {
+  name: 'fcose',
+  quality: 'proof',
+  randomize: true,
+  animate: true,
+  animationDuration: 500,
+  padding: 80,
+  nodeDimensionsIncludeLabels: true,
+  uniformNodeDimensions: false,
+  packComponents: true,
+  nodeRepulsion: 12000,
+  idealEdgeLength: 120,
+  edgeElasticity: 0.45,
+  nestingFactor: 0.1,
+  numIter: 2500,
+  piTol: 0.0000001,
+} as cytoscape.LayoutOptions
+
 // ─── 初始化 ────────────────────────────────────────────────────────────────────
 function initCy() {
   if (!containerRef.value) return
@@ -253,15 +282,7 @@ function initCy() {
     container: containerRef.value,
     elements: buildElements(props.graph),
     style: buildStylesheet(props.isDark ?? false),
-    layout: {
-      name: 'cose',
-      animate: false,
-      padding: 60,
-      nodeOverlap: 20,
-      idealEdgeLength: 140,
-      nodeRepulsion: () => 10000,
-      gravity: 0.8,
-    },
+    layout: { ...fcoseLayout, animate: false } as cytoscape.LayoutOptions,
     userZoomingEnabled: true,
     userPanningEnabled: true,
     boxSelectionEnabled: false,
@@ -270,6 +291,48 @@ function initCy() {
     maxZoom: 3,
   })
   bindEvents()
+  if (props.hiddenTypes?.length) applyTypeFilter(props.hiddenTypes)
+}
+
+// ─── 節點類型篩選 ─────────────────────────────────────────────────────────────
+function applyTypeFilter(hiddenTypes: NodeType[]) {
+  if (!cy) return
+  cy.batch(() => {
+    cy!.nodes().forEach((node) => {
+      if (hiddenTypes.includes(node.data('type') as NodeType)) {
+        node.style('display', 'none')
+      } else {
+        node.style('display', 'element')
+      }
+    })
+    cy!.edges().forEach((edge) => {
+      const srcHidden = cy!.$id(edge.data('source')).style('display') === 'none'
+      const tgtHidden = cy!.$id(edge.data('target')).style('display') === 'none'
+      edge.style('display', srcHidden || tgtHidden ? 'none' : 'element')
+    })
+  })
+}
+
+// ─── 從外部聚焦節點（Command 搜尋用）─────────────────────────────────────────
+function focusNode(id: string) {
+  if (!cy) return
+  const node = cy.$id(id) as cytoscape.NodeSingular
+  if (!node || node.empty()) return
+  isSelected = true
+  selectedNode.value = {
+    id: node.id(),
+    type: node.data('type') as NodeType,
+    label: node.data('label'),
+    description: node.data('description'),
+  }
+  clearHighlight()
+  applyHighlight(node, 'select')
+  cy.animate({
+    center: { eles: node },
+    zoom: Math.max(cy.zoom(), 1.2),
+    duration: 350,
+    easing: 'ease-in-out-cubic',
+  })
 }
 
 // ─── 監聽 isDark 切換主題 ──────────────────────────────────────────────────────
@@ -288,11 +351,18 @@ watch(
     if (!cy) return
     cy.elements().remove()
     cy.add(buildElements(newGraph))
-    cy.layout({ name: 'cose', animate: true }).run()
+    cy.layout(fcoseLayout).run()
     isSelected = false
     selectedNode.value = null
     clearHighlight()
   },
+  { deep: true },
+)
+
+// ─── 監聽篩選類型變化 ─────────────────────────────────────────────────────────
+watch(
+  () => props.hiddenTypes,
+  (types) => applyTypeFilter(types ?? []),
   { deep: true },
 )
 
@@ -309,7 +379,7 @@ function zoomOut() {
   cy.zoom({ level: cy.zoom() * 0.8, renderedPosition: { x: cy.width() / 2, y: cy.height() / 2 } })
 }
 function resetLayout() {
-  cy?.layout({ name: 'cose', animate: true, padding: 60 }).run()
+  cy?.layout(fcoseLayout).run()
 }
 
 // ─── 詳細卡事件 ────────────────────────────────────────────────────────────────
@@ -337,47 +407,55 @@ onBeforeUnmount(() => {
   cy?.destroy()
   cy = null
 })
+
+defineExpose({ focusNode })
 </script>
 
 <template>
   <div class="relative w-full h-full overflow-hidden rounded-xl border bg-background flex flex-col">
 
     <!-- 工具列 -->
-    <div class="absolute top-3 left-3 z-10 flex flex-col gap-1.5">
-      <Button
-        variant="outline"
-        size="icon-sm"
-        title="放大"
-        @click="zoomIn"
-      >
-        <ZoomIn class="size-3.5" />
-      </Button>
-      <Button
-        variant="outline"
-        size="icon-sm"
-        title="縮小"
-        @click="zoomOut"
-      >
-        <ZoomOut class="size-3.5" />
-      </Button>
-      <Separator class="my-0.5" />
-      <Button
-        variant="outline"
-        size="icon-sm"
-        title="全部顯示"
-        @click="fitView"
-      >
-        <Maximize2 class="size-3.5" />
-      </Button>
-      <Button
-        variant="outline"
-        size="icon-sm"
-        title="重新排列"
-        @click="resetLayout"
-      >
-        <RefreshCw class="size-3.5" />
-      </Button>
-    </div>
+    <TooltipProvider :delay-duration="400">
+      <div class="absolute top-3 left-3 z-10 flex flex-col gap-1.5">
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button variant="outline" size="icon-sm" @click="zoomIn">
+              <ZoomIn class="size-3.5" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="right">放大</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button variant="outline" size="icon-sm" @click="zoomOut">
+              <ZoomOut class="size-3.5" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="right">縮小</TooltipContent>
+        </Tooltip>
+
+        <Separator class="my-0.5" />
+
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button variant="outline" size="icon-sm" @click="fitView">
+              <Maximize2 class="size-3.5" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="right">全部顯示</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button variant="outline" size="icon-sm" @click="resetLayout">
+              <RefreshCw class="size-3.5" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="right">重新排列</TooltipContent>
+        </Tooltip>
+      </div>
+    </TooltipProvider>
 
     <!-- 操作提示 -->
     <div class="absolute bottom-3 left-3 z-10 text-[10px] text-muted-foreground/60 select-none space-y-0.5">
