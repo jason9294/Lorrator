@@ -87,6 +87,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
+import { setStoredAccessToken } from '@/lib/accessToken'
 import { AuthService } from '@/services'
 
 const router = useRouter()
@@ -111,14 +112,15 @@ async function handleRegister() {
   }
   isLoading.value = true
   try {
-    await AuthService.register({
+    const { data } = await AuthService.register({
       body: {
         username: form.value.username.trim(),
         password: form.value.password,
       },
     })
-    toast.success('註冊成功', { description: '請使用新帳號登入' })
-    await router.push('/login')
+    setStoredAccessToken(data.access_token)
+    toast.success('註冊成功', { description: '已自動登入' })
+    await router.push('/scenarios')
   } catch {
     // 錯誤訊息由 axios response interceptor（showAxiosErrorToast）顯示
   } finally {

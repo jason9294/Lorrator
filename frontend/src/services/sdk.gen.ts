@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { AuthLoginData, AuthLoginErrors, AuthLoginResponses, AuthLogoutData, AuthLogoutResponses, AuthRegisterData, AuthRegisterErrors, AuthRegisterResponses, DocumentsDownloadOriginalDocumentData, DocumentsDownloadOriginalDocumentErrors, DocumentsDownloadOriginalDocumentResponses, DocumentsGetDocumentMarkdownData, DocumentsGetDocumentMarkdownErrors, DocumentsGetDocumentMarkdownResponses, DocumentsProcessDocumentData, DocumentsProcessDocumentErrors, DocumentsProcessDocumentResponses, RerankerRerankEndpointData, RerankerRerankEndpointErrors, RerankerRerankEndpointResponses, RoomsSendRoomMessageData, RoomsSendRoomMessageErrors, RoomsSendRoomMessageResponses, ScenariosCreateRoomData, ScenariosCreateRoomErrors, ScenariosCreateRoomResponses, ScenariosCreateScenarioData, ScenariosCreateScenarioErrors, ScenariosCreateScenarioResponses, ScenariosGetScenarioGraphData, ScenariosGetScenarioGraphErrors, ScenariosGetScenarioGraphResponses, ScenariosListScenarioDocumentsData, ScenariosListScenarioDocumentsErrors, ScenariosListScenarioDocumentsResponses, ScenariosListScenariosData, ScenariosListScenariosResponses, ScenariosUploadScenarioDocumentData, ScenariosUploadScenarioDocumentErrors, ScenariosUploadScenarioDocumentResponses, ToolsChunkPlainTextData, ToolsChunkPlainTextErrors, ToolsChunkPlainTextResponses, ToolsEntityExtractToolData, ToolsEntityExtractToolErrors, ToolsEntityExtractToolResponses, UsersGetAllData, UsersGetAllResponses, UsersGetMeData, UsersGetMeResponses } from './types.gen';
+import type { AuthLoginData, AuthLoginErrors, AuthLoginResponses, AuthLogoutData, AuthLogoutResponses, AuthMeData, AuthMeResponses, AuthRegisterData, AuthRegisterErrors, AuthRegisterResponses, DocumentsDownloadOriginalDocumentData, DocumentsDownloadOriginalDocumentErrors, DocumentsDownloadOriginalDocumentResponses, DocumentsGetDocumentMarkdownData, DocumentsGetDocumentMarkdownErrors, DocumentsGetDocumentMarkdownResponses, DocumentsProcessDocumentData, DocumentsProcessDocumentErrors, DocumentsProcessDocumentResponses, RerankerRerankEndpointData, RerankerRerankEndpointErrors, RerankerRerankEndpointResponses, RoomsSendRoomMessageData, RoomsSendRoomMessageErrors, RoomsSendRoomMessageResponses, ScenariosCreateRoomData, ScenariosCreateRoomErrors, ScenariosCreateRoomResponses, ScenariosCreateScenarioData, ScenariosCreateScenarioErrors, ScenariosCreateScenarioResponses, ScenariosGetScenarioGraphData, ScenariosGetScenarioGraphErrors, ScenariosGetScenarioGraphResponses, ScenariosListScenarioDocumentsData, ScenariosListScenarioDocumentsErrors, ScenariosListScenarioDocumentsResponses, ScenariosListScenariosData, ScenariosListScenariosResponses, ScenariosUploadScenarioDocumentData, ScenariosUploadScenarioDocumentErrors, ScenariosUploadScenarioDocumentResponses, ToolsChunkPlainTextData, ToolsChunkPlainTextErrors, ToolsChunkPlainTextResponses, ToolsEntityExtractToolData, ToolsEntityExtractToolErrors, ToolsEntityExtractToolResponses, UsersGetAllData, UsersGetAllResponses, UsersGetMeData, UsersGetMeResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -19,6 +19,18 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 };
 
 export class AuthService {
+    /**
+     * current user
+     */
+    public static me<ThrowOnError extends boolean = true>(options?: Options<AuthMeData, ThrowOnError>) {
+        return (options?.client ?? client).get<AuthMeResponses, unknown, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/auth/me',
+            ...options
+        });
+    }
+    
     /**
      * login
      */
@@ -120,6 +132,7 @@ export class ScenariosService {
     public static createScenario<ThrowOnError extends boolean = true>(options: Options<ScenariosCreateScenarioData, ThrowOnError>) {
         return (options.client ?? client).post<ScenariosCreateScenarioResponses, ScenariosCreateScenarioErrors, ThrowOnError>({
             responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
             url: '/scenarios',
             ...options,
             headers: {
@@ -162,6 +175,7 @@ export class ScenariosService {
     public static createRoom<ThrowOnError extends boolean = true>(options: Options<ScenariosCreateRoomData, ThrowOnError>) {
         return (options.client ?? client).post<ScenariosCreateRoomResponses, ScenariosCreateRoomErrors, ThrowOnError>({
             responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
             url: '/scenarios/{scenario_id}/rooms',
             ...options,
             headers: {
@@ -208,6 +222,7 @@ export class DocumentsService {
     public static processDocument<ThrowOnError extends boolean = true>(options: Options<DocumentsProcessDocumentData, ThrowOnError>) {
         return (options.client ?? client).post<DocumentsProcessDocumentResponses, DocumentsProcessDocumentErrors, ThrowOnError>({
             responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
             url: '/documents/{document_id}/process',
             ...options
         });
@@ -249,6 +264,7 @@ export class RoomsService {
     public static sendRoomMessage<ThrowOnError extends boolean = true>(options: Options<RoomsSendRoomMessageData, ThrowOnError>) {
         return (options.client ?? client).post<RoomsSendRoomMessageResponses, RoomsSendRoomMessageErrors, ThrowOnError>({
             responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
             url: '/rooms/{room_id}/messages',
             ...options,
             headers: {

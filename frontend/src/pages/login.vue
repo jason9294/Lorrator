@@ -1,12 +1,15 @@
 <template>
   <div class="min-h-screen flex items-center justify-center bg-background text-foreground p-4">
     <div class="w-full max-w-sm space-y-6">
-
       <!-- Logo -->
       <div class="flex flex-col items-center gap-3 text-center">
-        <div class="w-12 h-12 rounded-2xl bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg">
+        <div
+          class="w-12 h-12 rounded-2xl bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg"
+        >
           <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+            <path
+              d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"
+            />
           </svg>
         </div>
         <div>
@@ -42,7 +45,10 @@
             />
           </div>
 
-          <div v-if="errorMessage" class="flex items-center gap-2 text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2">
+          <div
+            v-if="errorMessage"
+            class="flex items-center gap-2 text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2"
+          >
             <AlertCircle class="size-4 shrink-0" />
             {{ errorMessage }}
           </div>
@@ -62,7 +68,6 @@
           立即註冊
         </RouterLink>
       </p>
-
     </div>
   </div>
 </template>
@@ -77,6 +82,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
+import { setStoredAccessToken } from '@/lib/accessToken'
 import { AuthService } from '@/services'
 
 const router = useRouter()
@@ -93,12 +99,13 @@ async function handleLogin() {
   errorMessage.value = ''
   isLoading.value = true
   try {
-    await AuthService.login({
+    const { data } = await AuthService.login({
       body: {
         username: form.value.username.trim(),
         password: form.value.password,
       },
     })
+    setStoredAccessToken(data.access_token)
     toast.success('登入成功', { description: '歡迎回來' })
     await router.push('/scenarios')
   } catch {

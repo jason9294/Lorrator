@@ -12,22 +12,6 @@ export default defineConfig({
     { name: '@hey-api/client-axios', throwOnError: true, baseUrl: baseUrl },
     {
       name: '@hey-api/sdk',
-      // operationId: true,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      methodNameBuilder: (operation: any) => {
-        let name: string = operation.id
-        const service: string = operation.tags?.[0] ?? ''
-
-        console.log('operation', operation, typeof operation)
-        console.log('service', service, typeof service)
-        console.log('name', name, typeof name)
-
-        if (service && name.toLowerCase().startsWith(service.toLowerCase())) {
-          name = name.slice(service.length)
-        }
-
-        return name.charAt(0).toLowerCase() + name.slice(1)
-      },
       operations: {
         strategy: 'byTags',
         containerName: '{{name}}Service',
