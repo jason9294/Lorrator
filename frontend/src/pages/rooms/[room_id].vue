@@ -1,8 +1,9 @@
 <template>
   <div class="h-screen flex flex-col bg-background text-foreground overflow-hidden">
-
     <!-- 頂部導覽列 -->
-    <header class="shrink-0 flex items-center gap-3 px-5 h-13 border-b bg-card/80 backdrop-blur-sm z-30">
+    <header
+      class="shrink-0 flex items-center gap-3 px-5 h-13 border-b bg-card/80 backdrop-blur-sm z-30"
+    >
       <RouterLink to="/rooms">
         <Button variant="ghost" size="icon-sm" class="text-muted-foreground">
           <ArrowLeft class="size-4" />
@@ -13,10 +14,14 @@
 
       <div class="flex items-center gap-2.5 flex-1 min-w-0">
         <div class="relative shrink-0">
-          <div class="w-8 h-8 rounded-lg bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shadow-sm">
+          <div
+            class="w-8 h-8 rounded-lg bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shadow-sm"
+          >
             失
           </div>
-          <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-green-500 border-2 border-background" />
+          <span
+            class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-green-500 border-2 border-background"
+          />
         </div>
         <div class="flex flex-col leading-none min-w-0">
           <span class="text-sm font-semibold truncate">{{ roomName }}</span>
@@ -34,7 +39,6 @@
 
     <!-- 訊息列表 -->
     <main ref="messageListRef" class="flex-1 overflow-y-auto px-4 py-4 space-y-4 scroll-smooth">
-
       <!-- 日期分隔 -->
       <div class="flex items-center gap-3 py-1">
         <div class="flex-1 h-px bg-border" />
@@ -51,12 +55,15 @@
 
       <!-- 訊息氣泡 -->
       <template v-for="msg in messages" :key="msg.id">
-
         <!-- AI 訊息 -->
         <div v-if="msg.role === 'ai'" class="flex items-start gap-3 max-w-[85%]">
-          <div class="w-8 h-8 rounded-full bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+          <div
+            class="w-8 h-8 rounded-full bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center shrink-0 shadow-sm mt-0.5"
+          >
             <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+              <path
+                d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"
+              />
             </svg>
           </div>
           <div class="flex flex-col gap-1">
@@ -64,7 +71,9 @@
               <span class="text-xs font-semibold">AI 守門人</span>
               <span class="text-[10px] text-muted-foreground">{{ msg.time }}</span>
             </div>
-            <div class="bg-muted/60 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm leading-relaxed max-w-prose whitespace-pre-wrap">
+            <div
+              class="bg-muted/60 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm leading-relaxed max-w-prose whitespace-pre-wrap"
+            >
               {{ msg.content }}
             </div>
           </div>
@@ -72,7 +81,9 @@
 
         <!-- 玩家訊息 -->
         <div v-else class="flex items-start gap-3 max-w-[85%] ml-auto flex-row-reverse">
-          <div class="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0 mt-0.5">
+          <div
+            class="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0 mt-0.5"
+          >
             <User class="size-4 text-muted-foreground" />
           </div>
           <div class="flex flex-col gap-1 items-end">
@@ -80,27 +91,38 @@
               <span class="text-[10px] text-muted-foreground">{{ msg.time }}</span>
               <span class="text-xs font-semibold">你</span>
             </div>
-            <div class="bg-primary text-primary-foreground rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap">
+            <div
+              class="bg-primary text-primary-foreground rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap"
+            >
               {{ msg.content }}
             </div>
           </div>
         </div>
-
       </template>
 
       <!-- AI 輸入中 -->
       <div v-if="isAiTyping" class="flex items-start gap-3 max-w-[85%]">
-        <div class="w-8 h-8 rounded-full bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+        <div
+          class="w-8 h-8 rounded-full bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center shrink-0 shadow-sm mt-0.5"
+        >
           <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+            <path
+              d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"
+            />
           </svg>
         </div>
         <div class="flex flex-col gap-1">
           <span class="text-xs font-semibold">AI 守門人</span>
           <div class="bg-muted/60 rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:0ms]" />
-            <span class="w-1.5 h-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:150ms]" />
-            <span class="w-1.5 h-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:300ms]" />
+            <span
+              class="w-1.5 h-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:0ms]"
+            />
+            <span
+              class="w-1.5 h-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:150ms]"
+            />
+            <span
+              class="w-1.5 h-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:300ms]"
+            />
           </div>
         </div>
       </div>
@@ -119,7 +141,6 @@
             class="resize-none min-h-[44px] max-h-36 pr-2 py-2.5 text-sm"
             :rows="1"
             @keydown.enter.exact.prevent="sendMessage"
-            @keydown.enter.shift.exact="inputText += '\n'"
             @input="autoResize"
           />
         </div>
@@ -136,7 +157,6 @@
         Enter 發送 · Shift+Enter 換行
       </p>
     </footer>
-
   </div>
 </template>
 
@@ -173,7 +193,7 @@ const messages = ref<Message[]>([
   },
 ])
 
-async function sendMessage() {
+async function sendMessage(e: Event) {
   const text = inputText.value.trim()
   if (!text || isAiTyping.value) return
 
@@ -184,6 +204,8 @@ async function sendMessage() {
     time: now(),
   })
   inputText.value = ''
+  await nextTick()
+  autoResize(e)
   await scrollToBottom()
 
   isAiTyping.value = true

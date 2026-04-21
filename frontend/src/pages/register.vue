@@ -80,12 +80,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { toast } from 'vue-sonner'
 import { AlertCircle, UserPlus } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
+import { AuthService } from '@/services'
 
 const router = useRouter()
 
@@ -109,11 +111,16 @@ async function handleRegister() {
   }
   isLoading.value = true
   try {
-    // TODO: 替換為實際 API 呼叫
-    await new Promise((resolve) => setTimeout(resolve, 800))
-    router.push('/login')
+    await AuthService.register({
+      body: {
+        username: form.value.username.trim(),
+        password: form.value.password,
+      },
+    })
+    toast.success('註冊成功', { description: '請使用新帳號登入' })
+    await router.push('/login')
   } catch {
-    errorMessage.value = '註冊失敗，請稍後再試'
+    // 錯誤訊息由 axios response interceptor（showAxiosErrorToast）顯示
   } finally {
     isLoading.value = false
   }

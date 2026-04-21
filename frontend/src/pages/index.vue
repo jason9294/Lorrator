@@ -1,14 +1,18 @@
 <template>
   <div class="h-screen flex flex-col bg-background text-foreground overflow-hidden">
-
     <!-- ── 頂部導覽列 ──────────────────────────────────────────────────────── -->
-    <header class="shrink-0 flex items-center gap-3 px-5 h-13 border-b bg-card/80 backdrop-blur-sm z-30">
-
+    <header
+      class="shrink-0 flex items-center gap-3 px-5 h-13 border-b bg-card/80 backdrop-blur-sm z-30"
+    >
       <!-- Logo + 標題 -->
       <div class="flex items-center gap-2.5">
-        <div class="w-7 h-7 rounded-lg bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-sm shrink-0">
+        <div
+          class="w-7 h-7 rounded-lg bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-sm shrink-0"
+        >
           <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+            <path
+              d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"
+            />
           </svg>
         </div>
         <div class="flex flex-col leading-none">
@@ -21,11 +25,15 @@
 
       <!-- 統計 Pills -->
       <div class="flex items-center gap-2 shrink-0">
-        <span class="inline-flex items-center gap-1.5 text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full">
+        <span
+          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full"
+        >
           <span class="w-1.5 h-1.5 rounded-full bg-primary" />
           {{ visibleNodeCount }} / {{ graph.nodes.length }} 節點
         </span>
-        <span class="inline-flex items-center gap-1.5 text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full">
+        <span
+          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full"
+        >
           <span class="w-1.5 h-1.5 rounded-full bg-primary/50" />
           {{ graph.edges.length }} 關係
         </span>
@@ -74,12 +82,7 @@
             </KbdGroup>
           </Kbd>
         </Button>
-        <Button
-          variant="outline"
-          size="icon-sm"
-          class="sm:hidden"
-          @click="searchOpen = true"
-        >
+        <Button variant="outline" size="icon-sm" class="sm:hidden" @click="searchOpen = true">
           <Search class="size-3.5" />
         </Button>
 
@@ -114,11 +117,7 @@
       <CommandInput placeholder="搜尋節點名稱..." />
       <CommandList>
         <CommandEmpty>找不到符合的節點</CommandEmpty>
-        <CommandGroup
-          v-for="(label, type) in NODE_TYPE_LABELS"
-          :key="type"
-          :heading="label"
-        >
+        <CommandGroup v-for="(label, type) in NODE_TYPE_LABELS" :key="type" :heading="label">
           <CommandItem
             v-for="node in nodesByType[type as NodeType]"
             :key="node.id"
@@ -136,7 +135,6 @@
         </CommandGroup>
       </CommandList>
     </CommandDialog>
-
   </div>
 </template>
 
@@ -217,13 +215,15 @@ const graph = ref<Graph>({
       id: 'c1',
       type: 'character',
       label: '偵探 史密斯',
-      description: '主角調查員，曾任警探，對超自然現象持懷疑態度。擁有高尚的正直感，卻在調查阿卡姆事件後開始動搖。',
+      description:
+        '主角調查員，曾任警探，對超自然現象持懷疑態度。擁有高尚的正直感，卻在調查阿卡姆事件後開始動搖。',
     },
     {
       id: 'c2',
       type: 'character',
       label: '教授 威廉斯',
-      description: '米斯卡托尼克大學考古系教授，失蹤前留下大量研究筆記，據說已接觸到某件「超乎理解之物」。',
+      description:
+        '米斯卡托尼克大學考古系教授，失蹤前留下大量研究筆記，據說已接觸到某件「超乎理解之物」。',
     },
     {
       id: 'c3',
@@ -259,7 +259,8 @@ const graph = ref<Graph>({
       id: 'i1',
       type: 'item',
       label: '研究筆記',
-      description: '威廉斯教授失蹤前留下的手稿，記載著他對古代文明與異世界存在的研究推論，部分頁面被撕去。',
+      description:
+        '威廉斯教授失蹤前留下的手稿，記載著他對古代文明與異世界存在的研究推論，部分頁面被撕去。',
     },
     {
       id: 'i2',
@@ -277,31 +278,34 @@ const graph = ref<Graph>({
       id: 'e1',
       type: 'event',
       label: '教授失蹤事件',
-      description: '三週前，威廉斯教授在完成一次考古實地調查後失聯。警方結案為自願失蹤，但助手瑪格麗特不信。',
+      description:
+        '三週前，威廉斯教授在完成一次考古實地調查後失聯。警方結案為自願失蹤，但助手瑪格麗特不信。',
     },
     {
       id: 'k1',
       type: 'concept',
       label: '克蘇魯神話',
-      description: '一套描述超越人類理解的古老神靈與宇宙體系的神話框架，閱讀相關典籍可能導致理智崩潰。',
+      description:
+        '一套描述超越人類理解的古老神靈與宇宙體系的神話框架，閱讀相關典籍可能導致理智崩潰。',
     },
   ],
   edges: [
-    { id: 'e-c1-l1',  source: 'c1', target: 'l1', type: '調查',    directed: true  },
-    { id: 'e-c1-c2',  source: 'c1', target: 'c2', type: '尋找',    directed: true  },
-    { id: 'e-c2-l2',  source: 'c2', target: 'l2', type: '任職於',  directed: false },
-    { id: 'e-c2-i1',  source: 'c2', target: 'i1', type: '撰寫',    directed: true  },
-    { id: 'e-c3-c2',  source: 'c3', target: 'c2', type: '協助',    directed: true  },
-    { id: 'e-c3-i1',  source: 'c3', target: 'i1', type: '持有',    directed: false },
-    { id: 'e-c4-l3',  source: 'c4', target: 'l3', type: '出沒',    directed: false },
-    { id: 'e-i1-k1',  source: 'i1', target: 'k1', type: '記載',    directed: true  },
-    { id: 'e-i2-l3',  source: 'i2', target: 'l3', type: '發現於',  directed: false },
-    { id: 'e-i2-k1',  source: 'i2', target: 'k1', type: '關聯',    directed: false },
-    { id: 'e-o1-e1',  source: 'o1', target: 'e1', type: '涉嫌',    directed: false },
-    { id: 'e-o1-l3',  source: 'o1', target: 'l3', type: '使用',    directed: true  },
-    { id: 'e-e1-c2',  source: 'e1', target: 'c2', type: '當事人',  directed: false },
-    { id: 'e-c1-e1',  source: 'c1', target: 'e1', type: '調查',    directed: true  },
-    { id: 'e-l2-k1',  source: 'l2', target: 'k1', type: '收藏典籍', directed: true },
+    { id: 'e-c1-l1', source: 'c1', target: 'l1', type: '調查', directed: true },
+    { id: 'e-c1-l1-2', source: 'c1', target: 'l1', type: '調查2', directed: true },
+    { id: 'e-c1-c2', source: 'c1', target: 'c2', type: '尋找', directed: true },
+    { id: 'e-c2-l2', source: 'c2', target: 'l2', type: '任職於', directed: false },
+    { id: 'e-c2-i1', source: 'c2', target: 'i1', type: '撰寫', directed: true },
+    { id: 'e-c3-c2', source: 'c3', target: 'c2', type: '協助', directed: true },
+    { id: 'e-c3-i1', source: 'c3', target: 'i1', type: '持有', directed: false },
+    { id: 'e-c4-l3', source: 'c4', target: 'l3', type: '出沒', directed: false },
+    { id: 'e-i1-k1', source: 'i1', target: 'k1', type: '記載', directed: true },
+    { id: 'e-i2-l3', source: 'i2', target: 'l3', type: '發現於', directed: false },
+    { id: 'e-i2-k1', source: 'i2', target: 'k1', type: '關聯', directed: false },
+    { id: 'e-o1-e1', source: 'o1', target: 'e1', type: '涉嫌', directed: false },
+    { id: 'e-o1-l3', source: 'o1', target: 'l3', type: '使用', directed: true },
+    { id: 'e-e1-c2', source: 'e1', target: 'c2', type: '當事人', directed: false },
+    { id: 'e-c1-e1', source: 'c1', target: 'e1', type: '調查', directed: true },
+    { id: 'e-l2-k1', source: 'l2', target: 'k1', type: '收藏典籍', directed: true },
   ],
 })
 
@@ -316,7 +320,9 @@ function onNodeUpdated(node: GraphNode) {
 <style scoped>
 .icon-swap-enter-active,
 .icon-swap-leave-active {
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
 }
 .icon-swap-enter-from {
   opacity: 0;

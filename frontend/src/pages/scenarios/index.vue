@@ -1,12 +1,17 @@
 <template>
   <div class="min-h-screen flex flex-col bg-background text-foreground">
-
     <!-- 頂部導覽列 -->
-    <header class="shrink-0 flex items-center gap-3 px-5 h-13 border-b bg-card/80 backdrop-blur-sm z-30">
+    <header
+      class="shrink-0 flex items-center gap-3 px-5 h-13 border-b bg-card/80 backdrop-blur-sm z-30"
+    >
       <div class="flex items-center gap-2.5">
-        <div class="w-7 h-7 rounded-lg bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-sm shrink-0">
+        <div
+          class="w-7 h-7 rounded-lg bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-sm shrink-0"
+        >
           <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+            <path
+              d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"
+            />
           </svg>
         </div>
         <span class="text-sm font-semibold">劇本列表</span>
@@ -26,40 +31,23 @@
       </div>
     </header>
 
-    <!-- 創建劇本 Modal -->
-    <Dialog v-model:open="createDialogOpen">
-      <DialogContent class="sm:max-w-sm">
-        <DialogHeader>
-          <DialogTitle>創建新劇本</DialogTitle>
-          <DialogDescription>輸入劇本名稱後即可建立，建立後可在詳情頁繼續編輯。</DialogDescription>
-        </DialogHeader>
-        <div class="space-y-2 py-2">
-          <Label for="new-scenario-name">劇本名稱</Label>
-          <Input
-            id="new-scenario-name"
-            v-model="newScenarioName"
-            placeholder="例如：克蘇魯的呼喚"
-            :disabled="isCreatingScenario"
-            @keydown.enter="handleCreateScenario"
-          />
-        </div>
-        <DialogFooter>
-          <Button variant="outline" :disabled="isCreatingScenario" @click="createDialogOpen = false">
-            取消
-          </Button>
-          <Button :disabled="!newScenarioName.trim() || isCreatingScenario" @click="handleCreateScenario">
-            <Spinner v-if="isCreatingScenario" class="size-4" />
-            <Plus v-else class="size-4" />
-            {{ isCreatingScenario ? '建立中...' : '建立' }}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <CreateScenarioDialog
+      v-model:open="createDialogOpen"
+      v-model:name="newScenarioName"
+      v-model:system="newScenarioSystem"
+      v-model:description="newScenarioDescription"
+      v-model:min-players="newScenarioMinPlayers"
+      v-model:max-players="newScenarioMaxPlayers"
+      v-model:min-hours="newScenarioMinHours"
+      v-model:max-hours="newScenarioMaxHours"
+      :is-submitting="isCreatingScenario"
+      :error-message="createScenarioError"
+      @submit="handleCreateScenario"
+    />
 
     <!-- 主體 -->
     <main class="flex-1 p-6">
       <div class="max-w-4xl mx-auto space-y-6">
-
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-xl font-bold">所有劇本</h2>
@@ -67,38 +55,115 @@
           </div>
           <Badge variant="secondary" class="gap-1">
             <BookOpen class="size-3" />
-            {{ scenarios.length }} 個劇本
+            {{ isLoadingScenarios ? '載入中…' : `${scenarios.length} 個劇本` }}
           </Badge>
         </div>
 
         <!-- 劇本清單 -->
         <div class="grid gap-4">
-          <Card v-for="scenario in scenarios" :key="scenario.id" class="hover:shadow-md transition-shadow">
+          <!-- 載入中：先渲染頁面骨架避免白屏 -->
+          <template v-if="isLoadingScenarios">
+            <Card v-for="n in 6" :key="`loading-${n}`" class="transition-shadow">
+              <CardContent class="p-5">
+                <div class="flex items-start justify-between gap-4">
+                  <div class="flex items-start gap-4 flex-1 min-w-0">
+                    <div class="w-10 h-10 rounded-lg shrink-0 bg-muted animate-pulse" />
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <div class="h-4 w-40 bg-muted rounded animate-pulse" />
+                        <div class="h-4 w-14 bg-muted rounded animate-pulse" />
+                      </div>
+                      <div class="mt-2 space-y-2">
+                        <div class="h-3 w-full bg-muted rounded animate-pulse" />
+                        <div class="h-3 w-2/3 bg-muted rounded animate-pulse" />
+                      </div>
+                      <div class="flex items-center gap-3 mt-3">
+                        <div class="h-3 w-20 bg-muted rounded animate-pulse" />
+                        <div class="h-3 w-16 bg-muted rounded animate-pulse" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2 shrink-0">
+                    <Button variant="outline" size="sm" class="gap-1.5" disabled>
+                      <Spinner class="size-3.5" />
+                      載入中
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </template>
+
+          <!-- 失敗 -->
+          <Card v-else-if="scenariosLoadError" class="border-destructive/30">
+            <CardContent class="p-5">
+              <div class="flex items-start justify-between gap-4">
+                <div class="space-y-1">
+                  <div class="font-semibold text-sm">載入劇本清單失敗</div>
+                  <div class="text-xs text-muted-foreground wrap-break-word">
+                    {{ scenariosLoadError }}
+                  </div>
+                </div>
+                <Button size="sm" class="gap-2" @click="fetchScenarios">
+                  <Spinner v-if="isLoadingScenarios" class="size-3.5" />
+                  重試
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <!-- 空狀態 -->
+          <Card v-else-if="scenarios.length === 0" class="border-dashed">
+            <CardContent class="p-8">
+              <div class="text-center space-y-2">
+                <div class="text-sm font-semibold">目前還沒有劇本</div>
+                <div class="text-xs text-muted-foreground">
+                  你可以先建立第一個劇本，再開始建立房間。
+                </div>
+                <div class="pt-2">
+                  <Button size="sm" class="gap-2" @click="createDialogOpen = true">
+                    <Plus class="size-3.5" />
+                    創建劇本
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <!-- 成功 -->
+          <Card
+            v-else
+            v-for="scenario in scenarios"
+            :key="scenario.id"
+            class="hover:shadow-md transition-shadow"
+          >
             <CardContent class="p-5">
               <div class="flex items-start justify-between gap-4">
                 <div class="flex items-start gap-4 flex-1 min-w-0">
                   <!-- 類型圖示 -->
                   <div
                     class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 text-white text-sm font-bold"
-                    :style="{ backgroundColor: scenario.color }"
+                    :style="{ backgroundColor: colorFromId(scenario.id) }"
                   >
-                    {{ scenario.title.charAt(0) }}
+                    {{ scenario.name.charAt(0) }}
                   </div>
 
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2 flex-wrap">
-                      <h3 class="font-semibold text-base">{{ scenario.title }}</h3>
+                      <h3 class="font-semibold text-base">{{ scenario.name }}</h3>
                       <Badge variant="outline" class="text-[10px]">{{ scenario.system }}</Badge>
                     </div>
-                    <p class="text-sm text-muted-foreground mt-1 line-clamp-2">{{ scenario.description }}</p>
+                    <p class="text-sm text-muted-foreground mt-1 line-clamp-2">
+                      {{ scenario.description || '劇本尚未新增簡介，請至詳情頁編輯。' }}
+                    </p>
                     <div class="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
                       <span class="flex items-center gap-1">
                         <Users class="size-3" />
-                        {{ scenario.playerCount }} 人
+                        {{ playerCountText(scenario) }}
                       </span>
                       <span class="flex items-center gap-1">
                         <Clock class="size-3" />
-                        {{ scenario.duration }}
+                        {{ durationText(scenario) }}
                       </span>
                     </div>
                   </div>
@@ -127,103 +192,153 @@
             </CardContent>
           </Card>
         </div>
-
       </div>
     </main>
-
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { BookOpen, Clock, DoorOpen, Info, Plus, Users } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import CreateScenarioDialog from '@/components/dialogs/CreateScenarioDialog.vue'
+import { ScenariosService, type ScenarioResponse } from '@/services'
 
 const router = useRouter()
 
 const creatingRoomId = ref<string | null>(null)
 const createDialogOpen = ref(false)
 const newScenarioName = ref('')
+const newScenarioSystem = ref('')
+const newScenarioDescription = ref('')
+const newScenarioMinPlayers = ref('')
+const newScenarioMaxPlayers = ref('')
+const newScenarioMinHours = ref('')
+const newScenarioMaxHours = ref('')
 const isCreatingScenario = ref(false)
+const createScenarioError = ref<string | null>(null)
 
 const COLORS = ['#7c3aed', '#0891b2', '#b45309', '#be123c', '#10b981', '#f97316', '#6366f1']
 
+function colorFromId(id: string) {
+  let hash = 0
+  for (let i = 0; i < id.length; i += 1) {
+    hash = (hash * 31 + id.charCodeAt(i)) | 0
+  }
+  const idx = Math.abs(hash) % COLORS.length
+  return COLORS[idx]
+}
+
+function playerCountText(s: ScenarioResponse) {
+  if (s.min_players == null && s.max_players == null) return '— 人'
+  if (s.min_players != null && s.max_players != null) return `${s.min_players}-${s.max_players} 人`
+  if (s.min_players != null) return `${s.min_players}+ 人`
+  return `≤ ${s.max_players} 人`
+}
+
+function durationText(s: ScenarioResponse) {
+  if (s.min_hours == null && s.max_hours == null) return '—'
+  if (s.min_hours != null && s.max_hours != null) return `${s.min_hours}-${s.max_hours} 小時`
+  if (s.min_hours != null) return `${s.min_hours}+ 小時`
+  return `≤ ${s.max_hours} 小時`
+}
+
+function toIntOrNull(raw: string): number | null {
+  const t = raw.trim()
+  if (!t) return null
+  const n = Number.parseInt(t, 10)
+  return Number.isFinite(n) ? n : null
+}
+
+function toFloatOrNull(raw: string): number | null {
+  const t = raw.trim()
+  if (!t) return null
+  const n = Number.parseFloat(t)
+  return Number.isFinite(n) ? n : null
+}
+
 async function handleCreateScenario() {
   if (!newScenarioName.value.trim()) return
+  if (!newScenarioSystem.value.trim()) return
   isCreatingScenario.value = true
+  createScenarioError.value = null
   try {
-    // TODO: 替換為實際 API 呼叫
-    await new Promise((resolve) => setTimeout(resolve, 800))
-    const scenarioId = `s-${Date.now()}`
-    scenarios.value.unshift({
-      id: scenarioId,
-      title: newScenarioName.value.trim(),
-      system: '—',
-      description: '劇本尚未新增簡介，請至詳情頁編輯。',
-      playerCount: '—',
-      duration: '—',
-      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+    const res = await ScenariosService.createScenario({
+      body: {
+        name: newScenarioName.value.trim(),
+        system: newScenarioSystem.value.trim(),
+        description: newScenarioDescription.value.trim()
+          ? newScenarioDescription.value.trim()
+          : null,
+        min_players: toIntOrNull(newScenarioMinPlayers.value),
+        max_players: toIntOrNull(newScenarioMaxPlayers.value),
+        min_hours: toFloatOrNull(newScenarioMinHours.value),
+        max_hours: toFloatOrNull(newScenarioMaxHours.value),
+      },
     })
+    const created = res.data
+
+    scenarios.value = [created, ...scenarios.value.filter((s) => s.id !== created.id)]
     createDialogOpen.value = false
     newScenarioName.value = ''
-    router.push(`/scenarios/${scenarioId}`)
+    newScenarioSystem.value = ''
+    newScenarioDescription.value = ''
+    newScenarioMinPlayers.value = ''
+    newScenarioMaxPlayers.value = ''
+    newScenarioMinHours.value = ''
+    newScenarioMaxHours.value = ''
+
+    router.push(`/scenarios/${created.id}`)
+  } catch (e) {
+    const err = e as unknown
+    const detail = (err as { response?: { data?: { detail?: unknown } } })?.response?.data?.detail
+    if (Array.isArray(detail) && detail.length > 0) {
+      createScenarioError.value = detail
+        .map((d) => {
+          const loc = (d as { loc?: unknown })?.loc
+          const msg = (d as { msg?: unknown })?.msg
+          const locText = Array.isArray(loc) ? loc.join('.') : 'body'
+          const msgText = typeof msg === 'string' ? msg : 'invalid'
+          return `${locText}: ${msgText}`
+        })
+        .join('\n')
+      return
+    }
+    createScenarioError.value =
+      typeof (err as { message?: unknown })?.message === 'string'
+        ? (err as { message: string }).message
+        : '建立失敗，請稍後再試'
   } finally {
     isCreatingScenario.value = false
   }
 }
 
-const scenarios = ref([
-  {
-    id: 's1',
-    title: '克蘇魯的呼喚',
-    system: 'COC 7e',
-    description: '在阿卡姆的黑暗深處，古老的存在正在甦醒。調查員們必須面對超越人類理解的恐懼，揭開隱藏在小鎮背後的可怕秘密。',
-    playerCount: '2-5',
-    duration: '4-6 小時',
-    color: '#7c3aed',
-  },
-  {
-    id: 's2',
-    title: '暗影奔馳：新上海',
-    system: 'Shadowrun 6e',
-    description: '2080年的新上海，企業與黑市之間的界線早已模糊。一支影子傭兵小隊接下了一個看似簡單的滲透任務，卻發現背後牽涉到城市最大的陰謀。',
-    playerCount: '3-5',
-    duration: '6-8 小時',
-    color: '#0891b2',
-  },
-  {
-    id: 's3',
-    title: '龍與地下城：迷失礦坑',
-    system: 'D&D 5e',
-    description: '一座廢棄的矮人礦坑中藏有傳說中的寶藏，但同時也住著未知的危險。英雄們能否在黑暗中找到財富，並活著離開？',
-    playerCount: '4-6',
-    duration: '3-4 小時',
-    color: '#b45309',
-  },
-  {
-    id: 's4',
-    title: '吸血鬼：假面舞會',
-    system: 'VtM 5e',
-    description: '在上海的地下夜場，古老的吸血鬼氏族正進行著隱秘的權力鬥爭。作為剛覺醒的新生血族，你必須在各方勢力之間找到生存之道。',
-    playerCount: '3-5',
-    duration: '5-7 小時',
-    color: '#be123c',
-  },
-])
+const scenarios = ref<ScenarioResponse[]>([])
+const isLoadingScenarios = ref(false)
+const scenariosLoadError = ref<string | null>(null)
+
+async function fetchScenarios() {
+  isLoadingScenarios.value = true
+  scenariosLoadError.value = null
+  try {
+    const res = await ScenariosService.listScenarios()
+    scenarios.value = res.data
+  } catch (e) {
+    const err = e as unknown
+    scenariosLoadError.value =
+      typeof (err as { message?: unknown })?.message === 'string'
+        ? (err as { message: string }).message
+        : '請稍後再試'
+  } finally {
+    isLoadingScenarios.value = false
+  }
+}
+
+onMounted(fetchScenarios)
 
 async function createRoom(scenarioId: string) {
   creatingRoomId.value = scenarioId

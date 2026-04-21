@@ -70,12 +70,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { toast } from 'vue-sonner'
 import { AlertCircle, LogIn } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
+import { AuthService } from '@/services'
 
 const router = useRouter()
 
@@ -91,11 +93,16 @@ async function handleLogin() {
   errorMessage.value = ''
   isLoading.value = true
   try {
-    // TODO: 替換為實際 API 呼叫
-    await new Promise((resolve) => setTimeout(resolve, 800))
-    router.push('/scenarios')
+    await AuthService.login({
+      body: {
+        username: form.value.username.trim(),
+        password: form.value.password,
+      },
+    })
+    toast.success('登入成功', { description: '歡迎回來' })
+    await router.push('/scenarios')
   } catch {
-    errorMessage.value = '帳號或密碼錯誤，請再試一次'
+    // 錯誤訊息由 axios response interceptor（showAxiosErrorToast）顯示
   } finally {
     isLoading.value = false
   }
