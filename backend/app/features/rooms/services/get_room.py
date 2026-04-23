@@ -3,7 +3,10 @@ from uuid import UUID
 from fastapi import HTTPException
 
 from app.db.uow import UnitOfWorkDependency
-from app.features.rooms.schemas.responses import RoomDetailResponse, RoomParticipantResponse
+from app.features.rooms.schemas.responses import (
+    RoomDetailResponse,
+    RoomParticipantResponse,
+)
 
 
 class GetRoomService:
@@ -15,11 +18,31 @@ class GetRoomService:
         if room is None:
             raise HTTPException(status_code=404, detail="Room not found")
 
-        participant = await self._uow.room_repo.get_participant(room_id, current_user_id)
+        participant = await self._uow.room_repo.get_participant(
+            room_id, current_user_id
+        )
         if participant is None:
-            raise HTTPException(status_code=403, detail="You are not a participant of this room")
+            raise HTTPException(
+                status_code=403, detail="You are not a participant of this room"
+            )
 
         participants = await self._uow.room_repo.list_participants(room_id)
-        room_data = RoomDetailResponse.model_validate(room)
-        room_data.participants = [RoomParticipantResponse.model_validate(p) for p in participants]
+        room_data = RoomDetailResponse(
+            id=room.id,
+            scenario_id=room.scenario_id,
+            host_id=room.host_id,
+            name=room.name,
+            description=room.description,
+            status=room.status,
+            invite_code=room.invite_code,
+            participants=[
+                RoomParticipantResponse(
+                    user_id=p.user_id,
+                    role=p.role,
+                    is_ready=p.is_ready,
+                    joined_at=p.joined_at,
+                )
+                for p in participants
+            ],
+        )
         return room_data

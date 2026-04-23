@@ -3,7 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
 
-from app.shared.enums import RoomStatus
+from app.shared.enums import RoomMessageRole, RoomStatus
 
 
 class RoomParticipantResponse(BaseModel):
@@ -36,7 +36,8 @@ class RoomMessageResponse(BaseModel):
 
     id: UUID
     room_id: UUID
-    sender_id: UUID
+    sender_id: UUID | None
+    role: RoomMessageRole
     content: str
     created_at: datetime
     updated_at: datetime

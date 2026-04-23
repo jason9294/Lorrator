@@ -1,5 +1,6 @@
 from sqlmodel import SQLModel
 
+from .character_model import CharacterModel
 from .document_model import DocumentModel
 from .embedding_cache_model import EmbeddingCacheModel
 from .embedding_model import EmbeddingModel
@@ -13,6 +14,7 @@ from .user_model import UserModel
 
 __all__ = [
     "SQLModel",
+    "CharacterModel",
     "DocumentModel",
     "EmbeddingCacheModel",
     "EmbeddingModel",

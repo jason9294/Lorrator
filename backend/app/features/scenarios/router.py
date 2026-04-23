@@ -8,6 +8,7 @@ from .schemas.requests import CreateRoomRequest, CreateScenarioRequest, UpdateSc
 from .schemas.responses import (
     DocumentResponse,
     RoomDetailResponse,
+    ScenarioGraphResponse,
     ScenarioResponse,
 )
 from .services import (
@@ -137,10 +138,11 @@ async def create_room(
 
 @router.get(
     path="/{scenario_id}/graph",
+    response_model=ScenarioGraphResponse,
     summary="查看劇本的知識圖譜",
 )
 async def get_scenario_graph(
     scenario_id: UUID,
     svc: GetScenarioGraphService = Depends(),
 ):
-    await svc.execute(scenario_id)
+    return await svc.execute(scenario_id)

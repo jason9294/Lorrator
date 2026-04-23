@@ -1,7 +1,7 @@
 import secrets
 from uuid import UUID
 
-from sqlmodel import col, select
+from sqlmodel import col, select, update
 
 from app.models import RoomModel
 from app.models.links.room_participant_link import RoomParticipantLink
@@ -77,13 +77,17 @@ class RoomRepository(BaseRepository):
         result = await self.session.execute(statement)
         return list(result.scalars().all())
 
-    async def set_participant_ready(
-        self, participant: RoomParticipantLink, is_ready: bool
-    ) -> RoomParticipantLink:
-        participant.is_ready = is_ready
-        self.session.add(participant)
+    async def set_participant_ready(self, room_id: UUID, user_id: UUID, is_ready: bool):
+        statement = (
+            update(RoomParticipantLink)
+            .where(
+                col(RoomParticipantLink.room_id) == room_id,
+                col(RoomParticipantLink.user_id) == user_id,
+            )
+            .values(is_ready=is_ready)
+        )
+        await self.session.execute(statement)
         await self.session.flush()
-        return participant
 
     async def remove_participant(self, participant: RoomParticipantLink) -> None:
         await self.session.delete(participant)

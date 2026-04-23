@@ -12,7 +12,7 @@ export type WsMessage = {
 }
 
 /** 僅關心特定 `type` 時，只收到該則的 `payload` */
-type WsPayloadHandler = (payload: Record<string, unknown>) => void
+export type WsPayloadHandler = (payload: Record<string, unknown>) => void
 
 /** 需要依完整訊息判斷邏輯時使用（會比 `onType` 先執行） */
 type WsAnyHandler = (message: WsMessage) => void
@@ -25,6 +25,13 @@ const anyHandlers = new Set<WsAnyHandler>()
 
 /** 全 App 共用一條連線，避免重複 ticket／多 socket 競態 */
 let sharedSocket: WebSocket | null = null
+
+/**
+ * 進行中的連線 Promise（模組層級單例）。
+ * 任何後續的 connect() 呼叫直接 await 同一份 Promise，
+ * 不會重新換票或建立第二條連線。
+ */
+let connectingPromise: Promise<void> | null = null
 
 /** 讀取 `VITE_API_URL`（REST 換票用），去掉結尾斜線方便拼接路徑 */
 function apiBaseUrl(): string {
@@ -155,78 +162,86 @@ export function useAppWebSocket() {
     if (!token) {
       throw new Error('需要 access token 才能換取 WebSocket 票證')
     }
-    if (connecting.value) return
+
     if (sharedSocket?.readyState === WebSocket.OPEN) {
       connected.value = true
       return
     }
 
-    connecting.value = true
-    lastError.value = null
-    try {
-      const base = apiBaseUrl()
-      const ticketRes = await fetch(`${base}/websocket/ticket`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: 'application/json',
-        },
-      })
-      if (!ticketRes.ok) {
-        throw new Error(`換取票證失敗：HTTP ${ticketRes.status}`)
+    // 若已有進行中的連線流程，直接共用同一份 Promise，不重複換票
+    if (connectingPromise) return connectingPromise
+
+    connectingPromise = (async () => {
+      connecting.value = true
+      lastError.value = null
+      try {
+        const base = apiBaseUrl()
+        const ticketRes = await fetch(`${base}/websocket/ticket`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: 'application/json',
+          },
+        })
+        if (!ticketRes.ok) {
+          throw new Error(`換取票證失敗：HTTP ${ticketRes.status}`)
+        }
+        const ticketJson = (await ticketRes.json()) as {
+          ticket?: string
+          expires_in_seconds?: number
+        }
+        if (!ticketJson.ticket) {
+          throw new Error('票證回應格式錯誤')
+        }
+
+        disconnect()
+
+        const wsBase = httpBaseToWsBase(base)
+        const url = `${wsBase}/websocket/ws?ticket=${encodeURIComponent(ticketJson.ticket)}`
+        const socket = new WebSocket(url)
+        sharedSocket = socket
+        wireSocket(socket)
+
+        await new Promise<void>((resolve, reject) => {
+          const onOpen = () => {
+            cleanup()
+            connected.value = true
+            connecting.value = false
+            resolve()
+          }
+          const onError = () => {
+            cleanup()
+            connecting.value = false
+            connected.value = false
+            reject(new Error('WebSocket 連線失敗'))
+          }
+          const cleanup = () => {
+            socket.removeEventListener('open', onOpen)
+            socket.removeEventListener('error', onError)
+          }
+          socket.addEventListener('open', onOpen, { once: true })
+          socket.addEventListener('error', onError, { once: true })
+        })
+
+        socket.addEventListener('close', () => {
+          if (sharedSocket === socket) {
+            sharedSocket = null
+            connected.value = false
+          }
+        })
+      } catch (e) {
+        connecting.value = false
+        connected.value = false
+        const err = e instanceof Error ? e : new Error(String(e))
+        lastError.value = err
+        throw err
+      } finally {
+        connecting.value = false
+        connectingPromise = null
       }
-      const ticketJson = (await ticketRes.json()) as {
-        ticket?: string
-        expires_in_seconds?: number
-      }
-      if (!ticketJson.ticket) {
-        throw new Error('票證回應格式錯誤')
-      }
+    })()
 
-      disconnect()
-
-      const wsBase = httpBaseToWsBase(base)
-      const url = `${wsBase}/websocket/ws?ticket=${encodeURIComponent(ticketJson.ticket)}`
-      const socket = new WebSocket(url)
-      sharedSocket = socket
-      wireSocket(socket)
-
-      await new Promise<void>((resolve, reject) => {
-        const onOpen = () => {
-          cleanup()
-          connected.value = true
-          connecting.value = false
-          resolve()
-        }
-        const onError = () => {
-          cleanup()
-          connecting.value = false
-          connected.value = false
-          reject(new Error('WebSocket 連線失敗'))
-        }
-        const cleanup = () => {
-          socket.removeEventListener('open', onOpen)
-          socket.removeEventListener('error', onError)
-        }
-        socket.addEventListener('open', onOpen, { once: true })
-        socket.addEventListener('error', onError, { once: true })
-      })
-
-      socket.addEventListener('close', () => {
-        if (sharedSocket === socket) {
-          sharedSocket = null
-          connected.value = false
-        }
-      })
-    } catch (e) {
-      connecting.value = false
-      connected.value = false
-      const err = e instanceof Error ? e : new Error(String(e))
-      lastError.value = err
-      throw err
-    } finally {
-      connecting.value = false
-    }
+    return connectingPromise
   }
 
   return {

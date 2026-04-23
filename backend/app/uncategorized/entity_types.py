@@ -3,6 +3,10 @@ from typing import Literal
 from pydantic import BaseModel
 
 
+class NPC(BaseModel):
+    """Not Playable Character"""
+
+
 class Event(BaseModel):
     """event of scenario"""
 

@@ -34,7 +34,9 @@
     <!-- 主內容 -->
     <template v-else-if="scenarioDetail">
       <!-- 頂部導覽列 -->
-      <header class="shrink-0 flex items-center gap-3 px-5 h-13 border-b bg-card/80 backdrop-blur-sm z-30">
+      <header
+        class="shrink-0 flex items-center gap-3 px-5 h-13 border-b bg-card/80 backdrop-blur-sm z-30"
+      >
         <RouterLink to="/scenarios">
           <Button variant="ghost" size="icon-sm" class="text-muted-foreground">
             <ArrowLeft class="size-4" />
@@ -77,21 +79,11 @@
         <div class="flex items-center gap-2 shrink-0">
           <!-- 草稿操作：編輯 / 發布 -->
           <template v-if="scenarioDetail.status === 'DRAFT'">
-            <Button
-              variant="outline"
-              size="sm"
-              class="gap-1.5"
-              @click="editDialogOpen = true"
-            >
+            <Button variant="outline" size="sm" class="gap-1.5" @click="editDialogOpen = true">
               <Pencil class="size-3.5" />
               編輯
             </Button>
-            <Button
-              size="sm"
-              class="gap-1.5"
-              :disabled="isPublishing"
-              @click="handlePublish"
-            >
+            <Button size="sm" class="gap-1.5" :disabled="isPublishing" @click="handlePublish">
               <Spinner v-if="isPublishing" class="size-3.5" />
               <Globe v-else class="size-3.5" />
               {{ isPublishing ? '發布中...' : '發布劇本' }}
@@ -131,9 +123,11 @@
             v-for="tab in tabs"
             :key="tab.id"
             class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors"
-            :class="activeTab === tab.id
-              ? 'bg-background text-foreground shadow-sm'
-              : 'text-muted-foreground hover:text-foreground'"
+            :class="
+              activeTab === tab.id
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            "
             @click="activeTab = tab.id"
           >
             <component :is="tab.icon" class="size-3.5" />
@@ -173,12 +167,7 @@
             <p class="text-sm font-medium">尚無知識圖譜資料</p>
             <p class="text-xs opacity-80">後端圖譜功能就緒後，將顯示於此。</p>
           </div>
-          <KnowledgeGraph
-            v-else
-            :key="scenarioDetail.id"
-            :graph="graph"
-            :is-dark="isDark"
-          />
+          <KnowledgeGraph v-else :key="scenarioDetail.id" :graph="graph" :is-dark="isDark" />
         </div>
 
         <!-- Tab 2: 知識圖譜實體清單 -->
@@ -201,7 +190,11 @@
               <div class="flex items-center gap-2 flex-wrap">
                 <button
                   class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border transition-colors"
-                  :class="entityFilter === '' ? 'bg-primary text-primary-foreground border-primary' : 'border-border text-muted-foreground hover:text-foreground'"
+                  :class="
+                    entityFilter === ''
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'border-border text-muted-foreground hover:text-foreground'
+                  "
                   @click="entityFilter = ''"
                 >
                   全部
@@ -210,10 +203,17 @@
                   v-for="(label, type) in NODE_TYPE_LABELS"
                   :key="type"
                   class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border transition-colors"
-                  :class="entityFilter === type ? 'bg-primary text-primary-foreground border-primary' : 'border-border text-muted-foreground hover:text-foreground'"
+                  :class="
+                    entityFilter === type
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'border-border text-muted-foreground hover:text-foreground'
+                  "
                   @click="entityFilter = entityFilter === type ? '' : type"
                 >
-                  <span class="w-1.5 h-1.5 rounded-full" :style="{ backgroundColor: NODE_COLORS[type as NodeType] }" />
+                  <span
+                    class="w-1.5 h-1.5 rounded-full"
+                    :style="{ backgroundColor: NODE_COLORS[type as NodeType] }"
+                  />
                   {{ label }}
                 </button>
               </div>
@@ -222,9 +222,19 @@
                 <table class="w-full text-sm">
                   <thead>
                     <tr class="bg-muted/50 border-b">
-                      <th class="text-left px-4 py-2.5 text-xs text-muted-foreground font-medium w-28">類型</th>
-                      <th class="text-left px-4 py-2.5 text-xs text-muted-foreground font-medium w-36">名稱</th>
-                      <th class="text-left px-4 py-2.5 text-xs text-muted-foreground font-medium">描述</th>
+                      <th
+                        class="text-left px-4 py-2.5 text-xs text-muted-foreground font-medium w-28"
+                      >
+                        類型
+                      </th>
+                      <th
+                        class="text-left px-4 py-2.5 text-xs text-muted-foreground font-medium w-36"
+                      >
+                        名稱
+                      </th>
+                      <th class="text-left px-4 py-2.5 text-xs text-muted-foreground font-medium">
+                        描述
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -235,12 +245,17 @@
                     >
                       <td class="px-4 py-3">
                         <span class="inline-flex items-center gap-1.5 text-xs">
-                          <span class="w-2 h-2 rounded-full shrink-0" :style="{ backgroundColor: NODE_COLORS[node.type] }" />
+                          <span
+                            class="w-2 h-2 rounded-full shrink-0"
+                            :style="{ backgroundColor: NODE_COLORS[node.type] }"
+                          />
                           {{ NODE_TYPE_LABELS[node.type] }}
                         </span>
                       </td>
                       <td class="px-4 py-3 font-medium">{{ node.label }}</td>
-                      <td class="px-4 py-3 text-muted-foreground text-xs">{{ node.description }}</td>
+                      <td class="px-4 py-3 text-muted-foreground text-xs">
+                        {{ node.description }}
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -256,11 +271,18 @@
               <h3 class="font-semibold">文件清單</h3>
               <div class="flex items-center gap-2">
                 <Badge variant="secondary">{{ documents.length }} 份文件</Badge>
-                <Button size="sm" class="gap-1.5" :disabled="documentsLoading" @click="triggerUpload">
+                <Button
+                  v-if="documents.length === 0"
+                  size="sm"
+                  class="gap-1.5"
+                  :disabled="documentsLoading"
+                  @click="triggerUpload"
+                >
                   <Upload class="size-3.5" />
                   上傳文件
                 </Button>
                 <input
+                  v-if="documents.length === 0"
                   ref="fileInputRef"
                   type="file"
                   class="hidden"
@@ -271,8 +293,15 @@
               </div>
             </div>
 
-            <p v-if="documentsError" class="text-sm text-destructive whitespace-pre-wrap">{{ documentsError }}</p>
-            <p v-if="uploadError" class="text-sm text-destructive whitespace-pre-wrap">{{ uploadError }}</p>
+            <p v-if="documentsError" class="text-sm text-destructive whitespace-pre-wrap">
+              {{ documentsError }}
+            </p>
+            <p v-if="uploadError" class="text-sm text-destructive whitespace-pre-wrap">
+              {{ uploadError }}
+            </p>
+            <p v-if="processError" class="text-sm text-destructive whitespace-pre-wrap">
+              {{ processError }}
+            </p>
 
             <div v-if="uploadingFiles.length > 0" class="space-y-2">
               <div
@@ -288,7 +317,10 @@
               </div>
             </div>
 
-            <div v-if="documentsLoading" class="flex items-center gap-2 text-sm text-muted-foreground py-4">
+            <div
+              v-if="documentsLoading"
+              class="flex items-center gap-2 text-sm text-muted-foreground py-4"
+            >
               <Spinner class="size-4" />
               載入文件清單中…
             </div>
@@ -305,7 +337,30 @@
                 </div>
                 <div class="flex-1 min-w-0">
                   <p class="text-sm font-medium truncate">{{ doc.filename }}</p>
-                  <p class="text-xs text-muted-foreground">{{ documentMetaLine(doc) }}</p>
+                  <p class="text-xs text-muted-foreground">
+                    {{ documentMetaLine(doc) }}
+                    <span class="mx-1">·</span>
+                    <span>{{ documentStatusLabel(doc.status) }}</span>
+                  </p>
+                </div>
+                <div class="shrink-0">
+                  <Button
+                    v-if="canProcessDocument(doc.status)"
+                    size="sm"
+                    variant="outline"
+                    class="gap-1.5"
+                    :disabled="processingDocumentId === doc.id"
+                    @click="handleProcessDocument(doc.id, doc.status)"
+                  >
+                    <Spinner v-if="processingDocumentId === doc.id" class="size-3.5" />
+                    <template v-else>
+                      <Network class="size-3.5" />
+                    </template>
+                    {{ doc.status === 'FAILED' ? '重新處理' : '處理文件' }}
+                  </Button>
+                  <Button v-else size="sm" variant="outline" disabled>
+                    {{ doc.status === 'PROCESSING' ? '處理中…' : '已處理' }}
+                  </Button>
                 </div>
               </div>
             </div>
@@ -372,9 +427,21 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ArrowLeft, FileText, Globe, List, Moon, Network, Pencil, PencilLine, Plus, Sun, Upload } from 'lucide-vue-next'
+import {
+  ArrowLeft,
+  FileText,
+  Globe,
+  List,
+  Moon,
+  Network,
+  Pencil,
+  PencilLine,
+  Plus,
+  Sun,
+  Upload,
+} from 'lucide-vue-next'
 import type { NodeType } from '@/types/graph'
 import { NODE_COLORS, NODE_TYPE_LABELS } from '@/types/graph'
 import type { Graph } from '@/types/graph'
@@ -383,7 +450,13 @@ import KnowledgeGraph from '@/components/graph/KnowledgeGraph.vue'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
-import { ScenariosService, type DocumentResponse, type ScenarioResponse } from '@/services'
+import {
+  DocumentsService,
+  ScenariosService,
+  type DocumentResponse,
+  type ScenarioResponse,
+} from '@/services'
+import { useAppWebSocket } from '@/composables/useAppWebSocket'
 
 const route = useRoute()
 const router = useRouter()
@@ -425,6 +498,8 @@ const documentsError = ref<string | null>(null)
 const fileInputRef = ref<HTMLInputElement | null>(null)
 const uploadingFiles = ref<{ name: string }[]>([])
 const uploadError = ref<string | null>(null)
+const processingDocumentId = ref<string | null>(null)
+const processError = ref<string | null>(null)
 
 // 發布
 const isPublishing = ref(false)
@@ -456,14 +531,23 @@ function normalizeGraphPayload(data: unknown): Graph {
 
   const nodes = nodesRaw
     .map((n) => {
-      if (!n || typeof n !== 'object') return null
+      if (!n || typeof n !== 'object') {
+        console.error('Invalid node:', n)
+        return null
+      }
       const x = n as Record<string, unknown>
       const id = typeof x.id === 'string' ? x.id : null
       const type = typeof x.type === 'string' ? x.type : null
       const label = typeof x.label === 'string' ? x.label : null
       const description = typeof x.description === 'string' ? x.description : ''
-      if (!id || !type || !label) return null
-      if (!NODE_TYPE_LABELS[type as NodeType]) return null
+      if (!id || !type || !label) {
+        console.error('Invalid node:', n)
+        return null
+      }
+      if (!NODE_TYPE_LABELS[type as NodeType]) {
+        console.error('Invalid node type:', type)
+        return null
+      }
       return { id, type: type as NodeType, label, description }
     })
     .filter((n): n is NonNullable<typeof n> => n !== null)
@@ -486,12 +570,15 @@ function normalizeGraphPayload(data: unknown): Graph {
 }
 
 async function loadGraph() {
+  console.log('loadGraph() called with id:', scenarioId.value)
   const id = scenarioId.value
   if (!id) return
   try {
     const res = await ScenariosService.getScenarioGraph({ path: { scenario_id: id } })
     graph.value = normalizeGraphPayload(res.data)
-  } catch {
+    console.log('Graph loaded successfully:', graph.value)
+  } catch (error) {
+    console.error('Error loading graph:', error)
     graph.value = { nodes: [], edges: [] }
   }
 }
@@ -511,6 +598,34 @@ async function loadDocuments() {
     documentsError.value = typeof detail === 'string' ? detail : (err.message ?? '無法載入文件清單')
   } finally {
     documentsLoading.value = false
+  }
+}
+
+function documentStatusLabel(status: string) {
+  if (status === 'READY') return '待處理'
+  if (status === 'PROCESSING') return '處理中'
+  if (status === 'COMPLETED') return '已完成'
+  if (status === 'FAILED') return '失敗'
+  return status
+}
+
+function canProcessDocument(status: string) {
+  return status === 'READY' || status === 'FAILED'
+}
+
+async function handleProcessDocument(documentId: string, status: string) {
+  if (!canProcessDocument(status)) return
+  processingDocumentId.value = documentId
+  processError.value = null
+  try {
+    await DocumentsService.processDocument({ path: { document_id: documentId } })
+    await loadDocuments()
+  } catch (err) {
+    const e = err as { response?: { data?: { detail?: unknown } }; message?: string }
+    const detail = e.response?.data?.detail
+    processError.value = typeof detail === 'string' ? detail : (e.message ?? '處理失敗，請稍後再試')
+  } finally {
+    processingDocumentId.value = null
   }
 }
 
@@ -541,12 +656,20 @@ async function bootstrap() {
 }
 
 onMounted(bootstrap)
-watch(scenarioId, () => { void bootstrap() })
+watch(scenarioId, () => {
+  void bootstrap()
+})
 
 function formatDateTime(iso: string) {
   const d = new Date(iso)
   if (Number.isNaN(d.getTime())) return iso
-  return d.toLocaleString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+  return d.toLocaleString('zh-TW', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
 }
 
 function documentMetaLine(doc: DocumentResponse) {
@@ -586,13 +709,39 @@ async function onFileChange(e: Event) {
         })
         .join('\n')
     } else {
-      uploadError.value = typeof detail === 'string' ? detail : (e.message ?? '上傳失敗，請稍後再試')
+      uploadError.value =
+        typeof detail === 'string' ? detail : (e.message ?? '上傳失敗，請稍後再試')
     }
   } finally {
     uploadingFiles.value = []
     input.value = ''
   }
 }
+
+// WebSocket：文件處理完成後刷新文件與圖譜
+const ws = useAppWebSocket()
+let unsubscribeWs: (() => void) | null = null
+
+onMounted(async () => {
+  try {
+    await ws.connect()
+  } catch {
+    // ignore
+  }
+  unsubscribeWs = ws.onType('documents.process_updated', (payload) => {
+    const sid = String(payload.scenario_id ?? '')
+    if (!sid || sid !== String(scenarioId.value ?? '')) return
+    void loadDocuments()
+    const st = String(payload.status ?? '')
+    if (st === 'COMPLETED') {
+      void loadGraph()
+    }
+  })
+})
+
+onUnmounted(() => {
+  unsubscribeWs?.()
+})
 
 async function handlePublish() {
   const id = scenarioId.value

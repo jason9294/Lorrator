@@ -1,322 +1,263 @@
 <template>
-  <div class="h-screen flex flex-col bg-background text-foreground overflow-hidden">
-    <!-- ── 頂部導覽列 ──────────────────────────────────────────────────────── -->
-    <header
-      class="shrink-0 flex items-center gap-3 px-5 h-13 border-b bg-card/80 backdrop-blur-sm z-30"
-    >
-      <!-- Logo + 標題 -->
-      <div class="flex items-center gap-2.5">
-        <div
-          class="w-7 h-7 rounded-lg bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-sm shrink-0"
-        >
-          <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
-            <path
-              d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"
-            />
-          </svg>
+  <div class="min-h-screen flex flex-col bg-background text-foreground">
+    <AppHeader />
+
+    <main class="flex-1 p-6">
+      <div class="max-w-4xl mx-auto space-y-10">
+
+        <!-- 歡迎區塊 -->
+        <div class="pt-6 space-y-2">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-sm shrink-0">
+              <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" />
+              </svg>
+            </div>
+            <div>
+              <h1 class="text-2xl font-bold tracking-tight">歡迎來到 Lorrator</h1>
+              <p class="text-sm text-muted-foreground">你的 TRPG 跑團助手</p>
+            </div>
+          </div>
         </div>
-        <div class="flex flex-col leading-none">
-          <span class="text-sm font-semibold">知識圖譜</span>
-          <span class="text-[10px] text-muted-foreground">克蘇魯的呼喚 · COC</span>
-        </div>
+
+        <!-- 快速入口 -->
+        <section class="space-y-3">
+          <h2 class="text-sm font-semibold text-muted-foreground uppercase tracking-wider">快速入口</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+            <!-- 我的房間 -->
+            <RouterLink to="/rooms" class="group">
+              <Card class="h-full hover:shadow-md hover:border-primary/30 transition-all cursor-pointer">
+                <CardContent class="p-5 space-y-3">
+                  <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+                    <DoorOpen class="size-5 text-green-600 dark:text-green-400" />
+                  </div>
+                  <div>
+                    <div class="font-semibold text-sm group-hover:text-primary transition-colors">我的房間</div>
+                    <p class="text-xs text-muted-foreground mt-0.5">進入正在進行的跑團</p>
+                  </div>
+                  <div class="flex items-center gap-1 text-xs text-muted-foreground">
+                    <ArrowRight class="size-3" />
+                    <span>查看房間</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </RouterLink>
+
+            <!-- 劇本庫 -->
+            <RouterLink to="/scenarios" class="group">
+              <Card class="h-full hover:shadow-md hover:border-primary/30 transition-all cursor-pointer">
+                <CardContent class="p-5 space-y-3">
+                  <div class="w-10 h-10 rounded-lg bg-violet-500/10 flex items-center justify-center">
+                    <BookOpen class="size-5 text-violet-600 dark:text-violet-400" />
+                  </div>
+                  <div>
+                    <div class="font-semibold text-sm group-hover:text-primary transition-colors">劇本庫</div>
+                    <p class="text-xs text-muted-foreground mt-0.5">瀏覽與建立跑團劇本</p>
+                  </div>
+                  <div class="flex items-center gap-1 text-xs text-muted-foreground">
+                    <ArrowRight class="size-3" />
+                    <span>查看劇本</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </RouterLink>
+
+            <!-- 角色卡 -->
+            <RouterLink to="/characters" class="group">
+              <Card class="h-full hover:shadow-md hover:border-primary/30 transition-all cursor-pointer">
+                <CardContent class="p-5 space-y-3">
+                  <div class="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                    <User class="size-5 text-amber-600 dark:text-amber-400" />
+                  </div>
+                  <div>
+                    <div class="font-semibold text-sm group-hover:text-primary transition-colors">角色卡</div>
+                    <p class="text-xs text-muted-foreground mt-0.5">管理你的 TRPG 角色</p>
+                  </div>
+                  <div class="flex items-center gap-1 text-xs text-muted-foreground">
+                    <ArrowRight class="size-3" />
+                    <span>查看角色</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </RouterLink>
+
+          </div>
+        </section>
+
+        <!-- 統計數字 -->
+        <section class="space-y-3">
+          <h2 class="text-sm font-semibold text-muted-foreground uppercase tracking-wider">總覽</h2>
+          <div class="grid grid-cols-3 gap-4">
+            <Card>
+              <CardContent class="p-5">
+                <div class="text-2xl font-bold">
+                  <span v-if="isLoadingStats" class="inline-block w-8 h-6 bg-muted rounded animate-pulse" />
+                  <span v-else>{{ stats.rooms }}</span>
+                </div>
+                <div class="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                  <DoorOpen class="size-3" />
+                  個房間
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent class="p-5">
+                <div class="text-2xl font-bold">
+                  <span v-if="isLoadingStats" class="inline-block w-8 h-6 bg-muted rounded animate-pulse" />
+                  <span v-else>{{ stats.scenarios }}</span>
+                </div>
+                <div class="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                  <BookOpen class="size-3" />
+                  個劇本
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent class="p-5">
+                <div class="text-2xl font-bold">
+                  <span v-if="isLoadingStats" class="inline-block w-8 h-6 bg-muted rounded animate-pulse" />
+                  <span v-else>{{ stats.characters }}</span>
+                </div>
+                <div class="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                  <User class="size-3" />
+                  個角色
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        <!-- 進行中的房間 -->
+        <section class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h2 class="text-sm font-semibold text-muted-foreground uppercase tracking-wider">進行中的跑團</h2>
+            <RouterLink to="/rooms" class="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
+              查看全部
+              <ArrowRight class="size-3" />
+            </RouterLink>
+          </div>
+
+          <!-- 載入中 -->
+          <div v-if="isLoadingRooms" class="grid gap-3">
+            <Card v-for="n in 2" :key="n">
+              <CardContent class="p-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-lg bg-muted animate-pulse shrink-0" />
+                  <div class="flex-1 space-y-1.5">
+                    <div class="h-3.5 w-32 bg-muted rounded animate-pulse" />
+                    <div class="h-3 w-48 bg-muted rounded animate-pulse" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <!-- 有資料 -->
+          <div v-else-if="runningRooms.length > 0" class="grid gap-3">
+            <Card
+              v-for="room in runningRooms"
+              :key="room.id"
+              class="hover:shadow-md transition-shadow cursor-pointer"
+              @click="router.push(`/rooms/${room.id}`)"
+            >
+              <CardContent class="p-4">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-9 h-9 rounded-lg flex items-center justify-center text-white text-xs font-bold shrink-0"
+                    :style="{ backgroundColor: colorFromId(room.id) }"
+                  >
+                    {{ room.name.charAt(0) }}
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2">
+                      <span class="font-semibold text-sm">{{ room.name }}</span>
+                      <span class="w-2 h-2 rounded-full bg-green-500 shrink-0" />
+                      <span class="text-[10px] text-green-600 dark:text-green-400 font-medium">跑團中</span>
+                    </div>
+                    <p class="text-xs text-muted-foreground truncate mt-0.5">{{ room.description || '無簡介' }}</p>
+                  </div>
+                  <Button variant="outline" size="sm" class="shrink-0 gap-1.5">
+                    <DoorOpen class="size-3.5" />
+                    進入
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <!-- 空狀態 -->
+          <Card v-else class="border-dashed">
+            <CardContent class="p-8 text-center space-y-2">
+              <DoorOpen class="size-8 text-muted-foreground/30 mx-auto" />
+              <p class="text-sm text-muted-foreground">目前沒有進行中的跑團</p>
+              <RouterLink to="/scenarios">
+                <Button size="sm" variant="outline" class="gap-1.5 mt-1">
+                  <BookOpen class="size-3.5" />
+                  瀏覽劇本來開始
+                </Button>
+              </RouterLink>
+            </CardContent>
+          </Card>
+        </section>
+
       </div>
-
-      <div class="w-px h-5 bg-border mx-1 shrink-0" />
-
-      <!-- 統計 Pills -->
-      <div class="flex items-center gap-2 shrink-0">
-        <span
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full"
-        >
-          <span class="w-1.5 h-1.5 rounded-full bg-primary" />
-          {{ visibleNodeCount }} / {{ graph.nodes.length }} 節點
-        </span>
-        <span
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full"
-        >
-          <span class="w-1.5 h-1.5 rounded-full bg-primary/50" />
-          {{ graph.edges.length }} 關係
-        </span>
-      </div>
-
-      <div class="w-px h-5 bg-border mx-1 shrink-0" />
-
-      <!-- 節點類型篩選 ToggleGroup -->
-      <div class="hidden lg:flex items-center">
-        <ToggleGroup
-          type="multiple"
-          variant="outline"
-          :model-value="visibleTypes"
-          class="gap-1"
-          @update:model-value="onVisibleTypesChange"
-        >
-          <ToggleGroupItem
-            v-for="(label, type) in NODE_TYPE_LABELS"
-            :key="type"
-            :value="type"
-            class="h-7 px-2.5 text-xs gap-1.5"
-          >
-            <span
-              class="inline-block size-2 rounded-full shrink-0"
-              :style="{ backgroundColor: NODE_COLORS[type as NodeType] }"
-            />
-            {{ label }}
-          </ToggleGroupItem>
-        </ToggleGroup>
-      </div>
-
-      <!-- 右側工具 -->
-      <div class="ml-auto flex items-center gap-2 shrink-0">
-        <!-- 搜尋按鈕 -->
-        <Button
-          variant="outline"
-          size="sm"
-          class="gap-2 text-muted-foreground hidden sm:inline-flex"
-          @click="searchOpen = true"
-        >
-          <Search class="size-3.5" />
-          <span class="text-xs">搜尋節點</span>
-          <Kbd class="ml-1">
-            <KbdGroup>
-              <span>⌘K</span>
-            </KbdGroup>
-          </Kbd>
-        </Button>
-        <Button variant="outline" size="icon-sm" class="sm:hidden" @click="searchOpen = true">
-          <Search class="size-3.5" />
-        </Button>
-
-        <!-- 暗色 / 亮色切換 -->
-        <Button
-          variant="outline"
-          size="icon-sm"
-          :title="isDark ? '切換為亮色模式' : '切換為暗色模式'"
-          @click="toggle"
-        >
-          <Transition name="icon-swap" mode="out-in">
-            <Moon v-if="!isDark" :key="'moon'" class="size-3.5" />
-            <Sun v-else :key="'sun'" class="size-3.5" />
-          </Transition>
-        </Button>
-      </div>
-    </header>
-
-    <!-- ── 主體 ────────────────────────────────────────────────────────────── -->
-    <main class="flex-1 p-4 min-h-0">
-      <KnowledgeGraph
-        ref="graphRef"
-        :graph="graph"
-        :is-dark="isDark"
-        :hidden-types="hiddenTypes"
-        @node-updated="onNodeUpdated"
-      />
     </main>
-
-    <!-- ── Command 搜尋 Palette ─────────────────────────────────────────── -->
-    <CommandDialog v-model:open="searchOpen" title="搜尋節點" description="輸入節點名稱進行搜尋">
-      <CommandInput placeholder="搜尋節點名稱..." />
-      <CommandList>
-        <CommandEmpty>找不到符合的節點</CommandEmpty>
-        <CommandGroup v-for="(label, type) in NODE_TYPE_LABELS" :key="type" :heading="label">
-          <CommandItem
-            v-for="node in nodesByType[type as NodeType]"
-            :key="node.id"
-            :value="`${node.label} ${node.description}`"
-            class="gap-2.5"
-            @select="onSearchSelect(node.id)"
-          >
-            <span
-              class="inline-block size-2.5 rounded-full shrink-0"
-              :style="{ backgroundColor: NODE_COLORS[type as NodeType] }"
-            />
-            <span class="font-medium">{{ node.label }}</span>
-            <span class="text-muted-foreground text-xs truncate">{{ node.description }}</span>
-          </CommandItem>
-        </CommandGroup>
-      </CommandList>
-    </CommandDialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { Graph, GraphNode, NodeType } from '@/types/graph'
-import { NODE_COLORS, NODE_TYPE_LABELS } from '@/types/graph'
-import KnowledgeGraph from '@/components/graph/KnowledgeGraph.vue'
-import { useColorMode } from '@/composables/useColorMode'
-import { Moon, Sun, Search } from 'lucide-vue-next'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { ArrowRight, BookOpen, DoorOpen, User } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
-import { Kbd, KbdGroup } from '@/components/ui/kbd'
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
-import {
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command'
+import { Card, CardContent } from '@/components/ui/card'
+import AppHeader from '@/components/layout/AppHeader.vue'
+import { CharactersService, MeService, ScenariosService, type RoomResponse } from '@/services'
 
-// ─── 主題 ─────────────────────────────────────────────────────────────────────
-const { isDark, toggle } = useColorMode()
+const router = useRouter()
 
-// ─── Graph Ref（用於 focusNode）─────────────────────────────────────────────
-const graphRef = ref<InstanceType<typeof KnowledgeGraph> | null>(null)
+const isLoadingRooms = ref(false)
+const rooms = ref<RoomResponse[]>([])
 
-// ─── 搜尋 Palette ─────────────────────────────────────────────────────────────
-const searchOpen = ref(false)
+const isLoadingStats = ref(false)
+const stats = ref({ rooms: 0, scenarios: 0, characters: 0 })
 
-function onSearchSelect(nodeId: string) {
-  searchOpen.value = false
-  setTimeout(() => graphRef.value?.focusNode(nodeId), 100)
-}
-
-// Cmd+K 快捷鍵
-function onKeydown(e: KeyboardEvent) {
-  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-    e.preventDefault()
-    searchOpen.value = !searchOpen.value
-  }
-}
-onMounted(() => window.addEventListener('keydown', onKeydown))
-onUnmounted(() => window.removeEventListener('keydown', onKeydown))
-
-// ─── 節點類型篩選 ─────────────────────────────────────────────────────────────
-const allTypes = Object.keys(NODE_TYPE_LABELS) as NodeType[]
-const visibleTypes = ref<string[]>([...allTypes])
-
-const hiddenTypes = computed<NodeType[]>(() =>
-  allTypes.filter((t) => !visibleTypes.value.includes(t)),
+const runningRooms = computed(() =>
+  rooms.value.filter((r) => r.status === 'RUNNING').slice(0, 3),
 )
 
-function onVisibleTypesChange(val: unknown) {
-  const arr = Array.isArray(val) ? (val as string[]) : []
-  visibleTypes.value = arr.length ? arr : [...allTypes]
+function colorFromId(id: string) {
+  let hash = 0
+  for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) | 0
+  const hue = Math.abs(hash) % 360
+  return `hsl(${hue} 80% 45%)`
 }
 
-const visibleNodeCount = computed(
-  () => graph.value.nodes.filter((n) => !hiddenTypes.value.includes(n.type)).length,
-)
+async function loadData() {
+  isLoadingRooms.value = true
+  isLoadingStats.value = true
+  try {
+    const [roomsRes, scenariosRes, charactersRes] = await Promise.allSettled([
+      MeService.listMyRooms(),
+      ScenariosService.listScenarios(),
+      CharactersService.listCharacters(),
+    ])
 
-// 按類型分組（Command palette 用）
-const nodesByType = computed(() => {
-  const map: Partial<Record<NodeType, GraphNode[]>> = {}
-  for (const node of graph.value.nodes) {
-    if (!map[node.type]) map[node.type] = []
-    map[node.type]!.push(node)
-  }
-  return map
-})
+    if (roomsRes.status === 'fulfilled') {
+      rooms.value = roomsRes.value.data ?? []
+    }
 
-// ─── 示範資料：COC「失落的藝術家」劇本片段 ─────────────────────────────────────
-const graph = ref<Graph>({
-  nodes: [
-    {
-      id: 'c1',
-      type: 'character',
-      label: '偵探 史密斯',
-      description:
-        '主角調查員，曾任警探，對超自然現象持懷疑態度。擁有高尚的正直感，卻在調查阿卡姆事件後開始動搖。',
-    },
-    {
-      id: 'c2',
-      type: 'character',
-      label: '教授 威廉斯',
-      description:
-        '米斯卡托尼克大學考古系教授，失蹤前留下大量研究筆記，據說已接觸到某件「超乎理解之物」。',
-    },
-    {
-      id: 'c3',
-      type: 'character',
-      label: '瑪格麗特',
-      description: '威廉斯教授的助手，性格謹慎內向。調查員發現她似乎對某些事情諱莫如深。',
-    },
-    {
-      id: 'c4',
-      type: 'character',
-      label: '神秘老人',
-      description: '常在碼頭一帶出沒的怪異老人，能說出調查員不可能知道的事，身份不明。',
-    },
-    {
-      id: 'l1',
-      type: 'location',
-      label: '阿卡姆鎮',
-      description: '故事發生的核心地點，位於麻薩諸塞州。此地長年瀰漫著超自然傳說，居民習以為常。',
-    },
-    {
-      id: 'l2',
-      type: 'location',
-      label: '米斯卡托尼克大學',
-      description: '以龐大的禁忌書籍收藏聞名，其圖書館地下室封存著數卷《死靈之書》副本。',
-    },
-    {
-      id: 'l3',
-      type: 'location',
-      label: '廢棄倉庫',
-      description: '碼頭附近的廢棄倉庫，牆上刻有奇異符文。據說是某個祕密儀式的場所。',
-    },
-    {
-      id: 'i1',
-      type: 'item',
-      label: '研究筆記',
-      description:
-        '威廉斯教授失蹤前留下的手稿，記載著他對古代文明與異世界存在的研究推論，部分頁面被撕去。',
-    },
-    {
-      id: 'i2',
-      type: 'item',
-      label: '石板碎片',
-      description: '在廢棄倉庫中發現的古老石板碎片，上面的文字與任何已知語言都不相符。',
-    },
-    {
-      id: 'o1',
-      type: 'organization',
-      label: '星際智慧教派',
-      description: '在阿卡姆地下活動的神秘教派，崇拜來自外太空的古神實體，疑似與多起失蹤事件有關。',
-    },
-    {
-      id: 'e1',
-      type: 'event',
-      label: '教授失蹤事件',
-      description:
-        '三週前，威廉斯教授在完成一次考古實地調查後失聯。警方結案為自願失蹤，但助手瑪格麗特不信。',
-    },
-    {
-      id: 'k1',
-      type: 'concept',
-      label: '克蘇魯神話',
-      description:
-        '一套描述超越人類理解的古老神靈與宇宙體系的神話框架，閱讀相關典籍可能導致理智崩潰。',
-    },
-  ],
-  edges: [
-    { id: 'e-c1-l1', source: 'c1', target: 'l1', type: '調查', directed: true },
-    { id: 'e-c1-l1-2', source: 'c1', target: 'l1', type: '調查2', directed: true },
-    { id: 'e-c1-c2', source: 'c1', target: 'c2', type: '尋找', directed: true },
-    { id: 'e-c2-l2', source: 'c2', target: 'l2', type: '任職於', directed: false },
-    { id: 'e-c2-i1', source: 'c2', target: 'i1', type: '撰寫', directed: true },
-    { id: 'e-c3-c2', source: 'c3', target: 'c2', type: '協助', directed: true },
-    { id: 'e-c3-i1', source: 'c3', target: 'i1', type: '持有', directed: false },
-    { id: 'e-c4-l3', source: 'c4', target: 'l3', type: '出沒', directed: false },
-    { id: 'e-i1-k1', source: 'i1', target: 'k1', type: '記載', directed: true },
-    { id: 'e-i2-l3', source: 'i2', target: 'l3', type: '發現於', directed: false },
-    { id: 'e-i2-k1', source: 'i2', target: 'k1', type: '關聯', directed: false },
-    { id: 'e-o1-e1', source: 'o1', target: 'e1', type: '涉嫌', directed: false },
-    { id: 'e-o1-l3', source: 'o1', target: 'l3', type: '使用', directed: true },
-    { id: 'e-e1-c2', source: 'e1', target: 'c2', type: '當事人', directed: false },
-    { id: 'e-c1-e1', source: 'c1', target: 'e1', type: '調查', directed: true },
-    { id: 'e-l2-k1', source: 'l2', target: 'k1', type: '收藏典籍', directed: true },
-  ],
-})
-
-function onNodeUpdated(node: GraphNode) {
-  const idx = graph.value.nodes.findIndex((n) => n.id === node.id)
-  if (idx !== -1) {
-    graph.value.nodes[idx] = { ...node }
+    stats.value = {
+      rooms: roomsRes.status === 'fulfilled' ? (roomsRes.value.data?.length ?? 0) : 0,
+      scenarios: scenariosRes.status === 'fulfilled' ? (scenariosRes.value.data?.length ?? 0) : 0,
+      characters: charactersRes.status === 'fulfilled' ? (charactersRes.value.data?.length ?? 0) : 0,
+    }
+  } finally {
+    isLoadingRooms.value = false
+    isLoadingStats.value = false
   }
 }
+
+onMounted(loadData)
 </script>
-
-<style scoped>
-/*  */
-</style>

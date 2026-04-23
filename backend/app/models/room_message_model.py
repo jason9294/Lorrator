@@ -4,6 +4,7 @@ from uuid import UUID
 from sqlalchemy import Column, Index, Text
 from sqlmodel import Field, Relationship, SQLModel
 
+from app.shared.enums import RoomMessageRole
 from app.shared.utils import uuid7
 
 from .mixin.timestamp import TimestampMixin
@@ -19,8 +20,9 @@ class RoomMessageModel(TimestampMixin, SQLModel, table=True):
     id: UUID = Field(default_factory=uuid7, primary_key=True)
 
     room_id: UUID = Field(foreign_key="rooms.id")
-    sender_id: UUID = Field(foreign_key="users.id")
+    sender_id: UUID | None = Field(foreign_key="users.id")
 
+    role: RoomMessageRole
     content: str = Field(sa_column=Column(Text, nullable=False))
 
     room: Optional["RoomModel"] = Relationship()

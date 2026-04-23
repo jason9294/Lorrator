@@ -1,41 +1,14 @@
 <template>
   <div class="min-h-screen flex flex-col bg-background text-foreground">
 
-    <!-- 頂部導覽列 -->
-    <header class="shrink-0 flex items-center gap-3 px-5 h-13 border-b bg-card/80 backdrop-blur-sm z-30">
-      <div class="flex items-center gap-2.5">
-        <div class="w-7 h-7 rounded-lg bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-sm shrink-0">
-          <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
-          </svg>
-        </div>
-        <span class="text-sm font-semibold">我的房間</span>
-      </div>
-
-      <div class="ml-auto flex items-center gap-2 shrink-0">
+    <AppHeader>
+      <template #actions>
         <Button variant="outline" size="sm" class="gap-2" @click="joinDialogOpen = true">
           <LogIn class="size-3.5" />
           加入房間
         </Button>
-        <RouterLink to="/scenarios">
-          <Button variant="outline" size="sm" class="gap-2">
-            <BookOpen class="size-3.5" />
-            劇本列表
-          </Button>
-        </RouterLink>
-        <Button
-          variant="outline"
-          size="icon-sm"
-          :title="isDark ? '切換為亮色模式' : '切換為暗色模式'"
-          @click="toggle"
-        >
-          <Transition name="icon-swap" mode="out-in">
-            <Moon v-if="!isDark" :key="'moon'" class="size-3.5" />
-            <Sun v-else :key="'sun'" class="size-3.5" />
-          </Transition>
-        </Button>
-      </div>
-    </header>
+      </template>
+    </AppHeader>
 
     <!-- 加入房間 Dialog -->
     <div
@@ -171,12 +144,10 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { BookOpen, DoorOpen, LogIn, Moon, Sun } from 'lucide-vue-next'
+import { DoorOpen, LogIn } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
-import { useColorMode } from '@/composables/useColorMode'
-
-const { isDark, toggle } = useColorMode()
 import { Badge } from '@/components/ui/badge'
+import AppHeader from '@/components/layout/AppHeader.vue'
 import { Card, CardContent } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
 import { MeService, RoomsService, type RoomResponse, type RoomStatus } from '@/services'

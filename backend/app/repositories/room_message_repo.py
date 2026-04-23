@@ -1,17 +1,20 @@
 from uuid import UUID
 
-from sqlmodel import select
+from sqlmodel import desc, select
 
 from app.models import RoomMessageModel
+from app.shared.enums import RoomMessageRole
 
 from ._base_repo import BaseRepository
 
 
 class RoomMessageRepository(BaseRepository):
     async def create(
-        self, room_id: UUID, sender_id: UUID, content: str
+        self, room_id: UUID, sender_id: UUID | None, role: RoomMessageRole, content: str
     ) -> RoomMessageModel:
-        msg = RoomMessageModel(room_id=room_id, sender_id=sender_id, content=content)
+        msg = RoomMessageModel(
+            room_id=room_id, sender_id=sender_id, role=role, content=content
+        )
         self.session.add(msg)
         await self.session.flush()
         return msg
@@ -20,7 +23,7 @@ class RoomMessageRepository(BaseRepository):
         statement = (
             select(RoomMessageModel)
             .where(RoomMessageModel.room_id == room_id)
-            .order_by(RoomMessageModel.created_at)
+            .order_by(desc(RoomMessageModel.created_at))
         )
         result = await self.session.execute(statement)
         return list(result.scalars().all())

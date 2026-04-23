@@ -33,6 +33,27 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/characters/': RouteRecordInfo<
+      '/characters/',
+      '/characters',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/characters/[character_id]': RouteRecordInfo<
+      '/characters/[character_id]',
+      '/characters/:character_id',
+      { character_id: ParamValue<true> },
+      { character_id: ParamValue<false> },
+      | never
+    >,
+    '/graph-example': RouteRecordInfo<
+      '/graph-example',
+      '/graph-example',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/login': RouteRecordInfo<
       '/login',
       '/login',
@@ -91,6 +112,24 @@ declare module 'vue-router/auto-routes' {
     'src/pages/index.vue': {
       routes:
         | '/'
+      views:
+        | never
+    }
+    'src/pages/characters/index.vue': {
+      routes:
+        | '/characters/'
+      views:
+        | never
+    }
+    'src/pages/characters/[character_id].vue': {
+      routes:
+        | '/characters/[character_id]'
+      views:
+        | never
+    }
+    'src/pages/graph-example.vue': {
+      routes:
+        | '/graph-example'
       views:
         | never
     }

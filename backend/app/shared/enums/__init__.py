@@ -1,6 +1,11 @@
 from enum import Enum
 
 
+class GameSystem(str, Enum):
+    COC = "COC"
+    DND = "DND"
+
+
 class ScenarioStatus(Enum):
     DRAFT = "DRAFT"
     PUBLISHED = "PUBLISHED"
@@ -10,6 +15,12 @@ class RoomStatus(Enum):
     PREPARING = "PREPARING"
     RUNNING = "RUNNING"
     COMPLETED = "COMPLETED"
+
+
+class RoomMessageRole(Enum):
+    AGENT = "AGENT"
+    PLAYER = "PLAYER"
+    SYSTEM = "SYSTEM"
 
 
 class DocumentStatus(Enum):

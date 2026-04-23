@@ -5,6 +5,10 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.sql import AsyncSessionDependency
+from app.repositories.character_repo import (
+    CharacterRepository,
+    provide_character_repo_cls,
+)
 from app.repositories.document_repo import (
     DocumentRepository,
     provide_document_repo_cls,
@@ -37,6 +41,7 @@ class AsyncUnitOfWork:
         document_repo: DocumentRepository,
         room_repo: RoomRepository,
         room_message_repo: RoomMessageRepository,
+        character_repo: CharacterRepository,
     ):
         self.session = session
 
@@ -46,6 +51,7 @@ class AsyncUnitOfWork:
         self.document_repo = document_repo
         self.room_repo = room_repo
         self.room_message_repo = room_message_repo
+        self.character_repo = character_repo
 
     async def __aenter__(self) -> "AsyncUnitOfWork":
         logger.info("Entering AsyncUnitOfWork")
@@ -77,6 +83,9 @@ async def provide_async_uow(
     room_message_repo_cls: type[RoomMessageRepository] = Depends(
         provide_room_message_repo_cls
     ),
+    character_repo_cls: type[CharacterRepository] = Depends(
+        provide_character_repo_cls
+    ),
 ):
     async with AsyncUnitOfWork(
         session=session,
@@ -86,6 +95,7 @@ async def provide_async_uow(
         document_repo=document_repo_cls(session),
         room_repo=room_repo_cls(session),
         room_message_repo=room_message_repo_cls(session),
+        character_repo=character_repo_cls(session),
     ) as uow:
         yield uow
 

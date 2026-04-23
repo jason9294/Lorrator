@@ -15,6 +15,126 @@ export type BodyScenariosUploadScenarioDocument = {
 };
 
 /**
+ * CharacterDetailResponse
+ */
+export type CharacterDetailResponse = {
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Owner Id
+     */
+    owner_id: string;
+    /**
+     * Name
+     */
+    name: string;
+    game_system: GameSystem;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Updated At
+     */
+    updated_at: string;
+    /**
+     * Data
+     */
+    data?: CoCCharacterDataOutput | {
+        [key: string]: unknown;
+    } | null;
+};
+
+/**
+ * CharacterResponse
+ */
+export type CharacterResponse = {
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Owner Id
+     */
+    owner_id: string;
+    /**
+     * Name
+     */
+    name: string;
+    game_system: GameSystem;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Updated At
+     */
+    updated_at: string;
+};
+
+/**
+ * CharacterSkill
+ */
+export type CharacterSkillInput = {
+    type: CoCSkillType;
+    category: CoCSkillCategory;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Base Value
+     */
+    base_value?: number;
+    /**
+     * Occupation Value
+     */
+    occupation_value?: number;
+    /**
+     * Interest Value
+     */
+    interest_value?: number;
+    /**
+     * Adjustments
+     */
+    adjustments?: Array<SkillAdjustment>;
+};
+
+/**
+ * CharacterSkill
+ */
+export type CharacterSkillOutput = {
+    type: CoCSkillType;
+    category: CoCSkillCategory;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Base Value
+     */
+    base_value?: number;
+    /**
+     * Occupation Value
+     */
+    occupation_value?: number;
+    /**
+     * Interest Value
+     */
+    interest_value?: number;
+    /**
+     * Adjustments
+     */
+    adjustments?: Array<SkillAdjustment>;
+    /**
+     * Total Value
+     */
+    readonly total_value: number;
+};
+
+/**
  * ChunkResponse
  */
 export type ChunkResponse = {
@@ -66,6 +186,281 @@ export type ChunkTextResponse = {
      * Chunks
      */
     chunks: Array<ChunkResponse>;
+};
+
+/**
+ * CoCCharacterData
+ *
+ * COC 7th Edition 角色資料（存入 JSONB）
+ */
+export type CoCCharacterDataInput = {
+    /**
+     * Occupation
+     */
+    occupation?: string;
+    occupational_features?: OccupationFeatureType;
+    /**
+     * Age
+     */
+    age?: number;
+    /**
+     * Gender
+     */
+    gender?: string;
+    /**
+     * Residence
+     */
+    residence?: string;
+    /**
+     * Birthplace
+     */
+    birthplace?: string;
+    /**
+     * Description
+     */
+    description?: string;
+    /**
+     * Hp
+     */
+    hp?: number;
+    /**
+     * Mp
+     */
+    mp?: number;
+    /**
+     * San
+     */
+    san?: number;
+    /**
+     * Luck
+     */
+    luck?: number;
+    /**
+     * Strength
+     */
+    strength?: number;
+    /**
+     * Constitution
+     */
+    constitution?: number;
+    /**
+     * Size
+     */
+    size?: number;
+    /**
+     * Dexterity
+     */
+    dexterity?: number;
+    /**
+     * Appearance
+     */
+    appearance?: number;
+    /**
+     * Intelligence
+     */
+    intelligence?: number;
+    /**
+     * Power
+     */
+    power?: number;
+    /**
+     * Education
+     */
+    education?: number;
+    /**
+     * Believer
+     */
+    believer?: boolean;
+    /**
+     * Cthulhu Mythos
+     */
+    cthulhu_mythos?: number;
+    /**
+     * Ideology Beliefs
+     */
+    ideology_beliefs?: string;
+    /**
+     * Significant People
+     */
+    significant_people?: string;
+    /**
+     * Meaningful Locations
+     */
+    meaningful_locations?: string;
+    /**
+     * Treasured Possessions
+     */
+    treasured_possessions?: string;
+    /**
+     * Traits
+     */
+    traits?: string;
+    /**
+     * Bonds
+     */
+    bonds?: string;
+    /**
+     * Skills
+     */
+    skills?: Array<CharacterSkillInput>;
+    /**
+     * Skill Adjustments
+     */
+    skill_adjustments?: Array<SkillAdjustment>;
+};
+
+/**
+ * CoCCharacterData
+ *
+ * COC 7th Edition 角色資料（存入 JSONB）
+ */
+export type CoCCharacterDataOutput = {
+    /**
+     * Occupation
+     */
+    occupation?: string;
+    occupational_features?: OccupationFeatureType;
+    /**
+     * Age
+     */
+    age?: number;
+    /**
+     * Gender
+     */
+    gender?: string;
+    /**
+     * Residence
+     */
+    residence?: string;
+    /**
+     * Birthplace
+     */
+    birthplace?: string;
+    /**
+     * Description
+     */
+    description?: string;
+    /**
+     * Hp
+     */
+    hp?: number;
+    /**
+     * Mp
+     */
+    mp?: number;
+    /**
+     * San
+     */
+    san?: number;
+    /**
+     * Luck
+     */
+    luck?: number;
+    /**
+     * Strength
+     */
+    strength?: number;
+    /**
+     * Constitution
+     */
+    constitution?: number;
+    /**
+     * Size
+     */
+    size?: number;
+    /**
+     * Dexterity
+     */
+    dexterity?: number;
+    /**
+     * Appearance
+     */
+    appearance?: number;
+    /**
+     * Intelligence
+     */
+    intelligence?: number;
+    /**
+     * Power
+     */
+    power?: number;
+    /**
+     * Education
+     */
+    education?: number;
+    /**
+     * Believer
+     */
+    believer?: boolean;
+    /**
+     * Cthulhu Mythos
+     */
+    cthulhu_mythos?: number;
+    /**
+     * Ideology Beliefs
+     */
+    ideology_beliefs?: string;
+    /**
+     * Significant People
+     */
+    significant_people?: string;
+    /**
+     * Meaningful Locations
+     */
+    meaningful_locations?: string;
+    /**
+     * Treasured Possessions
+     */
+    treasured_possessions?: string;
+    /**
+     * Traits
+     */
+    traits?: string;
+    /**
+     * Bonds
+     */
+    bonds?: string;
+    /**
+     * Skills
+     */
+    skills?: Array<CharacterSkillOutput>;
+    /**
+     * Skill Adjustments
+     */
+    skill_adjustments?: Array<SkillAdjustment>;
+};
+
+/**
+ * CoCSkillAdjustmentType
+ *
+ * COC 技能調整來源
+ */
+export type CoCSkillAdjustmentType = 'GROWTH' | 'CUSTOM';
+
+/**
+ * CoCSkillCategory
+ *
+ * COC 技能分類
+ */
+export type CoCSkillCategory = 'NEGOTIATION' | 'INVESTIGATION' | 'LANGUAGE' | 'MEDICAL' | 'PILOT' | 'SURVIVAL' | 'ART_AND_CRAFT' | 'SCIENCE' | 'CUSTOM';
+
+/**
+ * CoCSkillType
+ *
+ * COC 技能類型
+ */
+export type CoCSkillType = 'STANDARD' | 'DERIVED' | 'CUSTOM';
+
+/**
+ * CreateCharacterRequest
+ */
+export type CreateCharacterRequest = {
+    /**
+     * Name
+     */
+    name: string;
+    game_system?: GameSystem;
+    data?: CoCCharacterDataInput;
 };
 
 /**
@@ -173,6 +568,11 @@ export type DocumentResponse = {
 export type DocumentStatus = 'READY' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
 
 /**
+ * GameSystem
+ */
+export type GameSystem = 'COC' | 'DND';
+
+/**
  * HTTPValidationError
  */
 export type HttpValidationError = {
@@ -221,6 +621,13 @@ export type MeResponse = {
 };
 
 /**
+ * OccupationFeatureType
+ *
+ * COC 職業技能點計算方式
+ */
+export type OccupationFeatureType = 'EDU' | 'EDU_STR' | 'EDU_DEX' | 'EDU_APP' | 'EDU_POW';
+
+/**
  * ProcessDocumentResponse
  */
 export type ProcessDocumentResponse = {
@@ -228,10 +635,11 @@ export type ProcessDocumentResponse = {
      * Document Id
      */
     document_id: string;
+    status: DocumentStatus;
     /**
      * Message
      */
-    message?: string;
+    message: string;
     /**
      * Entities
      */
@@ -303,6 +711,41 @@ export type RerankResponse = {
 };
 
 /**
+ * RoomDetailResponse
+ */
+export type RoomDetailResponse = {
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Scenario Id
+     */
+    scenario_id: string;
+    /**
+     * Host Id
+     */
+    host_id: string;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Description
+     */
+    description: string | null;
+    status: RoomStatus;
+    /**
+     * Invite Code
+     */
+    invite_code: string;
+    /**
+     * Participants
+     */
+    participants: Array<RoomParticipantResponse>;
+};
+
+/**
  * RoomMessageResponse
  */
 export type RoomMessageResponse = {
@@ -317,7 +760,8 @@ export type RoomMessageResponse = {
     /**
      * Sender Id
      */
-    sender_id: string;
+    sender_id: string | null;
+    role: RoomMessageRole;
     /**
      * Content
      */
@@ -331,6 +775,11 @@ export type RoomMessageResponse = {
      */
     updated_at: string;
 };
+
+/**
+ * RoomMessageRole
+ */
+export type RoomMessageRole = 'AGENT' | 'PLAYER' | 'SYSTEM';
 
 /**
  * RoomParticipantResponse
@@ -389,6 +838,68 @@ export type RoomResponse = {
  * RoomStatus
  */
 export type RoomStatus = 'PREPARING' | 'RUNNING' | 'COMPLETED';
+
+/**
+ * ScenarioGraphEdgeResponse
+ */
+export type ScenarioGraphEdgeResponse = {
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Source
+     */
+    source: string;
+    /**
+     * Target
+     */
+    target: string;
+    /**
+     * Type
+     */
+    type?: string;
+    /**
+     * Directed
+     */
+    directed?: boolean;
+};
+
+/**
+ * ScenarioGraphNodeResponse
+ */
+export type ScenarioGraphNodeResponse = {
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Type
+     */
+    type: string;
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Description
+     */
+    description?: string;
+};
+
+/**
+ * ScenarioGraphResponse
+ */
+export type ScenarioGraphResponse = {
+    /**
+     * Nodes
+     */
+    nodes: Array<ScenarioGraphNodeResponse>;
+    /**
+     * Edges
+     */
+    edges: Array<ScenarioGraphEdgeResponse>;
+};
 
 /**
  * ScenarioResponse
@@ -457,6 +968,21 @@ export type SendMessageRequest = {
 };
 
 /**
+ * SkillAdjustment
+ */
+export type SkillAdjustment = {
+    type: CoCSkillAdjustmentType;
+    /**
+     * Value
+     */
+    value: number;
+    /**
+     * Note
+     */
+    note?: string;
+};
+
+/**
  * TokenResponse
  */
 export type TokenResponse = {
@@ -468,6 +994,17 @@ export type TokenResponse = {
      * Token Type
      */
     token_type?: string;
+};
+
+/**
+ * UpdateCharacterRequest
+ */
+export type UpdateCharacterRequest = {
+    /**
+     * Name
+     */
+    name?: string | null;
+    data?: CoCCharacterDataInput | null;
 };
 
 /**
@@ -547,76 +1084,185 @@ export type WsTicketResponse = {
 };
 
 /**
- * RoomDetailResponse
+ * CharacterDetailResponse
  */
-export type AppFeaturesRoomsSchemasResponsesRoomDetailResponse = {
+export type CharacterDetailResponseWritable = {
     /**
      * Id
      */
     id: string;
     /**
-     * Scenario Id
+     * Owner Id
      */
-    scenario_id: string;
-    /**
-     * Host Id
-     */
-    host_id: string;
+    owner_id: string;
     /**
      * Name
      */
     name: string;
+    game_system: GameSystem;
     /**
-     * Description
+     * Created At
      */
-    description: string | null;
-    status: RoomStatus;
+    created_at: string;
     /**
-     * Invite Code
+     * Updated At
      */
-    invite_code: string;
+    updated_at: string;
     /**
-     * Participants
+     * Data
      */
-    participants: Array<RoomParticipantResponse>;
+    data?: CoCCharacterDataOutputWritable | {
+        [key: string]: unknown;
+    } | null;
 };
 
 /**
- * RoomDetailResponse
+ * CharacterSkill
  */
-export type AppFeaturesScenariosSchemasResponsesRoomDetailResponse = {
-    /**
-     * Id
-     */
-    id: string;
-    /**
-     * Scenario Id
-     */
-    scenario_id: string;
-    /**
-     * Host Id
-     */
-    host_id: string;
+export type CharacterSkillOutputWritable = {
+    type: CoCSkillType;
+    category: CoCSkillCategory;
     /**
      * Name
      */
     name: string;
     /**
+     * Base Value
+     */
+    base_value?: number;
+    /**
+     * Occupation Value
+     */
+    occupation_value?: number;
+    /**
+     * Interest Value
+     */
+    interest_value?: number;
+    /**
+     * Adjustments
+     */
+    adjustments?: Array<SkillAdjustment>;
+};
+
+/**
+ * CoCCharacterData
+ *
+ * COC 7th Edition 角色資料（存入 JSONB）
+ */
+export type CoCCharacterDataOutputWritable = {
+    /**
+     * Occupation
+     */
+    occupation?: string;
+    occupational_features?: OccupationFeatureType;
+    /**
+     * Age
+     */
+    age?: number;
+    /**
+     * Gender
+     */
+    gender?: string;
+    /**
+     * Residence
+     */
+    residence?: string;
+    /**
+     * Birthplace
+     */
+    birthplace?: string;
+    /**
      * Description
      */
-    description: string | null;
+    description?: string;
     /**
-     * Status
+     * Hp
      */
-    status: string;
+    hp?: number;
     /**
-     * Invite Code
+     * Mp
      */
-    invite_code: string;
+    mp?: number;
     /**
-     * Participants
+     * San
      */
-    participants: Array<RoomParticipantResponse>;
+    san?: number;
+    /**
+     * Luck
+     */
+    luck?: number;
+    /**
+     * Strength
+     */
+    strength?: number;
+    /**
+     * Constitution
+     */
+    constitution?: number;
+    /**
+     * Size
+     */
+    size?: number;
+    /**
+     * Dexterity
+     */
+    dexterity?: number;
+    /**
+     * Appearance
+     */
+    appearance?: number;
+    /**
+     * Intelligence
+     */
+    intelligence?: number;
+    /**
+     * Power
+     */
+    power?: number;
+    /**
+     * Education
+     */
+    education?: number;
+    /**
+     * Believer
+     */
+    believer?: boolean;
+    /**
+     * Cthulhu Mythos
+     */
+    cthulhu_mythos?: number;
+    /**
+     * Ideology Beliefs
+     */
+    ideology_beliefs?: string;
+    /**
+     * Significant People
+     */
+    significant_people?: string;
+    /**
+     * Meaningful Locations
+     */
+    meaningful_locations?: string;
+    /**
+     * Treasured Possessions
+     */
+    treasured_possessions?: string;
+    /**
+     * Traits
+     */
+    traits?: string;
+    /**
+     * Bonds
+     */
+    bonds?: string;
+    /**
+     * Skills
+     */
+    skills?: Array<CharacterSkillOutputWritable>;
+    /**
+     * Skill Adjustments
+     */
+    skill_adjustments?: Array<SkillAdjustment>;
 };
 
 export type WebsocketIssueWsTicketData = {
@@ -1012,7 +1658,7 @@ export type ScenariosCreateRoomResponses = {
     /**
      * Successful Response
      */
-    200: AppFeaturesScenariosSchemasResponsesRoomDetailResponse;
+    200: RoomDetailResponse;
 };
 
 export type ScenariosCreateRoomResponse = ScenariosCreateRoomResponses[keyof ScenariosCreateRoomResponses];
@@ -1042,8 +1688,10 @@ export type ScenariosGetScenarioGraphResponses = {
     /**
      * Successful Response
      */
-    200: unknown;
+    200: ScenarioGraphResponse;
 };
+
+export type ScenariosGetScenarioGraphResponse = ScenariosGetScenarioGraphResponses[keyof ScenariosGetScenarioGraphResponses];
 
 export type DocumentsGetDocumentMarkdownData = {
     body?: never;
@@ -1211,7 +1859,7 @@ export type RoomsGetRoomResponses = {
     /**
      * Successful Response
      */
-    200: AppFeaturesRoomsSchemasResponsesRoomDetailResponse;
+    200: RoomDetailResponse;
 };
 
 export type RoomsGetRoomResponse = RoomsGetRoomResponses[keyof RoomsGetRoomResponses];
@@ -1236,7 +1884,7 @@ export type RoomsJoinRoomResponses = {
     /**
      * Successful Response
      */
-    200: AppFeaturesRoomsSchemasResponsesRoomDetailResponse;
+    200: RoomDetailResponse;
 };
 
 export type RoomsJoinRoomResponse = RoomsJoinRoomResponses[keyof RoomsJoinRoomResponses];
@@ -1266,7 +1914,7 @@ export type RoomsRegenerateInviteCodeResponses = {
     /**
      * Successful Response
      */
-    200: AppFeaturesRoomsSchemasResponsesRoomDetailResponse;
+    200: RoomDetailResponse;
 };
 
 export type RoomsRegenerateInviteCodeResponse = RoomsRegenerateInviteCodeResponses[keyof RoomsRegenerateInviteCodeResponses];
@@ -1300,7 +1948,7 @@ export type RoomsKickParticipantResponses = {
     /**
      * Successful Response
      */
-    200: AppFeaturesRoomsSchemasResponsesRoomDetailResponse;
+    200: RoomDetailResponse;
 };
 
 export type RoomsKickParticipantResponse = RoomsKickParticipantResponses[keyof RoomsKickParticipantResponses];
@@ -1335,7 +1983,7 @@ export type RoomsSetReadyResponses = {
     /**
      * Successful Response
      */
-    200: AppFeaturesRoomsSchemasResponsesRoomDetailResponse;
+    200: RoomDetailResponse;
 };
 
 export type RoomsSetReadyResponse = RoomsSetReadyResponses[keyof RoomsSetReadyResponses];
@@ -1365,7 +2013,7 @@ export type RoomsStartSessionResponses = {
     /**
      * Successful Response
      */
-    200: AppFeaturesRoomsSchemasResponsesRoomDetailResponse;
+    200: RoomDetailResponse;
 };
 
 export type RoomsStartSessionResponse = RoomsStartSessionResponses[keyof RoomsStartSessionResponses];
@@ -1431,3 +2079,136 @@ export type RoomsSendRoomMessageResponses = {
 };
 
 export type RoomsSendRoomMessageResponse = RoomsSendRoomMessageResponses[keyof RoomsSendRoomMessageResponses];
+
+export type CharactersListCharactersData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/characters';
+};
+
+export type CharactersListCharactersResponses = {
+    /**
+     * Response Characters-List Characters
+     *
+     * Successful Response
+     */
+    200: Array<CharacterResponse>;
+};
+
+export type CharactersListCharactersResponse = CharactersListCharactersResponses[keyof CharactersListCharactersResponses];
+
+export type CharactersCreateCharacterData = {
+    body: CreateCharacterRequest;
+    path?: never;
+    query?: never;
+    url: '/characters';
+};
+
+export type CharactersCreateCharacterErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CharactersCreateCharacterError = CharactersCreateCharacterErrors[keyof CharactersCreateCharacterErrors];
+
+export type CharactersCreateCharacterResponses = {
+    /**
+     * Successful Response
+     */
+    201: CharacterDetailResponse;
+};
+
+export type CharactersCreateCharacterResponse = CharactersCreateCharacterResponses[keyof CharactersCreateCharacterResponses];
+
+export type CharactersDeleteCharacterData = {
+    body?: never;
+    path: {
+        /**
+         * Character Id
+         */
+        character_id: string;
+    };
+    query?: never;
+    url: '/characters/{character_id}';
+};
+
+export type CharactersDeleteCharacterErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CharactersDeleteCharacterError = CharactersDeleteCharacterErrors[keyof CharactersDeleteCharacterErrors];
+
+export type CharactersDeleteCharacterResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type CharactersDeleteCharacterResponse = CharactersDeleteCharacterResponses[keyof CharactersDeleteCharacterResponses];
+
+export type CharactersGetCharacterData = {
+    body?: never;
+    path: {
+        /**
+         * Character Id
+         */
+        character_id: string;
+    };
+    query?: never;
+    url: '/characters/{character_id}';
+};
+
+export type CharactersGetCharacterErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CharactersGetCharacterError = CharactersGetCharacterErrors[keyof CharactersGetCharacterErrors];
+
+export type CharactersGetCharacterResponses = {
+    /**
+     * Successful Response
+     */
+    200: CharacterDetailResponse;
+};
+
+export type CharactersGetCharacterResponse = CharactersGetCharacterResponses[keyof CharactersGetCharacterResponses];
+
+export type CharactersUpdateCharacterData = {
+    body: UpdateCharacterRequest;
+    path: {
+        /**
+         * Character Id
+         */
+        character_id: string;
+    };
+    query?: never;
+    url: '/characters/{character_id}';
+};
+
+export type CharactersUpdateCharacterErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CharactersUpdateCharacterError = CharactersUpdateCharacterErrors[keyof CharactersUpdateCharacterErrors];
+
+export type CharactersUpdateCharacterResponses = {
+    /**
+     * Successful Response
+     */
+    200: CharacterDetailResponse;
+};
+
+export type CharactersUpdateCharacterResponse = CharactersUpdateCharacterResponses[keyof CharactersUpdateCharacterResponses];

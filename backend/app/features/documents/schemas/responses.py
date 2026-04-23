@@ -2,6 +2,8 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
+from app.shared.enums import DocumentStatus
+
 
 class DocumentMarkdownResponse(BaseModel):
     content: str
@@ -9,6 +11,7 @@ class DocumentMarkdownResponse(BaseModel):
 
 class ProcessDocumentResponse(BaseModel):
     document_id: UUID
-    message: str = "TODO: document processing not implemented"
+    status: DocumentStatus
+    message: str
     entities: list
     relationships: list
