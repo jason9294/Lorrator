@@ -318,18 +318,5 @@ function onNodeUpdated(node: GraphNode) {
 </script>
 
 <style scoped>
-.icon-swap-enter-active,
-.icon-swap-leave-active {
-  transition:
-    opacity 0.15s ease,
-    transform 0.15s ease;
-}
-.icon-swap-enter-from {
-  opacity: 0;
-  transform: rotate(-30deg) scale(0.7);
-}
-.icon-swap-leave-to {
-  opacity: 0;
-  transform: rotate(30deg) scale(0.7);
-}
+/*  */
 </style>

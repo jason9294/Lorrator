@@ -1,5 +1,19 @@
 <template>
   <div class="min-h-screen flex items-center justify-center bg-background text-foreground p-4">
+    <!-- 主題切換浮動按鈕 -->
+    <div class="fixed top-4 right-4 z-50">
+      <Button
+        variant="outline"
+        size="icon-sm"
+        :title="isDark ? '切換為亮色模式' : '切換為暗色模式'"
+        @click="toggle"
+      >
+        <Transition name="icon-swap" mode="out-in">
+          <Moon v-if="!isDark" :key="'moon'" class="size-3.5" />
+          <Sun v-else :key="'sun'" class="size-3.5" />
+        </Transition>
+      </Button>
+    </div>
     <div class="w-full max-w-sm space-y-6">
       <!-- Logo -->
       <div class="flex flex-col items-center gap-3 text-center">
@@ -76,8 +90,11 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
-import { AlertCircle, LogIn } from 'lucide-vue-next'
+import { AlertCircle, LogIn, Moon, Sun } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
+import { useColorMode } from '@/composables/useColorMode'
+
+const { isDark, toggle } = useColorMode()
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'

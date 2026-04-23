@@ -85,6 +85,19 @@
             <Play v-else class="size-3.5" />
             {{ isStarting ? '啟動中...' : '開始跑團' }}
           </Button>
+
+          <!-- 主題切換 -->
+          <Button
+            variant="outline"
+            size="icon-sm"
+            :title="isDark ? '切換為亮色模式' : '切換為暗色模式'"
+            @click="toggle"
+          >
+            <Transition name="icon-swap" mode="out-in">
+              <Moon v-if="!isDark" :key="'moon'" class="size-3.5" />
+              <Sun v-else :key="'sun'" class="size-3.5" />
+            </Transition>
+          </Button>
         </div>
       </header>
 
@@ -321,8 +334,11 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { ArrowLeft, CheckCircle2, Circle, Copy, Play, RefreshCw, SendHorizonal, UserMinus } from 'lucide-vue-next'
+import { ArrowLeft, CheckCircle2, Circle, Copy, Moon, Play, RefreshCw, SendHorizonal, Sun, UserMinus } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
+import { useColorMode } from '@/composables/useColorMode'
+
+const { isDark, toggle } = useColorMode()
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
 import { Spinner } from '@/components/ui/spinner'

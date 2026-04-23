@@ -156,6 +156,7 @@ export type DocumentResponse = {
      * Md Path
      */
     md_path: string | null;
+    status: DocumentStatus;
     /**
      * Created At
      */
@@ -165,6 +166,11 @@ export type DocumentResponse = {
      */
     updated_at: string;
 };
+
+/**
+ * DocumentStatus
+ */
+export type DocumentStatus = 'READY' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
 
 /**
  * HTTPValidationError

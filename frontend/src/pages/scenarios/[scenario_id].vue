@@ -110,6 +110,19 @@
             <Plus v-else class="size-3.5" />
             {{ isCreatingRoom ? '建立中...' : '創建房間' }}
           </Button>
+
+          <!-- 主題切換 -->
+          <Button
+            variant="outline"
+            size="icon-sm"
+            :title="isDark ? '切換為亮色模式' : '切換為暗色模式'"
+            @click="toggle"
+          >
+            <Transition name="icon-swap" mode="out-in">
+              <Moon v-if="!isDark" :key="'moon'" class="size-3.5" />
+              <Sun v-else :key="'sun'" class="size-3.5" />
+            </Transition>
+          </Button>
         </div>
 
         <!-- Tab 切換器 -->
@@ -361,7 +374,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ArrowLeft, FileText, Globe, List, Network, Pencil, PencilLine, Plus, Upload } from 'lucide-vue-next'
+import { ArrowLeft, FileText, Globe, List, Moon, Network, Pencil, PencilLine, Plus, Sun, Upload } from 'lucide-vue-next'
 import type { NodeType } from '@/types/graph'
 import { NODE_COLORS, NODE_TYPE_LABELS } from '@/types/graph'
 import type { Graph } from '@/types/graph'
@@ -374,7 +387,7 @@ import { ScenariosService, type DocumentResponse, type ScenarioResponse } from '
 
 const route = useRoute()
 const router = useRouter()
-const { isDark } = useColorMode()
+const { isDark, toggle } = useColorMode()
 
 const COLORS = ['#7c3aed', '#0891b2', '#b45309', '#be123c', '#10b981', '#f97316', '#6366f1']
 

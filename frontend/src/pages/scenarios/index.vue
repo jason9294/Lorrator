@@ -28,6 +28,17 @@
           <Plus class="size-3.5" />
           創建劇本
         </Button>
+        <Button
+          variant="outline"
+          size="icon-sm"
+          :title="isDark ? '切換為亮色模式' : '切換為暗色模式'"
+          @click="toggle"
+        >
+          <Transition name="icon-swap" mode="out-in">
+            <Moon v-if="!isDark" :key="'moon'" class="size-3.5" />
+            <Sun v-else :key="'sun'" class="size-3.5" />
+          </Transition>
+        </Button>
       </div>
     </header>
 
@@ -219,8 +230,11 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { BookOpen, Clock, DoorOpen, Globe, Info, Lock, PencilLine, Plus, Users } from 'lucide-vue-next'
+import { BookOpen, Clock, DoorOpen, Globe, Info, Lock, Moon, PencilLine, Plus, Sun, Users } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
+import { useColorMode } from '@/composables/useColorMode'
+
+const { isDark, toggle } = useColorMode()
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
