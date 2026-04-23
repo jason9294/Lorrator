@@ -50,8 +50,8 @@
       <div class="max-w-4xl mx-auto space-y-6">
         <div class="flex items-center justify-between">
           <div>
-            <h2 class="text-xl font-bold">所有劇本</h2>
-            <p class="text-sm text-muted-foreground mt-0.5">選擇一個劇本開始你的冒險</p>
+            <h2 class="text-xl font-bold">劇本列表</h2>
+            <p class="text-sm text-muted-foreground mt-0.5">草稿僅自己可見，已發布可供所有人創建房間</p>
           </div>
           <Badge variant="secondary" class="gap-1">
             <BookOpen class="size-3" />
@@ -61,7 +61,7 @@
 
         <!-- 劇本清單 -->
         <div class="grid gap-4">
-          <!-- 載入中：先渲染頁面骨架避免白屏 -->
+          <!-- 載入中 -->
           <template v-if="isLoadingScenarios">
             <Card v-for="n in 6" :key="`loading-${n}`" class="transition-shadow">
               <CardContent class="p-5">
@@ -77,17 +77,7 @@
                         <div class="h-3 w-full bg-muted rounded animate-pulse" />
                         <div class="h-3 w-2/3 bg-muted rounded animate-pulse" />
                       </div>
-                      <div class="flex items-center gap-3 mt-3">
-                        <div class="h-3 w-20 bg-muted rounded animate-pulse" />
-                        <div class="h-3 w-16 bg-muted rounded animate-pulse" />
-                      </div>
                     </div>
-                  </div>
-                  <div class="flex items-center gap-2 shrink-0">
-                    <Button variant="outline" size="sm" class="gap-1.5" disabled>
-                      <Spinner class="size-3.5" />
-                      載入中
-                    </Button>
                   </div>
                 </div>
               </CardContent>
@@ -118,7 +108,7 @@
               <div class="text-center space-y-2">
                 <div class="text-sm font-semibold">目前還沒有劇本</div>
                 <div class="text-xs text-muted-foreground">
-                  你可以先建立第一個劇本，再開始建立房間。
+                  建立第一個劇本草稿，完成後發布即可開始跑團。
                 </div>
                 <div class="pt-2">
                   <Button size="sm" class="gap-2" @click="createDialogOpen = true">
@@ -152,9 +142,26 @@
                     <div class="flex items-center gap-2 flex-wrap">
                       <h3 class="font-semibold text-base">{{ scenario.name }}</h3>
                       <Badge variant="outline" class="text-[10px]">{{ scenario.system }}</Badge>
+                      <!-- 狀態徽章 -->
+                      <Badge
+                        v-if="scenario.status === 'DRAFT'"
+                        variant="secondary"
+                        class="text-[10px] gap-1"
+                      >
+                        <PencilLine class="size-2.5" />
+                        草稿
+                      </Badge>
+                      <Badge
+                        v-else
+                        class="text-[10px] gap-1 bg-green-500/15 text-green-700 dark:text-green-400 border-green-500/30"
+                        variant="outline"
+                      >
+                        <Globe class="size-2.5" />
+                        已發布
+                      </Badge>
                     </div>
                     <p class="text-sm text-muted-foreground mt-1 line-clamp-2">
-                      {{ scenario.description || '劇本尚未新增簡介，請至詳情頁編輯。' }}
+                      {{ scenario.description || '尚未新增簡介' }}
                     </p>
                     <div class="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
                       <span class="flex items-center gap-1">
@@ -178,6 +185,7 @@
                     </Button>
                   </RouterLink>
                   <Button
+                    v-if="scenario.status === 'PUBLISHED'"
                     size="sm"
                     class="gap-1.5"
                     :disabled="creatingRoomId === scenario.id"
@@ -186,6 +194,17 @@
                     <Spinner v-if="creatingRoomId === scenario.id" class="size-3.5" />
                     <Plus v-else class="size-3.5" />
                     {{ creatingRoomId === scenario.id ? '建立中...' : '創建房間' }}
+                  </Button>
+                  <Button
+                    v-else
+                    variant="outline"
+                    size="sm"
+                    class="gap-1.5 text-muted-foreground"
+                    disabled
+                    title="請先發布劇本才能創建房間"
+                  >
+                    <Lock class="size-3.5" />
+                    草稿中
                   </Button>
                 </div>
               </div>
@@ -200,7 +219,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { BookOpen, Clock, DoorOpen, Info, Plus, Users } from 'lucide-vue-next'
+import { BookOpen, Clock, DoorOpen, Globe, Info, Lock, PencilLine, Plus, Users } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
@@ -281,7 +300,6 @@ async function handleCreateScenario() {
       },
     })
     const created = res.data
-
     scenarios.value = [created, ...scenarios.value.filter((s) => s.id !== created.id)]
     createDialogOpen.value = false
     newScenarioName.value = ''
@@ -291,7 +309,6 @@ async function handleCreateScenario() {
     newScenarioMaxPlayers.value = ''
     newScenarioMinHours.value = ''
     newScenarioMaxHours.value = ''
-
     router.push(`/scenarios/${created.id}`)
   } catch (e) {
     const err = e as unknown
@@ -343,10 +360,15 @@ onMounted(fetchScenarios)
 async function createRoom(scenarioId: string) {
   creatingRoomId.value = scenarioId
   try {
-    // TODO: 替換為實際 API 呼叫
-    await new Promise((resolve) => setTimeout(resolve, 800))
-    const roomId = `room-${Date.now()}`
-    router.push(`/rooms/${roomId}`)
+    const scenario = scenarios.value.find((item) => item.id === scenarioId)
+    const res = await ScenariosService.createRoom({
+      path: { scenario_id: scenarioId },
+      body: {
+        name: scenario?.name?.trim() || '新房間',
+        description: scenario?.description ?? null,
+      },
+    })
+    router.push(`/rooms/${res.data.id}`)
   } finally {
     creatingRoomId.value = null
   }

@@ -177,6 +177,16 @@ export type HttpValidationError = {
 };
 
 /**
+ * JoinRoomRequest
+ */
+export type JoinRoomRequest = {
+    /**
+     * Invite Code
+     */
+    invite_code: string;
+};
+
+/**
  * LoginRequest
  */
 export type LoginRequest = {
@@ -194,6 +204,10 @@ export type LoginRequest = {
  * MeResponse
  */
 export type MeResponse = {
+    /**
+     * Id
+     */
+    id: string;
     /**
      * Username
      */
@@ -313,6 +327,28 @@ export type RoomMessageResponse = {
 };
 
 /**
+ * RoomParticipantResponse
+ */
+export type RoomParticipantResponse = {
+    /**
+     * User Id
+     */
+    user_id: string;
+    /**
+     * Role
+     */
+    role: string;
+    /**
+     * Is Ready
+     */
+    is_ready: boolean;
+    /**
+     * Joined At
+     */
+    joined_at: string;
+};
+
+/**
  * RoomResponse
  */
 export type RoomResponse = {
@@ -336,7 +372,17 @@ export type RoomResponse = {
      * Description
      */
     description: string | null;
+    status: RoomStatus;
+    /**
+     * Invite Code
+     */
+    invite_code: string;
 };
+
+/**
+ * RoomStatus
+ */
+export type RoomStatus = 'PREPARING' | 'RUNNING' | 'COMPLETED';
 
 /**
  * ScenarioResponse
@@ -378,7 +424,21 @@ export type ScenarioResponse = {
      * Creator Id
      */
     creator_id: string;
+    status: ScenarioStatus;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Updated At
+     */
+    updated_at: string;
 };
+
+/**
+ * ScenarioStatus
+ */
+export type ScenarioStatus = 'DRAFT' | 'PUBLISHED';
 
 /**
  * SendMessageRequest
@@ -402,6 +462,40 @@ export type TokenResponse = {
      * Token Type
      */
     token_type?: string;
+};
+
+/**
+ * UpdateScenarioRequest
+ */
+export type UpdateScenarioRequest = {
+    /**
+     * Name
+     */
+    name?: string | null;
+    /**
+     * Description
+     */
+    description?: string | null;
+    /**
+     * System
+     */
+    system?: string | null;
+    /**
+     * Min Players
+     */
+    min_players?: number | null;
+    /**
+     * Max Players
+     */
+    max_players?: number | null;
+    /**
+     * Min Hours
+     */
+    min_hours?: number | null;
+    /**
+     * Max Hours
+     */
+    max_hours?: number | null;
 };
 
 /**
@@ -431,6 +525,109 @@ export type ValidationError = {
         [key: string]: unknown;
     };
 };
+
+/**
+ * WsTicketResponse
+ */
+export type WsTicketResponse = {
+    /**
+     * Ticket
+     */
+    ticket: string;
+    /**
+     * Expires In Seconds
+     */
+    expires_in_seconds: number;
+};
+
+/**
+ * RoomDetailResponse
+ */
+export type AppFeaturesRoomsSchemasResponsesRoomDetailResponse = {
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Scenario Id
+     */
+    scenario_id: string;
+    /**
+     * Host Id
+     */
+    host_id: string;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Description
+     */
+    description: string | null;
+    status: RoomStatus;
+    /**
+     * Invite Code
+     */
+    invite_code: string;
+    /**
+     * Participants
+     */
+    participants: Array<RoomParticipantResponse>;
+};
+
+/**
+ * RoomDetailResponse
+ */
+export type AppFeaturesScenariosSchemasResponsesRoomDetailResponse = {
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Scenario Id
+     */
+    scenario_id: string;
+    /**
+     * Host Id
+     */
+    host_id: string;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Description
+     */
+    description: string | null;
+    /**
+     * Status
+     */
+    status: string;
+    /**
+     * Invite Code
+     */
+    invite_code: string;
+    /**
+     * Participants
+     */
+    participants: Array<RoomParticipantResponse>;
+};
+
+export type WebsocketIssueWsTicketData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/websocket/ticket';
+};
+
+export type WebsocketIssueWsTicketResponses = {
+    /**
+     * Successful Response
+     */
+    200: WsTicketResponse;
+};
+
+export type WebsocketIssueWsTicketResponse = WebsocketIssueWsTicketResponses[keyof WebsocketIssueWsTicketResponses];
 
 export type AuthMeData = {
     body?: never;
@@ -517,6 +714,24 @@ export type AuthRegisterResponses = {
 };
 
 export type AuthRegisterResponse = AuthRegisterResponses[keyof AuthRegisterResponses];
+
+export type MeListMyRoomsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/me/rooms';
+};
+
+export type MeListMyRoomsResponses = {
+    /**
+     * Response Me-List My Rooms
+     *
+     * Successful Response
+     */
+    200: Array<RoomResponse>;
+};
+
+export type MeListMyRoomsResponse = MeListMyRoomsResponses[keyof MeListMyRoomsResponses];
 
 export type UsersGetAllData = {
     body?: never;
@@ -614,6 +829,96 @@ export type ScenariosCreateScenarioResponses = {
 
 export type ScenariosCreateScenarioResponse = ScenariosCreateScenarioResponses[keyof ScenariosCreateScenarioResponses];
 
+export type ScenariosGetScenarioData = {
+    body?: never;
+    path: {
+        /**
+         * Scenario Id
+         */
+        scenario_id: string;
+    };
+    query?: never;
+    url: '/scenarios/{scenario_id}';
+};
+
+export type ScenariosGetScenarioErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ScenariosGetScenarioError = ScenariosGetScenarioErrors[keyof ScenariosGetScenarioErrors];
+
+export type ScenariosGetScenarioResponses = {
+    /**
+     * Successful Response
+     */
+    200: ScenarioResponse;
+};
+
+export type ScenariosGetScenarioResponse = ScenariosGetScenarioResponses[keyof ScenariosGetScenarioResponses];
+
+export type ScenariosUpdateScenarioData = {
+    body: UpdateScenarioRequest;
+    path: {
+        /**
+         * Scenario Id
+         */
+        scenario_id: string;
+    };
+    query?: never;
+    url: '/scenarios/{scenario_id}';
+};
+
+export type ScenariosUpdateScenarioErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ScenariosUpdateScenarioError = ScenariosUpdateScenarioErrors[keyof ScenariosUpdateScenarioErrors];
+
+export type ScenariosUpdateScenarioResponses = {
+    /**
+     * Successful Response
+     */
+    200: ScenarioResponse;
+};
+
+export type ScenariosUpdateScenarioResponse = ScenariosUpdateScenarioResponses[keyof ScenariosUpdateScenarioResponses];
+
+export type ScenariosPublishScenarioData = {
+    body?: never;
+    path: {
+        /**
+         * Scenario Id
+         */
+        scenario_id: string;
+    };
+    query?: never;
+    url: '/scenarios/{scenario_id}/publish';
+};
+
+export type ScenariosPublishScenarioErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ScenariosPublishScenarioError = ScenariosPublishScenarioErrors[keyof ScenariosPublishScenarioErrors];
+
+export type ScenariosPublishScenarioResponses = {
+    /**
+     * Successful Response
+     */
+    200: ScenarioResponse;
+};
+
+export type ScenariosPublishScenarioResponse = ScenariosPublishScenarioResponses[keyof ScenariosPublishScenarioResponses];
+
 export type ScenariosListScenarioDocumentsData = {
     body?: never;
     path: {
@@ -701,7 +1006,7 @@ export type ScenariosCreateRoomResponses = {
     /**
      * Successful Response
      */
-    200: RoomResponse;
+    200: AppFeaturesScenariosSchemasResponsesRoomDetailResponse;
 };
 
 export type ScenariosCreateRoomResponse = ScenariosCreateRoomResponses[keyof ScenariosCreateRoomResponses];
@@ -874,6 +1179,222 @@ export type ToolsEntityExtractToolResponses = {
      */
     200: unknown;
 };
+
+export type RoomsGetRoomData = {
+    body?: never;
+    path: {
+        /**
+         * Room Id
+         */
+        room_id: string;
+    };
+    query?: never;
+    url: '/rooms/{room_id}';
+};
+
+export type RoomsGetRoomErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type RoomsGetRoomError = RoomsGetRoomErrors[keyof RoomsGetRoomErrors];
+
+export type RoomsGetRoomResponses = {
+    /**
+     * Successful Response
+     */
+    200: AppFeaturesRoomsSchemasResponsesRoomDetailResponse;
+};
+
+export type RoomsGetRoomResponse = RoomsGetRoomResponses[keyof RoomsGetRoomResponses];
+
+export type RoomsJoinRoomData = {
+    body: JoinRoomRequest;
+    path?: never;
+    query?: never;
+    url: '/rooms/join';
+};
+
+export type RoomsJoinRoomErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type RoomsJoinRoomError = RoomsJoinRoomErrors[keyof RoomsJoinRoomErrors];
+
+export type RoomsJoinRoomResponses = {
+    /**
+     * Successful Response
+     */
+    200: AppFeaturesRoomsSchemasResponsesRoomDetailResponse;
+};
+
+export type RoomsJoinRoomResponse = RoomsJoinRoomResponses[keyof RoomsJoinRoomResponses];
+
+export type RoomsRegenerateInviteCodeData = {
+    body?: never;
+    path: {
+        /**
+         * Room Id
+         */
+        room_id: string;
+    };
+    query?: never;
+    url: '/rooms/{room_id}/invite-code/regenerate';
+};
+
+export type RoomsRegenerateInviteCodeErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type RoomsRegenerateInviteCodeError = RoomsRegenerateInviteCodeErrors[keyof RoomsRegenerateInviteCodeErrors];
+
+export type RoomsRegenerateInviteCodeResponses = {
+    /**
+     * Successful Response
+     */
+    200: AppFeaturesRoomsSchemasResponsesRoomDetailResponse;
+};
+
+export type RoomsRegenerateInviteCodeResponse = RoomsRegenerateInviteCodeResponses[keyof RoomsRegenerateInviteCodeResponses];
+
+export type RoomsKickParticipantData = {
+    body?: never;
+    path: {
+        /**
+         * Room Id
+         */
+        room_id: string;
+        /**
+         * User Id
+         */
+        user_id: string;
+    };
+    query?: never;
+    url: '/rooms/{room_id}/participants/{user_id}';
+};
+
+export type RoomsKickParticipantErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type RoomsKickParticipantError = RoomsKickParticipantErrors[keyof RoomsKickParticipantErrors];
+
+export type RoomsKickParticipantResponses = {
+    /**
+     * Successful Response
+     */
+    200: AppFeaturesRoomsSchemasResponsesRoomDetailResponse;
+};
+
+export type RoomsKickParticipantResponse = RoomsKickParticipantResponses[keyof RoomsKickParticipantResponses];
+
+export type RoomsSetReadyData = {
+    body?: never;
+    path: {
+        /**
+         * Room Id
+         */
+        room_id: string;
+    };
+    query: {
+        /**
+         * Is Ready
+         */
+        is_ready: boolean;
+    };
+    url: '/rooms/{room_id}/ready';
+};
+
+export type RoomsSetReadyErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type RoomsSetReadyError = RoomsSetReadyErrors[keyof RoomsSetReadyErrors];
+
+export type RoomsSetReadyResponses = {
+    /**
+     * Successful Response
+     */
+    200: AppFeaturesRoomsSchemasResponsesRoomDetailResponse;
+};
+
+export type RoomsSetReadyResponse = RoomsSetReadyResponses[keyof RoomsSetReadyResponses];
+
+export type RoomsStartSessionData = {
+    body?: never;
+    path: {
+        /**
+         * Room Id
+         */
+        room_id: string;
+    };
+    query?: never;
+    url: '/rooms/{room_id}/start';
+};
+
+export type RoomsStartSessionErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type RoomsStartSessionError = RoomsStartSessionErrors[keyof RoomsStartSessionErrors];
+
+export type RoomsStartSessionResponses = {
+    /**
+     * Successful Response
+     */
+    200: AppFeaturesRoomsSchemasResponsesRoomDetailResponse;
+};
+
+export type RoomsStartSessionResponse = RoomsStartSessionResponses[keyof RoomsStartSessionResponses];
+
+export type RoomsListRoomMessagesData = {
+    body?: never;
+    path: {
+        /**
+         * Room Id
+         */
+        room_id: string;
+    };
+    query?: never;
+    url: '/rooms/{room_id}/messages';
+};
+
+export type RoomsListRoomMessagesErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type RoomsListRoomMessagesError = RoomsListRoomMessagesErrors[keyof RoomsListRoomMessagesErrors];
+
+export type RoomsListRoomMessagesResponses = {
+    /**
+     * Response Rooms-List Room Messages
+     *
+     * Successful Response
+     */
+    200: Array<RoomMessageResponse>;
+};
+
+export type RoomsListRoomMessagesResponse = RoomsListRoomMessagesResponses[keyof RoomsListRoomMessagesResponses];
 
 export type RoomsSendRoomMessageData = {
     body: SendMessageRequest;

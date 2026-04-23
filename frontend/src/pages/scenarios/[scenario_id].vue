@@ -54,10 +54,66 @@
             <span class="text-sm font-semibold truncate">{{ scenarioDetail.name }}</span>
             <span class="text-[10px] text-muted-foreground">{{ scenarioDetail.system }}</span>
           </div>
+          <!-- 狀態徽章 -->
+          <Badge
+            v-if="scenarioDetail.status === 'DRAFT'"
+            variant="secondary"
+            class="text-[10px] gap-1 ml-1"
+          >
+            <PencilLine class="size-2.5" />
+            草稿
+          </Badge>
+          <Badge
+            v-else
+            class="text-[10px] gap-1 ml-1 bg-green-500/15 text-green-700 dark:text-green-400 border-green-500/30"
+            variant="outline"
+          >
+            <Globe class="size-2.5" />
+            已發布
+          </Badge>
+        </div>
+
+        <!-- 右側操作按鈕 -->
+        <div class="flex items-center gap-2 shrink-0">
+          <!-- 草稿操作：編輯 / 發布 -->
+          <template v-if="scenarioDetail.status === 'DRAFT'">
+            <Button
+              variant="outline"
+              size="sm"
+              class="gap-1.5"
+              @click="editDialogOpen = true"
+            >
+              <Pencil class="size-3.5" />
+              編輯
+            </Button>
+            <Button
+              size="sm"
+              class="gap-1.5"
+              :disabled="isPublishing"
+              @click="handlePublish"
+            >
+              <Spinner v-if="isPublishing" class="size-3.5" />
+              <Globe v-else class="size-3.5" />
+              {{ isPublishing ? '發布中...' : '發布劇本' }}
+            </Button>
+          </template>
+
+          <!-- 已發布操作：創建房間 -->
+          <Button
+            v-else
+            size="sm"
+            class="gap-1.5"
+            :disabled="isCreatingRoom"
+            @click="handleCreateRoom"
+          >
+            <Spinner v-if="isCreatingRoom" class="size-3.5" />
+            <Plus v-else class="size-3.5" />
+            {{ isCreatingRoom ? '建立中...' : '創建房間' }}
+          </Button>
         </div>
 
         <!-- Tab 切換器 -->
-        <nav class="hidden md:flex items-center gap-1 bg-muted rounded-lg p-1">
+        <nav class="hidden md:flex items-center gap-1 bg-muted rounded-lg p-1 ml-2">
           <button
             v-for="tab in tabs"
             :key="tab.id"
@@ -73,7 +129,7 @@
         </nav>
 
         <!-- 行動裝置 Tab 下拉 -->
-        <div class="md:hidden ml-auto">
+        <div class="md:hidden">
           <select
             v-model="activeTab"
             class="text-xs bg-muted border-0 rounded-md px-2 py-1.5 text-foreground outline-none"
@@ -82,6 +138,15 @@
           </select>
         </div>
       </header>
+
+      <!-- 發布確認提示 -->
+      <div
+        v-if="publishError"
+        class="shrink-0 px-5 py-2 bg-destructive/10 text-destructive text-xs flex items-center gap-2"
+      >
+        <span>{{ publishError }}</span>
+        <button class="ml-auto" @click="publishError = null">✕</button>
+      </div>
 
       <!-- Tab 內容 -->
       <main class="flex-1 min-h-0 overflow-hidden">
@@ -120,7 +185,6 @@
             </div>
 
             <template v-else>
-              <!-- 篩選 -->
               <div class="flex items-center gap-2 flex-wrap">
                 <button
                   class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border transition-colors"
@@ -141,7 +205,6 @@
                 </button>
               </div>
 
-              <!-- 實體表格 -->
               <div class="border rounded-lg overflow-hidden">
                 <table class="w-full text-sm">
                   <thead>
@@ -195,14 +258,9 @@
               </div>
             </div>
 
-            <p v-if="documentsError" class="text-sm text-destructive whitespace-pre-wrap">
-              {{ documentsError }}
-            </p>
-            <p v-if="uploadError" class="text-sm text-destructive whitespace-pre-wrap">
-              {{ uploadError }}
-            </p>
+            <p v-if="documentsError" class="text-sm text-destructive whitespace-pre-wrap">{{ documentsError }}</p>
+            <p v-if="uploadError" class="text-sm text-destructive whitespace-pre-wrap">{{ uploadError }}</p>
 
-            <!-- 上傳進度 -->
             <div v-if="uploadingFiles.length > 0" class="space-y-2">
               <div
                 v-for="f in uploadingFiles"
@@ -222,7 +280,6 @@
               載入文件清單中…
             </div>
 
-            <!-- 文件清單 -->
             <div v-else-if="documents.length > 0" class="border rounded-lg overflow-hidden">
               <div
                 v-for="(doc, idx) in documents"
@@ -235,14 +292,11 @@
                 </div>
                 <div class="flex-1 min-w-0">
                   <p class="text-sm font-medium truncate">{{ doc.filename }}</p>
-                  <p class="text-xs text-muted-foreground">
-                    {{ documentMetaLine(doc) }}
-                  </p>
+                  <p class="text-xs text-muted-foreground">{{ documentMetaLine(doc) }}</p>
                 </div>
               </div>
             </div>
 
-            <!-- 空狀態 -->
             <div
               v-else-if="uploadingFiles.length === 0"
               class="flex flex-col items-center justify-center py-16 text-center border rounded-lg border-dashed"
@@ -255,13 +309,59 @@
         </div>
       </main>
     </template>
+
+    <!-- 編輯劇本 Dialog -->
+    <div
+      v-if="editDialogOpen"
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+      @click.self="editDialogOpen = false"
+    >
+      <div class="bg-card border rounded-xl shadow-xl w-full max-w-lg p-6 space-y-4">
+        <h2 class="text-lg font-semibold">編輯劇本</h2>
+        <div class="space-y-3">
+          <div>
+            <label class="text-xs font-medium text-muted-foreground mb-1 block">名稱</label>
+            <input
+              v-model="editName"
+              class="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary"
+              placeholder="劇本名稱"
+            />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-muted-foreground mb-1 block">規則系統</label>
+            <input
+              v-model="editSystem"
+              class="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary"
+              placeholder="COC, DND, etc."
+            />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-muted-foreground mb-1 block">簡介</label>
+            <textarea
+              v-model="editDescription"
+              rows="3"
+              class="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary resize-none"
+              placeholder="劇本簡介（選填）"
+            />
+          </div>
+        </div>
+        <p v-if="editError" class="text-xs text-destructive">{{ editError }}</p>
+        <div class="flex justify-end gap-2 pt-2">
+          <Button variant="outline" size="sm" @click="editDialogOpen = false">取消</Button>
+          <Button size="sm" :disabled="isEditing" @click="handleEdit">
+            <Spinner v-if="isEditing" class="size-3.5 mr-1.5" />
+            儲存
+          </Button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
-import { ArrowLeft, FileText, Network, List, Upload } from 'lucide-vue-next'
+import { useRoute, useRouter } from 'vue-router'
+import { ArrowLeft, FileText, Globe, List, Network, Pencil, PencilLine, Plus, Upload } from 'lucide-vue-next'
 import type { NodeType } from '@/types/graph'
 import { NODE_COLORS, NODE_TYPE_LABELS } from '@/types/graph'
 import type { Graph } from '@/types/graph'
@@ -273,6 +373,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { ScenariosService, type DocumentResponse, type ScenarioResponse } from '@/services'
 
 const route = useRoute()
+const router = useRouter()
 const { isDark } = useColorMode()
 
 const COLORS = ['#7c3aed', '#0891b2', '#b45309', '#be123c', '#10b981', '#f97316', '#6366f1']
@@ -297,7 +398,6 @@ const tabs = [
   { id: 'documents', label: '文件清單', icon: FileText },
 ]
 const activeTab = ref('graph')
-
 const entityFilter = ref('')
 
 const isInitialLoading = ref(true)
@@ -305,7 +405,6 @@ const pageError = ref<'not_found' | 'load_failed' | null>(null)
 const scenarioDetail = ref<ScenarioResponse | null>(null)
 
 const graph = ref<Graph>({ nodes: [], edges: [] })
-
 const documents = ref<DocumentResponse[]>([])
 const documentsLoading = ref(false)
 const documentsError = ref<string | null>(null)
@@ -313,6 +412,21 @@ const documentsError = ref<string | null>(null)
 const fileInputRef = ref<HTMLInputElement | null>(null)
 const uploadingFiles = ref<{ name: string }[]>([])
 const uploadError = ref<string | null>(null)
+
+// 發布
+const isPublishing = ref(false)
+const publishError = ref<string | null>(null)
+
+// 創建房間
+const isCreatingRoom = ref(false)
+
+// 編輯
+const editDialogOpen = ref(false)
+const editName = ref('')
+const editSystem = ref('')
+const editDescription = ref('')
+const isEditing = ref(false)
+const editError = ref<string | null>(null)
 
 const filteredNodes = computed(() =>
   entityFilter.value
@@ -337,12 +451,7 @@ function normalizeGraphPayload(data: unknown): Graph {
       const description = typeof x.description === 'string' ? x.description : ''
       if (!id || !type || !label) return null
       if (!NODE_TYPE_LABELS[type as NodeType]) return null
-      return {
-        id,
-        type: type as NodeType,
-        label,
-        description,
-      }
+      return { id, type: type as NodeType, label, description }
     })
     .filter((n): n is NonNullable<typeof n> => n !== null)
 
@@ -367,9 +476,7 @@ async function loadGraph() {
   const id = scenarioId.value
   if (!id) return
   try {
-    const res = await ScenariosService.getScenarioGraph({
-      path: { scenario_id: id },
-    })
+    const res = await ScenariosService.getScenarioGraph({ path: { scenario_id: id } })
     graph.value = normalizeGraphPayload(res.data)
   } catch {
     graph.value = { nodes: [], edges: [] }
@@ -382,19 +489,13 @@ async function loadDocuments() {
   documentsLoading.value = true
   documentsError.value = null
   try {
-    const res = await ScenariosService.listScenarioDocuments({
-      path: { scenario_id: id },
-    })
+    const res = await ScenariosService.listScenarioDocuments({ path: { scenario_id: id } })
     documents.value = res.data
   } catch (e) {
     documents.value = []
     const err = e as { response?: { data?: { detail?: unknown } }; message?: string }
     const detail = err.response?.data?.detail
-    if (typeof detail === 'string') {
-      documentsError.value = detail
-    } else {
-      documentsError.value = err.message ?? '無法載入文件清單'
-    }
+    documentsError.value = typeof detail === 'string' ? detail : (err.message ?? '無法載入文件清單')
   } finally {
     documentsLoading.value = false
   }
@@ -413,47 +514,32 @@ async function bootstrap() {
   scenarioDetail.value = null
   graph.value = { nodes: [], edges: [] }
   documents.value = []
-  documentsError.value = null
 
   try {
-    const listRes = await ScenariosService.listScenarios()
-    const found = listRes.data.find((s) => s.id === id)
-    if (!found) {
-      pageError.value = 'not_found'
-      return
-    }
-    scenarioDetail.value = found
+    const res = await ScenariosService.getScenario({ path: { scenario_id: id } })
+    scenarioDetail.value = res.data
     await Promise.all([loadGraph(), loadDocuments()])
-  } catch {
-    pageError.value = 'load_failed'
+  } catch (e) {
+    const status = (e as { response?: { status?: number } })?.response?.status
+    pageError.value = status === 404 || status === 403 ? 'not_found' : 'load_failed'
   } finally {
     isInitialLoading.value = false
   }
 }
 
 onMounted(bootstrap)
-
-watch(scenarioId, () => {
-  void bootstrap()
-})
+watch(scenarioId, () => { void bootstrap() })
 
 function formatDateTime(iso: string) {
   const d = new Date(iso)
   if (Number.isNaN(d.getTime())) return iso
-  return d.toLocaleString('zh-TW', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
+  return d.toLocaleString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
 }
 
 function documentMetaLine(doc: DocumentResponse) {
   const ct = doc.content_type?.trim()
   const when = formatDateTime(doc.created_at)
-  if (ct) return `${ct} · ${when}`
-  return when
+  return ct ? `${ct} · ${when}` : when
 }
 
 function triggerUpload() {
@@ -471,10 +557,7 @@ async function onFileChange(e: Event) {
 
   try {
     for (const file of Array.from(files)) {
-      await ScenariosService.uploadScenarioDocument({
-        path: { scenario_id: id },
-        body: { file },
-      })
+      await ScenariosService.uploadScenarioDocument({ path: { scenario_id: id }, body: { file } })
     }
     await loadDocuments()
     activeTab.value = 'documents'
@@ -486,19 +569,86 @@ async function onFileChange(e: Event) {
         .map((d) => {
           const loc = (d as { loc?: unknown })?.loc
           const msg = (d as { msg?: unknown })?.msg
-          const locText = Array.isArray(loc) ? loc.join('.') : 'body'
-          const msgText = typeof msg === 'string' ? msg : 'invalid'
-          return `${locText}: ${msgText}`
+          return `${Array.isArray(loc) ? loc.join('.') : 'body'}: ${typeof msg === 'string' ? msg : 'invalid'}`
         })
         .join('\n')
-    } else if (typeof detail === 'string') {
-      uploadError.value = detail
     } else {
-      uploadError.value = e.message ?? '上傳失敗，請稍後再試'
+      uploadError.value = typeof detail === 'string' ? detail : (e.message ?? '上傳失敗，請稍後再試')
     }
   } finally {
     uploadingFiles.value = []
     input.value = ''
+  }
+}
+
+async function handlePublish() {
+  const id = scenarioId.value
+  if (!id) return
+  isPublishing.value = true
+  publishError.value = null
+  try {
+    const res = await ScenariosService.publishScenario({ path: { scenario_id: id } })
+    scenarioDetail.value = res.data
+  } catch (e) {
+    const detail = (e as { response?: { data?: { detail?: unknown } } })?.response?.data?.detail
+    publishError.value = typeof detail === 'string' ? detail : '發布失敗，請稍後再試'
+  } finally {
+    isPublishing.value = false
+  }
+}
+
+async function handleCreateRoom() {
+  const id = scenarioId.value
+  if (!id || !scenarioDetail.value) return
+  isCreatingRoom.value = true
+  try {
+    const res = await ScenariosService.createRoom({
+      path: { scenario_id: id },
+      body: {
+        name: scenarioDetail.value.name.trim(),
+        description: scenarioDetail.value.description ?? null,
+      },
+    })
+    router.push(`/rooms/${res.data.id}`)
+  } finally {
+    isCreatingRoom.value = false
+  }
+}
+
+function openEditDialog() {
+  if (!scenarioDetail.value) return
+  editName.value = scenarioDetail.value.name
+  editSystem.value = scenarioDetail.value.system
+  editDescription.value = scenarioDetail.value.description ?? ''
+  editError.value = null
+  editDialogOpen.value = true
+}
+
+watch(editDialogOpen, (v) => {
+  if (v) openEditDialog()
+})
+
+async function handleEdit() {
+  const id = scenarioId.value
+  if (!id) return
+  isEditing.value = true
+  editError.value = null
+  try {
+    const res = await ScenariosService.updateScenario({
+      path: { scenario_id: id },
+      body: {
+        name: editName.value.trim() || undefined,
+        system: editSystem.value.trim() || undefined,
+        description: editDescription.value.trim() || null,
+      },
+    })
+    scenarioDetail.value = res.data
+    editDialogOpen.value = false
+  } catch (e) {
+    const detail = (e as { response?: { data?: { detail?: unknown } } })?.response?.data?.detail
+    editError.value = typeof detail === 'string' ? detail : '儲存失敗，請稍後再試'
+  } finally {
+    isEditing.value = false
   }
 }
 </script>

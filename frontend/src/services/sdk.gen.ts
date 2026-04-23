@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { AuthLoginData, AuthLoginErrors, AuthLoginResponses, AuthLogoutData, AuthLogoutResponses, AuthMeData, AuthMeResponses, AuthRegisterData, AuthRegisterErrors, AuthRegisterResponses, DocumentsDownloadOriginalDocumentData, DocumentsDownloadOriginalDocumentErrors, DocumentsDownloadOriginalDocumentResponses, DocumentsGetDocumentMarkdownData, DocumentsGetDocumentMarkdownErrors, DocumentsGetDocumentMarkdownResponses, DocumentsProcessDocumentData, DocumentsProcessDocumentErrors, DocumentsProcessDocumentResponses, RerankerRerankEndpointData, RerankerRerankEndpointErrors, RerankerRerankEndpointResponses, RoomsSendRoomMessageData, RoomsSendRoomMessageErrors, RoomsSendRoomMessageResponses, ScenariosCreateRoomData, ScenariosCreateRoomErrors, ScenariosCreateRoomResponses, ScenariosCreateScenarioData, ScenariosCreateScenarioErrors, ScenariosCreateScenarioResponses, ScenariosGetScenarioGraphData, ScenariosGetScenarioGraphErrors, ScenariosGetScenarioGraphResponses, ScenariosListScenarioDocumentsData, ScenariosListScenarioDocumentsErrors, ScenariosListScenarioDocumentsResponses, ScenariosListScenariosData, ScenariosListScenariosResponses, ScenariosUploadScenarioDocumentData, ScenariosUploadScenarioDocumentErrors, ScenariosUploadScenarioDocumentResponses, ToolsChunkPlainTextData, ToolsChunkPlainTextErrors, ToolsChunkPlainTextResponses, ToolsEntityExtractToolData, ToolsEntityExtractToolErrors, ToolsEntityExtractToolResponses, UsersGetAllData, UsersGetAllResponses, UsersGetMeData, UsersGetMeResponses } from './types.gen';
+import type { AuthLoginData, AuthLoginErrors, AuthLoginResponses, AuthLogoutData, AuthLogoutResponses, AuthMeData, AuthMeResponses, AuthRegisterData, AuthRegisterErrors, AuthRegisterResponses, DocumentsDownloadOriginalDocumentData, DocumentsDownloadOriginalDocumentErrors, DocumentsDownloadOriginalDocumentResponses, DocumentsGetDocumentMarkdownData, DocumentsGetDocumentMarkdownErrors, DocumentsGetDocumentMarkdownResponses, DocumentsProcessDocumentData, DocumentsProcessDocumentErrors, DocumentsProcessDocumentResponses, MeListMyRoomsData, MeListMyRoomsResponses, RerankerRerankEndpointData, RerankerRerankEndpointErrors, RerankerRerankEndpointResponses, RoomsGetRoomData, RoomsGetRoomErrors, RoomsGetRoomResponses, RoomsJoinRoomData, RoomsJoinRoomErrors, RoomsJoinRoomResponses, RoomsKickParticipantData, RoomsKickParticipantErrors, RoomsKickParticipantResponses, RoomsListRoomMessagesData, RoomsListRoomMessagesErrors, RoomsListRoomMessagesResponses, RoomsRegenerateInviteCodeData, RoomsRegenerateInviteCodeErrors, RoomsRegenerateInviteCodeResponses, RoomsSendRoomMessageData, RoomsSendRoomMessageErrors, RoomsSendRoomMessageResponses, RoomsSetReadyData, RoomsSetReadyErrors, RoomsSetReadyResponses, RoomsStartSessionData, RoomsStartSessionErrors, RoomsStartSessionResponses, ScenariosCreateRoomData, ScenariosCreateRoomErrors, ScenariosCreateRoomResponses, ScenariosCreateScenarioData, ScenariosCreateScenarioErrors, ScenariosCreateScenarioResponses, ScenariosGetScenarioData, ScenariosGetScenarioErrors, ScenariosGetScenarioGraphData, ScenariosGetScenarioGraphErrors, ScenariosGetScenarioGraphResponses, ScenariosGetScenarioResponses, ScenariosListScenarioDocumentsData, ScenariosListScenarioDocumentsErrors, ScenariosListScenarioDocumentsResponses, ScenariosListScenariosData, ScenariosListScenariosResponses, ScenariosPublishScenarioData, ScenariosPublishScenarioErrors, ScenariosPublishScenarioResponses, ScenariosUpdateScenarioData, ScenariosUpdateScenarioErrors, ScenariosUpdateScenarioResponses, ScenariosUploadScenarioDocumentData, ScenariosUploadScenarioDocumentErrors, ScenariosUploadScenarioDocumentResponses, ToolsChunkPlainTextData, ToolsChunkPlainTextErrors, ToolsChunkPlainTextResponses, ToolsEntityExtractToolData, ToolsEntityExtractToolErrors, ToolsEntityExtractToolResponses, UsersGetAllData, UsersGetAllResponses, UsersGetMeData, UsersGetMeResponses, WebsocketIssueWsTicketData, WebsocketIssueWsTicketResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -17,6 +17,20 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
      */
     meta?: Record<string, unknown>;
 };
+
+export class WebsocketService {
+    /**
+     * 以 access token 換取一次性 WebSocket 連線票證
+     */
+    public static issueWsTicket<ThrowOnError extends boolean = true>(options?: Options<WebsocketIssueWsTicketData, ThrowOnError>) {
+        return (options?.client ?? client).post<WebsocketIssueWsTicketResponses, unknown, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/websocket/ticket',
+            ...options
+        });
+    }
+}
 
 export class AuthService {
     /**
@@ -73,6 +87,20 @@ export class AuthService {
     }
 }
 
+export class MeService {
+    /**
+     * 查看自己參與的房間
+     */
+    public static listMyRooms<ThrowOnError extends boolean = true>(options?: Options<MeListMyRoomsData, ThrowOnError>) {
+        return (options?.client ?? client).get<MeListMyRoomsResponses, unknown, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/me/rooms',
+            ...options
+        });
+    }
+}
+
 export class UsersService {
     /**
      * ...
@@ -116,11 +144,12 @@ export class RerankerService {
 
 export class ScenariosService {
     /**
-     * 列出所有劇本
+     * 列出所有可見劇本（已發布 + 自己的草稿）
      */
     public static listScenarios<ThrowOnError extends boolean = true>(options?: Options<ScenariosListScenariosData, ThrowOnError>) {
         return (options?.client ?? client).get<ScenariosListScenariosResponses, unknown, ThrowOnError>({
             responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
             url: '/scenarios',
             ...options
         });
@@ -139,6 +168,46 @@ export class ScenariosService {
                 'Content-Type': 'application/json',
                 ...options.headers
             }
+        });
+    }
+    
+    /**
+     * 取得劇本詳情（草稿僅創作者可看）
+     */
+    public static getScenario<ThrowOnError extends boolean = true>(options: Options<ScenariosGetScenarioData, ThrowOnError>) {
+        return (options.client ?? client).get<ScenariosGetScenarioResponses, ScenariosGetScenarioErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/scenarios/{scenario_id}',
+            ...options
+        });
+    }
+    
+    /**
+     * 編輯劇本（僅草稿可編輯）
+     */
+    public static updateScenario<ThrowOnError extends boolean = true>(options: Options<ScenariosUpdateScenarioData, ThrowOnError>) {
+        return (options.client ?? client).patch<ScenariosUpdateScenarioResponses, ScenariosUpdateScenarioErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/scenarios/{scenario_id}',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+    
+    /**
+     * 發布劇本（發布後不可再編輯）
+     */
+    public static publishScenario<ThrowOnError extends boolean = true>(options: Options<ScenariosPublishScenarioData, ThrowOnError>) {
+        return (options.client ?? client).post<ScenariosPublishScenarioResponses, ScenariosPublishScenarioErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/scenarios/{scenario_id}/publish',
+            ...options
         });
     }
     
@@ -170,7 +239,7 @@ export class ScenariosService {
     }
     
     /**
-     * 在指定劇本建立跑團房間
+     * 在已發布的劇本建立跑團房間
      */
     public static createRoom<ThrowOnError extends boolean = true>(options: Options<ScenariosCreateRoomData, ThrowOnError>) {
         return (options.client ?? client).post<ScenariosCreateRoomResponses, ScenariosCreateRoomErrors, ThrowOnError>({
@@ -258,6 +327,94 @@ export class ToolsService {
 }
 
 export class RoomsService {
+    /**
+     * 取得房間詳情（需為參與者）
+     */
+    public static getRoom<ThrowOnError extends boolean = true>(options: Options<RoomsGetRoomData, ThrowOnError>) {
+        return (options.client ?? client).get<RoomsGetRoomResponses, RoomsGetRoomErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/rooms/{room_id}',
+            ...options
+        });
+    }
+    
+    /**
+     * 透過邀請碼加入房間
+     */
+    public static joinRoom<ThrowOnError extends boolean = true>(options: Options<RoomsJoinRoomData, ThrowOnError>) {
+        return (options.client ?? client).post<RoomsJoinRoomResponses, RoomsJoinRoomErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/rooms/join',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+    
+    /**
+     * 重新生成邀請碼（僅房主）
+     */
+    public static regenerateInviteCode<ThrowOnError extends boolean = true>(options: Options<RoomsRegenerateInviteCodeData, ThrowOnError>) {
+        return (options.client ?? client).post<RoomsRegenerateInviteCodeResponses, RoomsRegenerateInviteCodeErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/rooms/{room_id}/invite-code/regenerate',
+            ...options
+        });
+    }
+    
+    /**
+     * 踢出參與者（僅房主）
+     */
+    public static kickParticipant<ThrowOnError extends boolean = true>(options: Options<RoomsKickParticipantData, ThrowOnError>) {
+        return (options.client ?? client).delete<RoomsKickParticipantResponses, RoomsKickParticipantErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/rooms/{room_id}/participants/{user_id}',
+            ...options
+        });
+    }
+    
+    /**
+     * 設定自己的準備狀態
+     */
+    public static setReady<ThrowOnError extends boolean = true>(options: Options<RoomsSetReadyData, ThrowOnError>) {
+        return (options.client ?? client).post<RoomsSetReadyResponses, RoomsSetReadyErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/rooms/{room_id}/ready',
+            ...options
+        });
+    }
+    
+    /**
+     * 開始跑團（僅房主，所有人須已就緒）
+     */
+    public static startSession<ThrowOnError extends boolean = true>(options: Options<RoomsStartSessionData, ThrowOnError>) {
+        return (options.client ?? client).post<RoomsStartSessionResponses, RoomsStartSessionErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/rooms/{room_id}/start',
+            ...options
+        });
+    }
+    
+    /**
+     * 取得聊天記錄（僅跑團進行中）
+     */
+    public static listRoomMessages<ThrowOnError extends boolean = true>(options: Options<RoomsListRoomMessagesData, ThrowOnError>) {
+        return (options.client ?? client).get<RoomsListRoomMessagesResponses, RoomsListRoomMessagesErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/rooms/{room_id}/messages',
+            ...options
+        });
+    }
+    
     /**
      * 在房間內傳送訊息
      */
