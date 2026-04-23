@@ -1,0 +1,31 @@
+from typing import TYPE_CHECKING, Optional
+from uuid import UUID
+
+from sqlalchemy import Column, Index, Text
+from sqlmodel import Field, Relationship, SQLModel
+
+from app.shared.utils import uuid7
+
+from .mixin.timestamp import TimestampMixin
+
+if TYPE_CHECKING:
+    from app.models.room_model import RoomModel
+    from app.models.user_model import UserModel
+
+
+class RoomMessageModel(TimestampMixin, SQLModel, table=True):
+    __tablename__ = "room_messages"  # type: ignore
+
+    id: UUID = Field(default_factory=uuid7, primary_key=True)
+
+    room_id: UUID = Field(foreign_key="rooms.id")
+    sender_id: UUID = Field(foreign_key="users.id")
+
+    content: str = Field(sa_column=Column(Text, nullable=False))
+
+    room: Optional["RoomModel"] = Relationship()
+    sender: Optional["UserModel"] = Relationship()
+
+    __table_args__ = (
+        Index("ix_room_messages_room_id_created_at", "room_id", "created_at"),
+    )

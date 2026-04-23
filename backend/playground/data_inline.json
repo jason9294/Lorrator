@@ -1,0 +1,85 @@
+{
+    "name": "entities_and_relationships",
+    "strict": true,
+    "schema": {
+        "additionalProperties": false,
+        "properties": {
+            "entities": {
+                "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "id": {
+                            "title": "Id",
+                            "type": "string"
+                        },
+                        "name": {
+                            "title": "Name",
+                            "type": "string"
+                        },
+                        "type": {
+                            "title": "Type",
+                            "type": "string"
+                        },
+                        "description": {
+                            "title": "Description",
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "name",
+                        "type",
+                        "description"
+                    ],
+                    "title": "Entity",
+                    "type": "object"
+                },
+                "title": "Entities",
+                "type": "array"
+            },
+            "relationships": {
+                "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "id": {
+                            "title": "Id",
+                            "type": "string"
+                        },
+                        "source": {
+                            "title": "Source",
+                            "type": "string"
+                        },
+                        "target": {
+                            "title": "Target",
+                            "type": "string"
+                        },
+                        "type": {
+                            "title": "Type",
+                            "type": "string"
+                        },
+                        "description": {
+                            "title": "Description",
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "source",
+                        "target",
+                        "type",
+                        "description"
+                    ],
+                    "title": "Relationship",
+                    "type": "object"
+                },
+                "title": "Relationships",
+                "type": "array"
+            }
+        },
+        "required": [
+            "entities",
+            "relationships"
+        ],
+        "type": "object"
+    }
+}

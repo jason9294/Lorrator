@@ -1,0 +1,41 @@
+set shell := ["powershell", "-c"]
+set dotenv-load := true
+
+dev:
+    uv run fastapi dev --host 0.0.0.0 --port 8000
+
+lint:
+    uv run ruff check . # 檢查程式碼
+    uv run basedpyright # 類型檢查
+
+lint-fix:
+    uv run ruff check . --fix  # 自動修復
+
+typecheck:
+    uv run basedpyright # 類型檢查
+
+format:
+    uv run ruff format . # 自動格式化
+
+format-check:
+    uv run ruff format . --check # 檢查格式
+
+db-recreate:
+    uv run python -m scripts.recreate_db
+
+db-migrate message:
+    uv run alembic revision --autogenerate -m "{{ message }}"
+
+db-upgrade target="head":
+    uv run alembic upgrade "{{ target }}"
+
+db-downgrade target="-1":
+    uv run alembic downgrade "{{ target }}"
+
+db-reset: db-recreate db-upgrade
+
+gen-router name:
+    uv run typer scripts/gen_router.py run "{{ name }}"
+
+gen-service name:
+    uv run typer scripts/gen_service.py run "{{ name }}"
