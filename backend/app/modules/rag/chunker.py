@@ -1,7 +1,4 @@
-from __future__ import annotations
-
-from dataclasses import dataclass, field
-from typing import Optional
+from dataclasses import dataclass
 
 import tiktoken
 
@@ -49,9 +46,7 @@ def chunk_text(
     if overlap < 0:
         raise ValueError(f"overlap 必須 >= 0，目前為 {overlap}")
     if overlap >= chunk_size:
-        raise ValueError(
-            f"overlap ({overlap}) 必須小於 chunk_size ({chunk_size})"
-        )
+        raise ValueError(f"overlap ({overlap}) 必須小於 chunk_size ({chunk_size})")
 
     enc = tiktoken.get_encoding(encoding_name)
     token_ids: list[int] = enc.encode(text)

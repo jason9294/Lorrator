@@ -1,0 +1,7 @@
+---
+globs: **/schemas/*.py
+alwaysApply: false
+---
+# Schema 規範
+
+- 使用 Pydantic

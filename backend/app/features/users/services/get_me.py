@@ -1,0 +1,3 @@
+class GetMeService:
+    async def execute(self):
+        return ...

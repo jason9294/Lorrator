@@ -1,0 +1,18 @@
+{
+  "folders": [
+    {
+      "path": "backend",
+    },
+    {
+      "path": "frontend",
+    },
+  ],
+  "settings": {
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/.venv": true,
+      "**/__pycache__": true,
+    },
+    "editor.formatOnSave": true,
+  },
+}

@@ -1,0 +1,3 @@
+class ListUsersService:
+    async def execute(self):
+        return ...

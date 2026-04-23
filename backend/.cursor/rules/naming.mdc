@@ -1,0 +1,814 @@
+# 命名規範
+
+## 1. 目的
+
+本文件用於統一專案中的命名方式，降低協作時的理解成本，提升程式碼可讀性、可維護性與搜尋效率。
+
+本規範的核心原則如下：
+
+* 命名需清楚表達語意與責任
+* 同一概念在不同層中應盡可能保持一致
+* 一致性優先於個人習慣
+* 命名應以英文為主
+* 避免不必要的縮寫
+
+---
+
+## 3. 檔案與模組命名
+
+### 3.2 模組名稱應反映責任
+
+模組名稱應清楚描述功能或責任範圍。
+
+#### Good
+
+```python
+user_service.py
+payment_client.py
+token_utils.py
+```
+
+#### Bad
+
+```python
+common.py
+helpers.py
+misc.py
+```
+
+> `utils.py`、`helpers.py`、`common.py` 僅能在內容職責單一且明確時使用，否則應拆分為具體名稱。
+
+---
+
+## 4. Package 與資料夾命名
+
+### 4.1 資料夾名稱使用 `snake_case`
+
+```python
+routers/
+schemas/
+services/
+repositories/
+models/
+dependencies/
+core/
+```
+
+---
+
+## 5. 類別命名
+
+### 5.2 類別名稱應為名詞或名詞片語
+
+類別代表一個概念、角色或責任，因此應使用名詞。
+
+#### Good
+
+```python
+User
+OrderItem
+AuthService
+PaymentClient
+```
+
+#### Bad
+
+```python
+CreateUser
+HandleOrder
+ProcessPayment
+```
+
+---
+
+## 6. 函式與方法命名
+
+### 6.1 Function / Method 使用 `snake_case`
+
+#### Good
+
+```python
+get_user_by_id
+create_order
+verify_access_token
+```
+
+#### Bad
+
+```python
+getUserById
+CreateOrder
+verifyAccessToken
+```
+
+### 6.2 函式名稱應使用動詞開頭
+
+函式表示行為，因此命名應以動詞或動詞片語開頭。
+
+#### Good
+
+```python
+get_user_by_id
+list_orders
+create_payment
+update_profile
+delete_session
+```
+
+### 6.3 動詞應反映語意，不可混用
+
+以下動詞在專案中應有固定語意：
+
+#### `get`
+
+用於從資料來源中取得單筆資料，通常是 DB 查詢結果。
+
+```python
+get_user_by_id
+get_order_by_number
+```
+
+#### `list`
+
+用於取得多筆資料。
+
+```python
+list_users
+list_order_items
+```
+
+#### `create`
+
+用於建立新資料。
+
+```python
+create_user
+create_invoice
+```
+
+#### `update`
+
+用於更新既有資料。
+
+```python
+update_user_profile
+update_order_status
+```
+
+#### `delete`
+
+用於刪除資料。
+
+```python
+delete_api_key
+delete_cart_item
+```
+
+#### `fetch`
+
+用於呼叫外部服務或第三方 API。
+
+```python
+fetch_exchange_rate
+fetch_google_user_info
+```
+
+#### `validate`
+
+用於資料驗證。
+
+```python
+validate_password_strength
+validate_order_payload
+```
+
+#### `build`
+
+用於組裝、產生物件或回傳資料結構。
+
+```python
+build_user_response
+build_jwt_payload
+```
+
+#### `convert`
+
+用於資料型別或格式轉換。
+
+```python
+convert_currency
+convert_model_to_schema
+```
+
+### 6.4 避免模糊動詞
+
+以下名稱原則上禁止使用，除非情境非常明確：
+
+```python
+handle_data
+process_info
+do_task
+run
+execute
+manage_user
+```
+
+---
+
+## 7. 變數命名
+
+### 7.1 變數使用 `snake_case`
+
+#### Good
+
+```python
+user_id
+order_items
+access_token
+created_at
+```
+
+#### Bad
+
+```python
+userId
+OrderItems
+accessToken
+```
+
+### 7.2 集合型變數使用複數
+
+#### Good
+
+```python
+users
+orders
+payment_methods
+```
+
+#### Bad
+
+```python
+user_list_data
+order_item_collection
+```
+
+### 7.3 布林值使用可判斷語意的前綴
+
+布林變數應使用以下前綴：
+
+* `is_`
+* `has_`
+* `can_`
+* `should_`
+
+#### Good
+
+```python
+is_active
+has_permission
+can_retry
+should_refresh_token
+```
+
+#### Bad
+
+```python
+active_flag
+permission_ok
+retry
+refresh
+```
+
+### 7.4 避免無意義名稱
+
+#### Avoid
+
+```python
+data
+value
+result
+item
+obj
+tmp
+```
+
+若使用這類名稱，必須保證範圍很小且語意清楚。
+
+---
+
+## 8. 常數命名
+
+### 8.1 常數使用 `UPPER_SNAKE_CASE`
+
+#### Good
+
+```python
+DEFAULT_PAGE_SIZE
+MAX_RETRY_COUNT
+ACCESS_TOKEN_EXPIRE_MINUTES
+```
+
+#### Bad
+
+```python
+defaultPageSize
+maxRetryCount
+AccessTokenExpireMinutes
+```
+
+### 8.2 常數名稱需表達用途
+
+```python
+PASSWORD_MIN_LENGTH
+SUPPORTED_IMAGE_TYPES
+ORDER_STATUS_PENDING
+```
+
+---
+
+## 9. Enum 命名
+
+### 9.1 Enum 類別使用 `PascalCase`
+
+#### Good
+
+```python
+OrderStatus
+UserRole
+PaymentMethod
+```
+
+### 9.2 Enum 成員使用 `UPPER_SNAKE_CASE`
+
+#### Good
+
+```python
+class OrderStatus(str, Enum):
+    PENDING = "pending"
+    PAID = "paid"
+    CANCELLED = "cancelled"
+```
+
+---
+
+## 10. Pydantic Schema 命名
+
+### 10.1 Schema 類別使用 `PascalCase`
+
+所有 Pydantic model 命名必須清楚區分用途。
+
+### 10.2 請依用途加上固定後綴
+
+#### Request Schema
+
+用於建立資料：
+
+```python
+UserCreateRequest
+OrderCreateRequest
+```
+
+用於更新資料：
+
+```python
+UserUpdateRequest
+OrderUpdateRequest
+```
+
+用於查詢條件：
+
+```python
+UserQueryParams
+OrderFilterParams
+```
+
+#### Response Schema
+
+```python
+UserResponse
+OrderResponse
+OrderDetailResponse
+```
+
+### 10.3 避免模糊名稱
+
+#### Avoid
+
+```python
+UserSchema
+OrderDto
+DataModel
+```
+
+除非專案有明確約定，否則不使用泛稱 `Schema`、`Dto` 作為主要命名方式。
+
+---
+
+## 11. ORM Model 命名
+
+### 11.1 ORM Model 使用 `PascalCase` 名詞
+
+#### Good
+
+```python
+User
+Order
+OrderItem
+RefreshToken
+```
+
+### 11.2 資料表名稱使用複數 `snake_case`
+
+#### Good
+
+```python
+users
+orders
+order_items
+refresh_tokens
+```
+
+### 11.3 ORM Model 與 Table 對應應保持一致
+
+```python
+class User(Base):
+    __tablename__ = "users"
+```
+
+```python
+class OrderItem(Base):
+    __tablename__ = "order_items"
+```
+
+---
+
+## 12. Repository 命名
+
+### 12.1 Repository 類別以 `Repository` 結尾
+
+#### Good
+
+```python
+UserRepository
+OrderRepository
+PaymentRepository
+```
+
+### 12.2 Repository 方法名稱以資料存取語意為主
+
+#### Good
+
+```python
+get_by_id
+get_by_email
+list_by_user_id
+create
+update
+delete
+exists_by_email
+```
+
+### 12.3 Repository 不應混入業務語意
+
+#### Avoid
+
+```python
+activate_user_subscription
+complete_checkout
+send_notification
+```
+
+這類邏輯應放在 Service 層。
+
+---
+
+## 13. Service 命名
+
+### 13.1 Service 類別以 `Service` 結尾
+
+#### Good
+
+```python
+UserService
+OrderService
+AuthService
+```
+
+### 13.2 Service 方法名稱應反映業務行為
+
+#### Good
+
+```python
+register_user
+login_user
+cancel_order
+refresh_access_token
+```
+
+#### Avoid
+
+```python
+do_user
+handle_order
+process_auth
+```
+
+---
+
+## 14. Router 命名
+
+### 14.1 Router 檔名使用資源名稱
+
+#### Good
+
+```python
+users.py
+orders.py
+auth.py
+payments.py
+```
+
+### 14.2 APIRouter 變數統一命名為 `router`
+
+```python
+router = APIRouter(prefix="/users", tags=["users"])
+```
+
+### 14.3 路由處理函式使用動詞加資源名稱
+
+#### Good
+
+```python
+create_user
+get_user
+list_orders
+update_order_status
+```
+
+---
+
+## 15. Dependency 命名
+
+### 15.1 依賴函式使用 `get_` 開頭
+
+用於提供 DI 資源的 dependency，統一使用 `get_` 前綴。
+
+#### Good
+
+```python
+get_db_session
+get_current_user
+get_order_service
+```
+
+### 15.2 驗證型 dependency 使用明確動詞
+
+#### Good
+
+```python
+require_admin_user
+verify_api_key
+validate_access_scope
+```
+
+---
+
+## 16. API 路徑命名
+
+### 16.1 路徑使用小寫複數名詞
+
+#### Good
+
+```python
+/users
+/orders
+/order-items
+```
+
+#### Bad
+
+```python
+/getUsers
+/orderItem
+/UserData
+```
+
+### 16.2 URL 路徑不包含動詞
+
+HTTP Method 已表達行為，路徑應聚焦資源。
+
+#### Good
+
+```http
+GET /users
+POST /users
+GET /orders/{order_id}
+DELETE /orders/{order_id}
+```
+
+#### Bad
+
+```http
+POST /create-user
+GET /get-orders
+DELETE /delete-order/{order_id}
+```
+
+---
+
+## 17. 資料庫欄位命名
+
+### 17.1 欄位名稱使用 `snake_case`
+
+#### Good
+
+```sql
+user_id
+created_at
+updated_at
+deleted_at
+order_status
+```
+
+### 17.2 外鍵統一使用 `{resource}_id`
+
+#### Good
+
+```sql
+user_id
+order_id
+product_id
+```
+
+### 17.3 時間欄位統一命名
+
+```sql
+created_at
+updated_at
+deleted_at
+expired_at
+```
+
+---
+
+## 18. 測試命名
+
+### 18.1 測試檔名使用 `test_*.py`
+
+#### Good
+
+```python
+test_user_service.py
+test_auth_router.py
+test_order_repository.py
+```
+
+### 18.2 測試函式名稱描述行為與預期結果
+
+#### Good
+
+```python
+def test_create_user_should_return_user_response():
+    ...
+
+def test_login_should_fail_with_invalid_password():
+    ...
+```
+
+### 18.3 命名格式建議
+
+```python
+test_<behavior>_should_<expected_result>
+```
+
+---
+
+## 19. 禁止事項
+
+以下命名方式在本專案中原則上禁止使用：
+
+```python
+data
+info
+handler
+manager
+temp
+misc
+common
+thing
+stuff
+```
+
+以下情況不允許混用同概念名稱：
+
+```python
+User / Member / Account
+OrderItem / ItemDetail / ProductLine
+```
+
+以下情況不允許出現語意不明的函式名稱：
+
+```python
+handle_user
+process_order
+run_task
+do_work
+```
+
+---
+
+## 20. 命名檢查原則
+
+每次命名時，請至少確認以下三點：
+
+### 20.1 是否能從名稱看出責任？
+
+### 20.2 是否與現有命名一致？
+
+### 20.3 是否能讓新加入的成員快速理解？
+
+若答案是否，應重新命名。
+
+---
+
+## 21. 範例對照
+
+### Good Example
+
+```python
+# models/user.py
+class User(Base):
+    __tablename__ = "users"
+
+# schemas/user.py
+class UserCreateRequest(BaseModel):
+    email: str
+    password: str
+
+class UserResponse(BaseModel):
+    id: int
+    email: str
+
+# repositories/user_repository.py
+class UserRepository:
+    def get_by_id(self, user_id: int) -> User | None:
+        ...
+
+    def get_by_email(self, email: str) -> User | None:
+        ...
+
+# services/user_service.py
+class UserService:
+    def register_user(self, payload: UserCreateRequest) -> User:
+        ...
+
+# routers/users.py
+@router.post("/", response_model=UserResponse)
+def create_user(...):
+    ...
+```
+
+### Bad Example
+
+```python
+# models/account.py
+class account(Base):
+    __tablename__ = "user_table"
+
+# schemas/user_schema.py
+class userDTO(BaseModel):
+    ...
+
+# repositories/userRepo.py
+class userRepo:
+    def fetch(self, id: int):
+        ...
+
+# services/user_manager.py
+class UserManager:
+    def handle_user(self, data):
+        ...
+```
+
+---
+
+# 補充建議
+
+這份命名規範文件建議搭配以下做法一起使用：
+
+* 在 code review 中檢查命名一致性
+* 在新功能開發前先對齊 domain 名稱
+* 文件中固定維護常見資源命名表，例如：
+
+  * `User`
+  * `Order`
+  * `OrderItem`
+  * `RefreshToken`
+
+---
+
+如果你要，我可以下一步直接幫你整理成更正式的 **`docs/naming-convention.md` 完整 Markdown 成品**，包含目錄、章節編號與可直接貼進 GitHub 的版本。
+---
+alwaysApply: true
+---
