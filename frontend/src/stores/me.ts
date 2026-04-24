@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import { AuthService, type MeResponse } from '@/services'
+import { AuthService, type MeResponse, type UpdateProfileRequest } from '@/services'
 
 export const useMeStore = defineStore('me', () => {
   const me = ref<MeResponse | null>(null)
@@ -9,8 +9,12 @@ export const useMeStore = defineStore('me', () => {
 
   const id = computed(() => me.value?.id ?? null)
   const username = computed(() => me.value?.username ?? null)
+  const nickname = computed(() => me.value?.nickname ?? null)
+  const avatarUrl = computed(() => me.value?.avatar_url ?? null)
+  const displayName = computed(() => me.value?.nickname || me.value?.username || null)
 
   async function fetchMe() {
+    console.log('[me-store] fetchMe')
     isLoading.value = true
     error.value = null
     try {
@@ -32,6 +36,18 @@ export const useMeStore = defineStore('me', () => {
     return await fetchMe()
   }
 
+  async function updateProfile(body: UpdateProfileRequest) {
+    const res = await AuthService.updateMe({ body })
+    me.value = res.data
+    return res.data
+  }
+
+  async function uploadAvatar(file: File) {
+    const res = await AuthService.uploadAvatar({ body: { file } })
+    me.value = res.data
+    return res.data
+  }
+
   function clear() {
     me.value = null
     error.value = null
@@ -42,10 +58,15 @@ export const useMeStore = defineStore('me', () => {
     me,
     id,
     username,
+    nickname,
+    avatarUrl,
+    displayName,
     isLoading,
     error,
     fetchMe,
     ensureMe,
+    updateProfile,
+    uploadAvatar,
     clear,
   }
 })

@@ -21,6 +21,9 @@ class UserModel(TimestampMixin, SQLModel, table=True):
     username: str = Field(max_length=255)  # 使用者帳號，需唯一
     password: Optional[str]  # 密碼
 
+    nickname: Optional[str] = Field(default=None, max_length=50)
+    avatar_url: Optional[str] = Field(default=None, max_length=512)
+
     # discord_id: Optional[int]
 
     __table_args__ = (UniqueConstraint("username", name="uq_users_username"),)

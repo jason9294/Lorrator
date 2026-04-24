@@ -11,8 +11,8 @@ from app.db.sql import async_engine
 from app.db.uow import UnitOfWorkDependency
 from app.modules.rag.chunker import chunk_text
 from app.modules.rag.json_schema import ExtractedEntities
-from app.uncategorized.entity_types import NPC, Ending, Event, Item, Location
 from app.shared.enums import DocumentStatus
+from app.uncategorized.entity_types import NPC, Ending, Event, Item, Location
 from graphiti_core import Graphiti
 from graphiti_core.utils.datetime_utils import utc_now
 
@@ -127,28 +127,29 @@ async def _process_document_job(
             content = path.read_text(encoding="utf-8")
             chunks = chunk_text(content)
 
-            graphiti = Graphiti(
-                settings.NEO4J_URI, settings.NEO4J_USER, settings.NEO4J_PASSWORD
-            )
-            try:
-                await graphiti.build_indices_and_constraints()
-                for i, chunk in enumerate(chunks):
-                    await graphiti.add_episode(
-                        name=f"TRPG Scenario {i}",
-                        episode_body=chunk.text,
-                        source_description="TRPG Scenario Chunk",
-                        reference_time=utc_now(),
-                        group_id=graph_group_id,
-                        entity_types={
-                            "NPC": NPC,
-                            "Event": Event,
-                            "Location": Location,
-                            "Item": Item,
-                            "Ending": Ending,
-                        },
-                    )
-            finally:
-                await graphiti.close()
+            if False:
+                graphiti = Graphiti(
+                    settings.NEO4J_URI, settings.NEO4J_USER, settings.NEO4J_PASSWORD
+                )
+                try:
+                    await graphiti.build_indices_and_constraints()
+                    for i, chunk in enumerate(chunks):
+                        await graphiti.add_episode(
+                            name=f"TRPG Scenario {i}",
+                            episode_body=chunk.text,
+                            source_description="TRPG Scenario Chunk",
+                            reference_time=utc_now(),
+                            group_id=graph_group_id,
+                            entity_types={
+                                "NPC": NPC,
+                                "Event": Event,
+                                "Location": Location,
+                                "Item": Item,
+                                "Ending": Ending,
+                            },
+                        )
+                finally:
+                    await graphiti.close()
 
             doc.status = DocumentStatus.COMPLETED
             await session.commit()

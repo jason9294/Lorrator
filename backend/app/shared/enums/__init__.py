@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import Enum, StrEnum
 
 
 class GameSystem(str, Enum):
@@ -17,10 +17,15 @@ class RoomStatus(Enum):
     COMPLETED = "COMPLETED"
 
 
-class RoomMessageRole(Enum):
+class RoomMessageRole(StrEnum):
     AGENT = "AGENT"
     PLAYER = "PLAYER"
     SYSTEM = "SYSTEM"
+
+
+class RoomMessageType(StrEnum):
+    CHAT = "CHAT"
+    DICE = "DICE"
 
 
 class DocumentStatus(Enum):

@@ -1,8 +1,10 @@
 import secrets
 from uuid import UUID
 
+from sqlalchemy.orm import selectinload
 from sqlmodel import col, select, update
 
+from app.db.sql import attr
 from app.models import RoomModel
 from app.models.links.room_participant_link import RoomParticipantLink
 from app.shared.enums import RoomStatus
@@ -77,6 +79,20 @@ class RoomRepository(BaseRepository):
         result = await self.session.execute(statement)
         return list(result.scalars().all())
 
+    async def list_participants_with_details(
+        self, room_id: UUID
+    ) -> list[RoomParticipantLink]:
+        statement = (
+            select(RoomParticipantLink)
+            .where(RoomParticipantLink.room_id == room_id)
+            .options(
+                selectinload(attr(RoomParticipantLink.user)),
+                selectinload(attr(RoomParticipantLink.character)),
+            )
+        )
+        result = await self.session.execute(statement)
+        return list(result.scalars().all())
+
     async def set_participant_ready(self, room_id: UUID, user_id: UUID, is_ready: bool):
         statement = (
             update(RoomParticipantLink)
@@ -85,6 +101,20 @@ class RoomRepository(BaseRepository):
                 col(RoomParticipantLink.user_id) == user_id,
             )
             .values(is_ready=is_ready)
+        )
+        await self.session.execute(statement)
+        await self.session.flush()
+
+    async def set_participant_character(
+        self, room_id: UUID, user_id: UUID, character_id: UUID | None
+    ) -> None:
+        statement = (
+            update(RoomParticipantLink)
+            .where(
+                col(RoomParticipantLink.room_id) == room_id,
+                col(RoomParticipantLink.user_id) == user_id,
+            )
+            .values(character_id=character_id)
         )
         await self.session.execute(statement)
         await self.session.flush()
@@ -104,6 +134,11 @@ class RoomRepository(BaseRepository):
         )
         result = await self.session.execute(statement)
         return list(result.scalars().all())
+
+    async def save(self, room: RoomModel) -> RoomModel:
+        self.session.add(room)
+        await self.session.flush()
+        return room
 
 
 def provide_room_repo_cls() -> type[RoomRepository]:

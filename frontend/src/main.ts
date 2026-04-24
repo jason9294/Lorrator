@@ -16,13 +16,10 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(router)
 
-app.mount('#app')
-
 client.setConfig({
   auth: () => getStoredAccessToken() ?? undefined,
 })
 
-// hey-api client config
 // 攔截 http error code 並顯示錯誤訊息
 client.instance.interceptors.response.use(
   (response) => response,
@@ -31,3 +28,5 @@ client.instance.interceptors.response.use(
     return Promise.reject(error)
   }
 )
+
+app.mount('#app')

@@ -205,6 +205,7 @@ import { Spinner } from '@/components/ui/spinner'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import CreateScenarioDialog from '@/components/dialogs/CreateScenarioDialog.vue'
 import { ScenariosService, type ScenarioResponse } from '@/services'
+import { colorFromId } from '@/utils/color'
 
 const router = useRouter()
 
@@ -219,17 +220,6 @@ const newScenarioMinHours = ref('')
 const newScenarioMaxHours = ref('')
 const isCreatingScenario = ref(false)
 const createScenarioError = ref<string | null>(null)
-
-const COLORS = ['#7c3aed', '#0891b2', '#b45309', '#be123c', '#10b981', '#f97316', '#6366f1']
-
-function colorFromId(id: string) {
-  let hash = 0
-  for (let i = 0; i < id.length; i += 1) {
-    hash = (hash * 31 + id.charCodeAt(i)) | 0
-  }
-  const idx = Math.abs(hash) % COLORS.length
-  return COLORS[idx]
-}
 
 function playerCountText(s: ScenarioResponse) {
   if (s.min_players == null && s.max_players == null) return '— 人'

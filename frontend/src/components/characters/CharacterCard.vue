@@ -3,6 +3,7 @@ import { User } from 'lucide-vue-next'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import type { CharacterResponse } from '@/services'
+import { colorFromId } from '@/utils/color'
 
 defineProps<{
   character: CharacterResponse
@@ -16,13 +17,6 @@ function systemLabel(system: string) {
   if (system === 'COC') return 'COC 7e'
   if (system === 'DND') return 'D&D 5e'
   return system
-}
-
-function colorFromId(id: string) {
-  let hash = 0
-  for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) | 0
-  const hue = Math.abs(hash) % 360
-  return `hsl(${hue} 65% 50%)`
 }
 
 function formatDate(dateStr: string) {

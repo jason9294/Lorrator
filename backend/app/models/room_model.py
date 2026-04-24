@@ -1,9 +1,10 @@
 import secrets
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Any, Optional
 from uuid import UUID
 
 from sqlalchemy import Index
-from sqlmodel import Field, Relationship, SQLModel
+from sqlalchemy.dialects.postgresql.json import JSONB
+from sqlmodel import Column, Field, Relationship, SQLModel
 
 from app.shared.enums import RoomStatus
 from app.shared.utils import uuid7
@@ -40,5 +41,10 @@ class RoomModel(SQLModel, table=True):
     participants: list["RoomParticipantLink"] = Relationship(back_populates="room")
 
     graph_group_id: UUID = Field(default_factory=uuid7)
+
+    agent_history: dict[str, Any] = Field(
+        default={},
+        sa_column=Column(JSONB, nullable=False, server_default="{}"),
+    )
 
     __table_args__ = (Index("ix_rooms_host_id", "host_id"),)

@@ -47,6 +47,13 @@ declare module 'vue-router/auto-routes' {
       { character_id: ParamValue<false> },
       | never
     >,
+    '/dashboard': RouteRecordInfo<
+      '/dashboard',
+      '/dashboard',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/graph-example': RouteRecordInfo<
       '/graph-example',
       '/graph-example',
@@ -124,6 +131,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/characters/[character_id].vue': {
       routes:
         | '/characters/[character_id]'
+      views:
+        | never
+    }
+    'src/pages/dashboard.vue': {
+      routes:
+        | '/dashboard'
       views:
         | never
     }

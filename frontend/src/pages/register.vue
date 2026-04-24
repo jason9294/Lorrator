@@ -137,7 +137,7 @@ async function handleRegister() {
     })
     setStoredAccessToken(data.access_token)
     toast.success('註冊成功', { description: '已自動登入' })
-    await router.push('/scenarios')
+    await router.push('/dashboard')
   } catch {
     // 錯誤訊息由 axios response interceptor（showAxiosErrorToast）顯示
   } finally {

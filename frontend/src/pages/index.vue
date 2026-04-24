@@ -1,263 +1,187 @@
 <template>
-  <div class="min-h-screen flex flex-col bg-background text-foreground">
-    <AppHeader />
+  <div class="min-h-screen flex flex-col bg-background text-foreground overflow-x-hidden">
+    <!-- 頂部導覽 -->
+    <header
+      class="shrink-0 flex items-center justify-between px-6 h-14 border-b bg-card/80 backdrop-blur-sm sticky top-0 z-30"
+    >
+      <div class="flex items-center gap-2.5">
+        <div
+          class="w-7 h-7 rounded-lg bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-sm shrink-0"
+        >
+          <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"
+            />
+          </svg>
+        </div>
+        <span class="text-sm font-semibold">Lorrator</span>
+      </div>
 
-    <main class="flex-1 p-6">
-      <div class="max-w-4xl mx-auto space-y-10">
+      <div class="flex items-center gap-2">
+        <Button
+          variant="outline"
+          size="icon-sm"
+          :title="isDark ? '切換為亮色模式' : '切換為暗色模式'"
+          @click="toggle"
+        >
+          <Transition name="icon-swap" mode="out-in">
+            <Moon v-if="!isDark" :key="'moon'" class="size-3.5" />
+            <Sun v-else :key="'sun'" class="size-3.5" />
+          </Transition>
+        </Button>
+        <RouterLink to="/login">
+          <Button variant="outline" size="sm">登入</Button>
+        </RouterLink>
+        <RouterLink to="/register">
+          <Button size="sm">免費註冊</Button>
+        </RouterLink>
+      </div>
+    </header>
 
-        <!-- 歡迎區塊 -->
-        <div class="pt-6 space-y-2">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-sm shrink-0">
-              <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" />
-              </svg>
+    <main class="flex-1">
+      <!-- Hero 區塊 -->
+      <section
+        class="relative flex flex-col items-center justify-center text-center px-6 py-24 sm:py-32 overflow-hidden"
+      >
+        <!-- 背景裝飾 -->
+        <div class="absolute inset-0 -z-10 overflow-hidden">
+          <div
+            class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-violet-500/8 blur-3xl"
+          />
+          <div
+            class="absolute top-2/3 right-1/4 w-[300px] h-[300px] rounded-full bg-indigo-500/6 blur-3xl"
+          />
+        </div>
+
+        <div class="max-w-3xl mx-auto space-y-6">
+          <!-- Badge -->
+          <div
+            class="inline-flex items-center gap-2 rounded-full border bg-muted/50 px-3 py-1 text-xs font-medium text-muted-foreground"
+          >
+            <span class="w-1.5 h-1.5 rounded-full bg-green-500" />
+            為 TRPG 玩家打造的智慧跑團助手
+          </div>
+
+          <h1 class="text-4xl sm:text-5xl font-bold tracking-tight leading-tight">
+            讓每次跑團<br />
+            <span
+              class="bg-linear-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent"
+            >
+              更有沉浸感
+            </span>
+          </h1>
+
+          <p class="text-base sm:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
+            Lorrator 結合 AI 守門人，讓你專注於劇情創作。<br class="hidden sm:block" />
+            管理角色卡、建立劇本、即時跑團，一站搞定。
+          </p>
+
+          <div class="flex items-center justify-center gap-3 pt-2">
+            <RouterLink to="/register">
+              <Button size="lg" class="gap-2 px-6">
+                <Sparkles class="size-4" />
+                免費開始
+              </Button>
+            </RouterLink>
+            <RouterLink to="/login">
+              <Button variant="outline" size="lg" class="px-6"> 登入 </Button>
+            </RouterLink>
+          </div>
+        </div>
+      </section>
+
+      <!-- 功能特色 -->
+      <section class="px-6 pb-24">
+        <div class="max-w-4xl mx-auto">
+          <div class="text-center mb-10 space-y-2">
+            <h2 class="text-2xl font-bold">一切你跑團需要的功能</h2>
+            <p class="text-sm text-muted-foreground">從角色創建到跑團結束，全程陪伴</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            <div class="rounded-xl border bg-card p-5 space-y-3">
+              <div class="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                <User class="size-5 text-amber-600 dark:text-amber-400" />
+              </div>
+              <div>
+                <h3 class="font-semibold text-sm">角色卡系統</h3>
+                <p class="text-xs text-muted-foreground mt-1 leading-relaxed">
+                  支援 COC 7e 完整角色卡，自動計算屬性，隨時查閱與更新。
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 class="text-2xl font-bold tracking-tight">歡迎來到 Lorrator</h1>
-              <p class="text-sm text-muted-foreground">你的 TRPG 跑團助手</p>
+
+            <div class="rounded-xl border bg-card p-5 space-y-3">
+              <div class="w-10 h-10 rounded-lg bg-violet-500/10 flex items-center justify-center">
+                <BookOpen class="size-5 text-violet-600 dark:text-violet-400" />
+              </div>
+              <div>
+                <h3 class="font-semibold text-sm">劇本知識庫</h3>
+                <p class="text-xs text-muted-foreground mt-1 leading-relaxed">
+                  上傳劇本文件，AI 自動解析並建立知識圖譜，讓 KP 輕鬆掌握全局。
+                </p>
+              </div>
+            </div>
+
+            <div class="rounded-xl border bg-card p-5 space-y-3">
+              <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+                <MessageCircle class="size-5 text-green-600 dark:text-green-400" />
+              </div>
+              <div>
+                <h3 class="font-semibold text-sm">AI 守門人</h3>
+                <p class="text-xs text-muted-foreground mt-1 leading-relaxed">
+                  即時 AI 輔助敘事，根據劇本內容回應玩家行動，提升沉浸體驗。
+                </p>
+              </div>
             </div>
           </div>
         </div>
+      </section>
 
-        <!-- 快速入口 -->
-        <section class="space-y-3">
-          <h2 class="text-sm font-semibold text-muted-foreground uppercase tracking-wider">快速入口</h2>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-
-            <!-- 我的房間 -->
-            <RouterLink to="/rooms" class="group">
-              <Card class="h-full hover:shadow-md hover:border-primary/30 transition-all cursor-pointer">
-                <CardContent class="p-5 space-y-3">
-                  <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
-                    <DoorOpen class="size-5 text-green-600 dark:text-green-400" />
-                  </div>
-                  <div>
-                    <div class="font-semibold text-sm group-hover:text-primary transition-colors">我的房間</div>
-                    <p class="text-xs text-muted-foreground mt-0.5">進入正在進行的跑團</p>
-                  </div>
-                  <div class="flex items-center gap-1 text-xs text-muted-foreground">
-                    <ArrowRight class="size-3" />
-                    <span>查看房間</span>
-                  </div>
-                </CardContent>
-              </Card>
-            </RouterLink>
-
-            <!-- 劇本庫 -->
-            <RouterLink to="/scenarios" class="group">
-              <Card class="h-full hover:shadow-md hover:border-primary/30 transition-all cursor-pointer">
-                <CardContent class="p-5 space-y-3">
-                  <div class="w-10 h-10 rounded-lg bg-violet-500/10 flex items-center justify-center">
-                    <BookOpen class="size-5 text-violet-600 dark:text-violet-400" />
-                  </div>
-                  <div>
-                    <div class="font-semibold text-sm group-hover:text-primary transition-colors">劇本庫</div>
-                    <p class="text-xs text-muted-foreground mt-0.5">瀏覽與建立跑團劇本</p>
-                  </div>
-                  <div class="flex items-center gap-1 text-xs text-muted-foreground">
-                    <ArrowRight class="size-3" />
-                    <span>查看劇本</span>
-                  </div>
-                </CardContent>
-              </Card>
-            </RouterLink>
-
-            <!-- 角色卡 -->
-            <RouterLink to="/characters" class="group">
-              <Card class="h-full hover:shadow-md hover:border-primary/30 transition-all cursor-pointer">
-                <CardContent class="p-5 space-y-3">
-                  <div class="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                    <User class="size-5 text-amber-600 dark:text-amber-400" />
-                  </div>
-                  <div>
-                    <div class="font-semibold text-sm group-hover:text-primary transition-colors">角色卡</div>
-                    <p class="text-xs text-muted-foreground mt-0.5">管理你的 TRPG 角色</p>
-                  </div>
-                  <div class="flex items-center gap-1 text-xs text-muted-foreground">
-                    <ArrowRight class="size-3" />
-                    <span>查看角色</span>
-                  </div>
-                </CardContent>
-              </Card>
-            </RouterLink>
-
-          </div>
-        </section>
-
-        <!-- 統計數字 -->
-        <section class="space-y-3">
-          <h2 class="text-sm font-semibold text-muted-foreground uppercase tracking-wider">總覽</h2>
-          <div class="grid grid-cols-3 gap-4">
-            <Card>
-              <CardContent class="p-5">
-                <div class="text-2xl font-bold">
-                  <span v-if="isLoadingStats" class="inline-block w-8 h-6 bg-muted rounded animate-pulse" />
-                  <span v-else>{{ stats.rooms }}</span>
-                </div>
-                <div class="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                  <DoorOpen class="size-3" />
-                  個房間
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent class="p-5">
-                <div class="text-2xl font-bold">
-                  <span v-if="isLoadingStats" class="inline-block w-8 h-6 bg-muted rounded animate-pulse" />
-                  <span v-else>{{ stats.scenarios }}</span>
-                </div>
-                <div class="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                  <BookOpen class="size-3" />
-                  個劇本
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent class="p-5">
-                <div class="text-2xl font-bold">
-                  <span v-if="isLoadingStats" class="inline-block w-8 h-6 bg-muted rounded animate-pulse" />
-                  <span v-else>{{ stats.characters }}</span>
-                </div>
-                <div class="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                  <User class="size-3" />
-                  個角色
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
-
-        <!-- 進行中的房間 -->
-        <section class="space-y-3">
-          <div class="flex items-center justify-between">
-            <h2 class="text-sm font-semibold text-muted-foreground uppercase tracking-wider">進行中的跑團</h2>
-            <RouterLink to="/rooms" class="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
-              查看全部
-              <ArrowRight class="size-3" />
-            </RouterLink>
-          </div>
-
-          <!-- 載入中 -->
-          <div v-if="isLoadingRooms" class="grid gap-3">
-            <Card v-for="n in 2" :key="n">
-              <CardContent class="p-4">
-                <div class="flex items-center gap-3">
-                  <div class="w-9 h-9 rounded-lg bg-muted animate-pulse shrink-0" />
-                  <div class="flex-1 space-y-1.5">
-                    <div class="h-3.5 w-32 bg-muted rounded animate-pulse" />
-                    <div class="h-3 w-48 bg-muted rounded animate-pulse" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <!-- 有資料 -->
-          <div v-else-if="runningRooms.length > 0" class="grid gap-3">
-            <Card
-              v-for="room in runningRooms"
-              :key="room.id"
-              class="hover:shadow-md transition-shadow cursor-pointer"
-              @click="router.push(`/rooms/${room.id}`)"
-            >
-              <CardContent class="p-4">
-                <div class="flex items-center gap-3">
-                  <div
-                    class="w-9 h-9 rounded-lg flex items-center justify-center text-white text-xs font-bold shrink-0"
-                    :style="{ backgroundColor: colorFromId(room.id) }"
-                  >
-                    {{ room.name.charAt(0) }}
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <div class="flex items-center gap-2">
-                      <span class="font-semibold text-sm">{{ room.name }}</span>
-                      <span class="w-2 h-2 rounded-full bg-green-500 shrink-0" />
-                      <span class="text-[10px] text-green-600 dark:text-green-400 font-medium">跑團中</span>
-                    </div>
-                    <p class="text-xs text-muted-foreground truncate mt-0.5">{{ room.description || '無簡介' }}</p>
-                  </div>
-                  <Button variant="outline" size="sm" class="shrink-0 gap-1.5">
-                    <DoorOpen class="size-3.5" />
-                    進入
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <!-- 空狀態 -->
-          <Card v-else class="border-dashed">
-            <CardContent class="p-8 text-center space-y-2">
-              <DoorOpen class="size-8 text-muted-foreground/30 mx-auto" />
-              <p class="text-sm text-muted-foreground">目前沒有進行中的跑團</p>
-              <RouterLink to="/scenarios">
-                <Button size="sm" variant="outline" class="gap-1.5 mt-1">
-                  <BookOpen class="size-3.5" />
-                  瀏覽劇本來開始
-                </Button>
-              </RouterLink>
-            </CardContent>
-          </Card>
-        </section>
-
-      </div>
+      <!-- CTA -->
+      <section class="px-6 pb-24">
+        <div
+          class="max-w-2xl mx-auto rounded-2xl border bg-linear-to-br from-violet-500/5 to-indigo-500/5 p-10 text-center space-y-5"
+        >
+          <h2 class="text-2xl font-bold">準備好開始你的冒險了嗎？</h2>
+          <p class="text-sm text-muted-foreground">免費建立帳號，立即體驗 AI 跑團的樂趣。</p>
+          <RouterLink to="/register">
+            <Button size="lg" class="gap-2 px-8">
+              <Sparkles class="size-4" />
+              立即免費註冊
+            </Button>
+          </RouterLink>
+        </div>
+      </section>
     </main>
+
+    <!-- 頁尾 -->
+    <footer class="border-t px-6 py-5 text-center text-xs text-muted-foreground">
+      © 2026 Lorrator · 為 TRPG 玩家打造
+    </footer>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ArrowRight, BookOpen, DoorOpen, User } from 'lucide-vue-next'
+import { BookOpen, MessageCircle, Moon, Sparkles, Sun, User } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import AppHeader from '@/components/layout/AppHeader.vue'
-import { CharactersService, MeService, ScenariosService, type RoomResponse } from '@/services'
+import { useColorMode } from '@/composables/useColorMode'
+import { getStoredAccessToken } from '@/lib/accessToken'
+import { AuthService } from '@/services'
 
 const router = useRouter()
+const { isDark, toggle } = useColorMode()
 
-const isLoadingRooms = ref(false)
-const rooms = ref<RoomResponse[]>([])
-
-const isLoadingStats = ref(false)
-const stats = ref({ rooms: 0, scenarios: 0, characters: 0 })
-
-const runningRooms = computed(() =>
-  rooms.value.filter((r) => r.status === 'RUNNING').slice(0, 3),
-)
-
-function colorFromId(id: string) {
-  let hash = 0
-  for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) | 0
-  const hue = Math.abs(hash) % 360
-  return `hsl(${hue} 80% 45%)`
-}
-
-async function loadData() {
-  isLoadingRooms.value = true
-  isLoadingStats.value = true
+onMounted(async () => {
+  const token = getStoredAccessToken()
+  if (!token) return
   try {
-    const [roomsRes, scenariosRes, charactersRes] = await Promise.allSettled([
-      MeService.listMyRooms(),
-      ScenariosService.listScenarios(),
-      CharactersService.listCharacters(),
-    ])
-
-    if (roomsRes.status === 'fulfilled') {
-      rooms.value = roomsRes.value.data ?? []
-    }
-
-    stats.value = {
-      rooms: roomsRes.status === 'fulfilled' ? (roomsRes.value.data?.length ?? 0) : 0,
-      scenarios: scenariosRes.status === 'fulfilled' ? (scenariosRes.value.data?.length ?? 0) : 0,
-      characters: charactersRes.status === 'fulfilled' ? (charactersRes.value.data?.length ?? 0) : 0,
-    }
-  } finally {
-    isLoadingRooms.value = false
-    isLoadingStats.value = false
+    await AuthService.me()
+    await router.replace('/dashboard')
+  } catch {
+    // token 失效，留在 landing page
   }
-}
-
-onMounted(loadData)
+})
 </script>

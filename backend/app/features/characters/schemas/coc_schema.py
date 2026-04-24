@@ -16,23 +16,26 @@ class OccupationFeatureType(StrEnum):
 class CoCSkillType(StrEnum):
     """COC 技能類型"""
 
-    STANDARD = "STANDARD"
-    DERIVED = "DERIVED"
-    CUSTOM = "CUSTOM"
+    STANDARD = "STANDARD"  # 標準技能
+    DERIVED = "DERIVED"  # 衍生技能
+    CUSTOM = "CUSTOM"  # 自訂技能
 
 
 class CoCSkillCategory(StrEnum):
     """COC 技能分類"""
 
-    NEGOTIATION = "NEGOTIATION"
-    INVESTIGATION = "INVESTIGATION"
-    LANGUAGE = "LANGUAGE"
-    MEDICAL = "MEDICAL"
-    PILOT = "PILOT"
-    SURVIVAL = "SURVIVAL"
-    ART_AND_CRAFT = "ART_AND_CRAFT"
-    SCIENCE = "SCIENCE"
-    CUSTOM = "CUSTOM"
+    NEGOTIATION = "NEGOTIATION"  # 溝通
+    INVESTIGATION = "INVESTIGATION"  # 調查
+    LANGUAGE = "LANGUAGE"  # 語言
+    MEDICAL = "MEDICAL"  # 醫療
+    PILOT = "PILOT"  # 特殊駕駛
+    SURVIVAL = "SURVIVAL"  # 生存
+    ART_AND_CRAFT = "ART_AND_CRAFT"  # 藝術與工藝
+    SCIENCE = "SCIENCE"  # 科學
+    MOVEMENT = "MOVEMENT"  # 移動
+    COMBAT = "COMBAT"  # 戰鬥
+    OCCUPATION = "OCCUPATION"  # 職業
+    CUSTOM = "CUSTOM"  # 自訂
 
 
 class CoCSkillAdjustmentType(StrEnum):
@@ -53,19 +56,20 @@ class CharacterSkill(BaseModel):
     category: CoCSkillCategory
     name: str
     base_value: int = 0
-    occupation_value: int = 0
-    interest_value: int = 0
+    occupation_value: int | None = None
+    interest_value: int | None = None
     adjustments: list[SkillAdjustment] = []
 
     @computed_field  # type: ignore[prop-decorator]
     @property
     def total_value(self) -> int:
-        return (
-            self.base_value
-            + self.occupation_value
-            + self.interest_value
-            + sum(adj.value for adj in self.adjustments)
-        )
+        total = self.base_value
+        if self.occupation_value is not None:
+            total += self.occupation_value
+        if self.interest_value is not None:
+            total += self.interest_value
+        total += sum(adj.value for adj in self.adjustments)
+        return total
 
 
 class CoCCharacterData(BaseModel):
@@ -110,4 +114,3 @@ class CoCCharacterData(BaseModel):
 
     # 技能
     skills: list[CharacterSkill] = []
-    skill_adjustments: list[SkillAdjustment] = []

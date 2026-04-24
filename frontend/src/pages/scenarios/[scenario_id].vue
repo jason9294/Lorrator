@@ -83,7 +83,13 @@
               <Pencil class="size-3.5" />
               編輯
             </Button>
-            <Button size="sm" class="gap-1.5" :disabled="isPublishing" @click="handlePublish">
+            <Button
+              size="sm"
+              class="gap-1.5"
+              :disabled="isPublishing || !canPublish"
+              :title="!canPublish ? '請先上傳文件並確認所有文件皆處理完成' : undefined"
+              @click="confirmPublishOpen = true"
+            >
               <Spinner v-if="isPublishing" class="size-3.5" />
               <Globe v-else class="size-3.5" />
               {{ isPublishing ? '發布中...' : '發布劇本' }}
@@ -146,7 +152,26 @@
         </div>
       </header>
 
-      <!-- 發布確認提示 -->
+      <!-- 發布確認 Dialog -->
+      <AlertDialog v-model:open="confirmPublishOpen">
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>確認發布劇本？</AlertDialogTitle>
+            <AlertDialogDescription>
+              發布後無法撤回，也無法再編輯劇本內容。請確認劇本與所有文件均已就緒。
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel :disabled="isPublishing">取消</AlertDialogCancel>
+            <AlertDialogAction :disabled="isPublishing" @click="handlePublish">
+              <Spinner v-if="isPublishing" class="size-3.5 mr-1.5" />
+              {{ isPublishing ? '發布中...' : '確認發布' }}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <!-- 發布錯誤提示 -->
       <div
         v-if="publishError"
         class="shrink-0 px-5 py-2 bg-destructive/10 text-destructive text-xs flex items-center gap-2"
@@ -451,12 +476,23 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import {
   DocumentsService,
   ScenariosService,
   type DocumentResponse,
   type ScenarioResponse,
 } from '@/services'
 import { useAppWebSocket } from '@/composables/useAppWebSocket'
+import { toast } from 'vue-sonner'
 
 const route = useRoute()
 const router = useRouter()
@@ -504,6 +540,12 @@ const processError = ref<string | null>(null)
 // 發布
 const isPublishing = ref(false)
 const publishError = ref<string | null>(null)
+const confirmPublishOpen = ref(false)
+
+const canPublish = computed(() => {
+  if (!documents.value.length) return false
+  return documents.value.every((d) => d.status === 'COMPLETED')
+})
 
 // 創建房間
 const isCreatingRoom = ref(false)
@@ -735,6 +777,10 @@ onMounted(async () => {
     const st = String(payload.status ?? '')
     if (st === 'COMPLETED') {
       void loadGraph()
+      toast.success('文件處理完成', { description: '知識圖譜已更新。' })
+    } else if (st === 'FAILED') {
+      const errMsg = typeof payload.error === 'string' ? payload.error : '請重新嘗試處理。'
+      toast.error('文件處理失敗', { description: errMsg })
     }
   })
 })

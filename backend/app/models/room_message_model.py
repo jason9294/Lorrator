@@ -1,10 +1,10 @@
 from typing import TYPE_CHECKING, Optional
 from uuid import UUID
 
-from sqlalchemy import Column, Index, Text
+from sqlalchemy import Column, Index, String, Text
 from sqlmodel import Field, Relationship, SQLModel
 
-from app.shared.enums import RoomMessageRole
+from app.shared.enums import RoomMessageRole, RoomMessageType
 from app.shared.utils import uuid7
 
 from .mixin.timestamp import TimestampMixin
@@ -23,6 +23,10 @@ class RoomMessageModel(TimestampMixin, SQLModel, table=True):
     sender_id: UUID | None = Field(foreign_key="users.id")
 
     role: RoomMessageRole
+    type: RoomMessageType = Field(
+        default=RoomMessageType.CHAT,
+        sa_column=Column(String, nullable=False, server_default="CHAT"),
+    )
     content: str = Field(sa_column=Column(Text, nullable=False))
 
     room: Optional["RoomModel"] = Relationship()

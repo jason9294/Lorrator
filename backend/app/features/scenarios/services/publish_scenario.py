@@ -4,7 +4,7 @@ from fastapi import HTTPException
 
 from app.db.uow import UnitOfWorkDependency
 from app.features.scenarios.schemas.responses import ScenarioResponse
-from app.shared.enums import ScenarioStatus
+from app.shared.enums import DocumentStatus, ScenarioStatus
 
 
 class PublishScenarioService:
@@ -21,6 +21,20 @@ class PublishScenarioService:
 
         if scenario.status == ScenarioStatus.PUBLISHED:
             raise HTTPException(status_code=409, detail="Scenario is already published")
+
+        documents = await self._uow.document_repo.list_by_scenario(scenario_id)
+        if not documents:
+            raise HTTPException(
+                status_code=422,
+                detail="Scenario must have at least one document before publishing",
+            )
+
+        non_completed = [d for d in documents if d.status != DocumentStatus.COMPLETED]
+        if non_completed:
+            raise HTTPException(
+                status_code=422,
+                detail="All documents must be processed (COMPLETED) before publishing",
+            )
 
         scenario = await self._uow.scenario_repo.publish(scenario)
         return ScenarioResponse.model_validate(scenario)

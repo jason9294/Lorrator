@@ -1,19 +1,24 @@
 from uuid import UUID
 
-from sqlmodel import desc, select
+from sqlmodel import asc, select
 
 from app.models import RoomMessageModel
-from app.shared.enums import RoomMessageRole
+from app.shared.enums import RoomMessageRole, RoomMessageType
 
 from ._base_repo import BaseRepository
 
 
 class RoomMessageRepository(BaseRepository):
     async def create(
-        self, room_id: UUID, sender_id: UUID | None, role: RoomMessageRole, content: str
+        self,
+        room_id: UUID,
+        sender_id: UUID | None,
+        role: RoomMessageRole,
+        content: str,
+        type: RoomMessageType = RoomMessageType.CHAT,
     ) -> RoomMessageModel:
         msg = RoomMessageModel(
-            room_id=room_id, sender_id=sender_id, role=role, content=content
+            room_id=room_id, sender_id=sender_id, role=role, type=type, content=content
         )
         self.session.add(msg)
         await self.session.flush()
@@ -23,7 +28,7 @@ class RoomMessageRepository(BaseRepository):
         statement = (
             select(RoomMessageModel)
             .where(RoomMessageModel.room_id == room_id)
-            .order_by(desc(RoomMessageModel.created_at))
+            .order_by(asc(RoomMessageModel.created_at))
         )
         result = await self.session.execute(statement)
         return list(result.scalars().all())

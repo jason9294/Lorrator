@@ -4,7 +4,13 @@ from fastapi import APIRouter, Depends
 
 from app.core.deps import JWTDependency
 
-from .schemas.requests import JoinRoomRequest, SendMessageRequest
+from .schemas.requests import (
+    JoinRoomRequest,
+    RollDiceRequest,
+    SelectCharacterRequest,
+    SendMessageRequest,
+    SkillCheckRequest,
+)
 from .schemas.responses import RoomDetailResponse, RoomMessageResponse
 from .services import (
     GetRoomService,
@@ -12,6 +18,8 @@ from .services import (
     KickParticipantService,
     ListRoomMessagesService,
     RegenerateInviteService,
+    RollDiceService,
+    SelectCharacterService,
     SendRoomMessageService,
     SetReadyService,
     StartSessionService,
@@ -74,6 +82,20 @@ async def kick_participant(
 
 
 @router.post(
+    path="/{room_id}/character",
+    response_model=RoomDetailResponse,
+    summary="選擇角色卡（準備中且未就緒才可操作）",
+)
+async def select_character(
+    room_id: UUID,
+    body: SelectCharacterRequest,
+    jwt: JWTDependency,
+    svc: SelectCharacterService = Depends(),
+) -> RoomDetailResponse:
+    return await svc.execute(room_id, body, jwt.sub)
+
+
+@router.post(
     path="/{room_id}/ready",
     response_model=RoomDetailResponse,
     summary="設定自己的準備狀態",
@@ -125,3 +147,31 @@ async def send_room_message(
     svc: SendRoomMessageService = Depends(),
 ) -> RoomMessageResponse:
     return await svc.execute(room_id, body, jwt.sub)
+
+
+@router.post(
+    path="/{room_id}/dice/roll",
+    response_model=RoomMessageResponse,
+    summary="擲骰（普通模式，aDb 格式）",
+)
+async def roll_dice(
+    room_id: UUID,
+    body: RollDiceRequest,
+    jwt: JWTDependency,
+    svc: RollDiceService = Depends(),
+) -> RoomMessageResponse:
+    return await svc.roll(room_id, body, jwt.sub)
+
+
+@router.post(
+    path="/{room_id}/dice/skill-check",
+    response_model=RoomMessageResponse,
+    summary="技能檢定（輸入技能名稱與數值，自動擲 1d100 判定成敗）",
+)
+async def skill_check(
+    room_id: UUID,
+    body: SkillCheckRequest,
+    jwt: JWTDependency,
+    svc: RollDiceService = Depends(),
+) -> RoomMessageResponse:
+    return await svc.skill_check(room_id, body, jwt.sub)

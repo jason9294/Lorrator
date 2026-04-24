@@ -3,7 +3,8 @@ import { z } from "zod"
 export const roomsCreateMessagePayloadSchema = z.object({
   id: z.string(),
   room_id: z.string(),
-  role: z.enum(['PLAYER', 'AGENT']),
+  role: z.enum(['PLAYER', 'AGENT', 'SYSTEM']),
+  type: z.enum(['CHAT', 'DICE']),
   sender_id: z.string().nullable(),
   content: z.string(),
   created_at: z.string(),
@@ -28,3 +29,23 @@ export const roomsKickPayloadSchema = z.object({
   room_id: z.string(),
   user_id: z.string(),
 })
+
+export const roomsSelectCharacterPayloadSchema = z.object({
+  room_id: z.string(),
+  user_id: z.string(),
+  character_id: z.string().nullable(),
+  character_name: z.string().nullable(),
+})
+
+export const documentProcessUpdatedPayloadSchema = z.object({
+  document_id: z.string(),
+  scenario_id: z.string(),
+  status: z.enum(['READY', 'PROCESSING', 'COMPLETED', 'FAILED']),
+  error: z.string().optional(),
+})
+
+export const roomsAiThinkingPayloadSchema = z.object({
+  room_id: z.string(),
+})
+
+export type DocumentProcessUpdatedPayload = z.infer<typeof documentProcessUpdatedPayloadSchema>

@@ -8,6 +8,7 @@ from sqlmodel import DateTime, Field, Relationship, SQLModel
 from app.shared.utils import datetime_utcnow, uuid7
 
 if TYPE_CHECKING:
+    from app.models.character_model import CharacterModel
     from app.models.room_model import RoomModel
     from app.models.user_model import UserModel
 
@@ -21,6 +22,9 @@ class RoomParticipantLink(SQLModel, table=True):
     room_id: UUID = Field(foreign_key="rooms.id")
     user_id: UUID = Field(foreign_key="users.id")
 
+    # 選擇的角色卡（準備中可選，就緒或開始後不可更改）
+    character_id: Optional[UUID] = Field(default=None, foreign_key="characters.id")
+
     role: str  # player / gm
 
     is_ready: bool = Field(default=False)
@@ -32,7 +36,8 @@ class RoomParticipantLink(SQLModel, table=True):
 
     # Relationships
     room: Optional["RoomModel"] = Relationship(back_populates="participants")
-    user: Optional["UserModel"] = Relationship()
+    user: "UserModel" = Relationship()
+    character: "CharacterModel" = Relationship()
 
     __table_args__ = (
         Index("ix_room_participants_room_id", "room_id"),

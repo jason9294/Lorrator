@@ -1,13 +1,13 @@
 from datetime import timedelta
 
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, Response, UploadFile, File
 
 from app.core.deps import JWTDependency
 from app.core.security import TOKEN_COOKIE_NAME
 
-from .schemas.requests import LoginRequest, RegisterRequest
+from .schemas.requests import LoginRequest, RegisterRequest, UpdateProfileRequest
 from .schemas.responses import MeResponse, TokenResponse
-from .services import LoginService, LogoutService, MeService, RegisterService
+from .services import LoginService, LogoutService, MeService, RegisterService, UpdateProfileService, UploadAvatarService
 
 _ACCESS_TOKEN_EXPIRE = timedelta(days=7)
 
@@ -35,6 +35,30 @@ async def me(
     svc: MeService = Depends(),
 ) -> MeResponse:
     return await svc.execute(jwt.sub)
+
+
+@router.patch(
+    path="/me",
+    summary="update current user profile",
+)
+async def update_me(
+    body: UpdateProfileRequest,
+    jwt: JWTDependency,
+    svc: UpdateProfileService = Depends(),
+) -> MeResponse:
+    return await svc.execute(jwt.sub, body)
+
+
+@router.post(
+    path="/me/avatar",
+    summary="upload avatar image",
+)
+async def upload_avatar(
+    jwt: JWTDependency,
+    file: UploadFile = File(...),
+    svc: UploadAvatarService = Depends(),
+) -> MeResponse:
+    return await svc.execute(jwt.sub, file)
 
 
 @router.post(path="/login", summary="login")

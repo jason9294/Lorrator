@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { AuthLoginData, AuthLoginErrors, AuthLoginResponses, AuthLogoutData, AuthLogoutResponses, AuthMeData, AuthMeResponses, AuthRegisterData, AuthRegisterErrors, AuthRegisterResponses, CharactersCreateCharacterData, CharactersCreateCharacterErrors, CharactersCreateCharacterResponses, CharactersDeleteCharacterData, CharactersDeleteCharacterErrors, CharactersDeleteCharacterResponses, CharactersGetCharacterData, CharactersGetCharacterErrors, CharactersGetCharacterResponses, CharactersListCharactersData, CharactersListCharactersResponses, CharactersUpdateCharacterData, CharactersUpdateCharacterErrors, CharactersUpdateCharacterResponses, DocumentsDownloadOriginalDocumentData, DocumentsDownloadOriginalDocumentErrors, DocumentsDownloadOriginalDocumentResponses, DocumentsGetDocumentMarkdownData, DocumentsGetDocumentMarkdownErrors, DocumentsGetDocumentMarkdownResponses, DocumentsProcessDocumentData, DocumentsProcessDocumentErrors, DocumentsProcessDocumentResponses, MeListMyRoomsData, MeListMyRoomsResponses, RerankerRerankEndpointData, RerankerRerankEndpointErrors, RerankerRerankEndpointResponses, RoomsGetRoomData, RoomsGetRoomErrors, RoomsGetRoomResponses, RoomsJoinRoomData, RoomsJoinRoomErrors, RoomsJoinRoomResponses, RoomsKickParticipantData, RoomsKickParticipantErrors, RoomsKickParticipantResponses, RoomsListRoomMessagesData, RoomsListRoomMessagesErrors, RoomsListRoomMessagesResponses, RoomsRegenerateInviteCodeData, RoomsRegenerateInviteCodeErrors, RoomsRegenerateInviteCodeResponses, RoomsSendRoomMessageData, RoomsSendRoomMessageErrors, RoomsSendRoomMessageResponses, RoomsSetReadyData, RoomsSetReadyErrors, RoomsSetReadyResponses, RoomsStartSessionData, RoomsStartSessionErrors, RoomsStartSessionResponses, ScenariosCreateRoomData, ScenariosCreateRoomErrors, ScenariosCreateRoomResponses, ScenariosCreateScenarioData, ScenariosCreateScenarioErrors, ScenariosCreateScenarioResponses, ScenariosGetScenarioData, ScenariosGetScenarioErrors, ScenariosGetScenarioGraphData, ScenariosGetScenarioGraphErrors, ScenariosGetScenarioGraphResponses, ScenariosGetScenarioResponses, ScenariosListScenarioDocumentsData, ScenariosListScenarioDocumentsErrors, ScenariosListScenarioDocumentsResponses, ScenariosListScenariosData, ScenariosListScenariosResponses, ScenariosPublishScenarioData, ScenariosPublishScenarioErrors, ScenariosPublishScenarioResponses, ScenariosUpdateScenarioData, ScenariosUpdateScenarioErrors, ScenariosUpdateScenarioResponses, ScenariosUploadScenarioDocumentData, ScenariosUploadScenarioDocumentErrors, ScenariosUploadScenarioDocumentResponses, ToolsChunkPlainTextData, ToolsChunkPlainTextErrors, ToolsChunkPlainTextResponses, ToolsEntityExtractToolData, ToolsEntityExtractToolErrors, ToolsEntityExtractToolResponses, UsersGetAllData, UsersGetAllResponses, UsersGetMeData, UsersGetMeResponses, WebsocketIssueWsTicketData, WebsocketIssueWsTicketResponses } from './types.gen';
+import type { AuthLoginData, AuthLoginErrors, AuthLoginResponses, AuthLogoutData, AuthLogoutResponses, AuthMeData, AuthMeResponses, AuthRegisterData, AuthRegisterErrors, AuthRegisterResponses, AuthUpdateMeData, AuthUpdateMeErrors, AuthUpdateMeResponses, AuthUploadAvatarData, AuthUploadAvatarErrors, AuthUploadAvatarResponses, CharactersCreateCharacterData, CharactersCreateCharacterErrors, CharactersCreateCharacterResponses, CharactersDeleteCharacterData, CharactersDeleteCharacterErrors, CharactersDeleteCharacterResponses, CharactersGetCharacterData, CharactersGetCharacterErrors, CharactersGetCharacterResponses, CharactersListCharactersData, CharactersListCharactersResponses, CharactersUpdateCharacterData, CharactersUpdateCharacterErrors, CharactersUpdateCharacterResponses, DocumentsDownloadOriginalDocumentData, DocumentsDownloadOriginalDocumentErrors, DocumentsDownloadOriginalDocumentResponses, DocumentsGetDocumentMarkdownData, DocumentsGetDocumentMarkdownErrors, DocumentsGetDocumentMarkdownResponses, DocumentsProcessDocumentData, DocumentsProcessDocumentErrors, DocumentsProcessDocumentResponses, MeListMyRoomsData, MeListMyRoomsResponses, RerankerRerankEndpointData, RerankerRerankEndpointErrors, RerankerRerankEndpointResponses, RoomsGetRoomData, RoomsGetRoomErrors, RoomsGetRoomResponses, RoomsJoinRoomData, RoomsJoinRoomErrors, RoomsJoinRoomResponses, RoomsKickParticipantData, RoomsKickParticipantErrors, RoomsKickParticipantResponses, RoomsListRoomMessagesData, RoomsListRoomMessagesErrors, RoomsListRoomMessagesResponses, RoomsRegenerateInviteCodeData, RoomsRegenerateInviteCodeErrors, RoomsRegenerateInviteCodeResponses, RoomsRollDiceData, RoomsRollDiceErrors, RoomsRollDiceResponses, RoomsSelectCharacterData, RoomsSelectCharacterErrors, RoomsSelectCharacterResponses, RoomsSendRoomMessageData, RoomsSendRoomMessageErrors, RoomsSendRoomMessageResponses, RoomsSetReadyData, RoomsSetReadyErrors, RoomsSetReadyResponses, RoomsSkillCheckData, RoomsSkillCheckErrors, RoomsSkillCheckResponses, RoomsStartSessionData, RoomsStartSessionErrors, RoomsStartSessionResponses, ScenariosCreateRoomData, ScenariosCreateRoomErrors, ScenariosCreateRoomResponses, ScenariosCreateScenarioData, ScenariosCreateScenarioErrors, ScenariosCreateScenarioResponses, ScenariosGetScenarioData, ScenariosGetScenarioErrors, ScenariosGetScenarioGraphData, ScenariosGetScenarioGraphErrors, ScenariosGetScenarioGraphResponses, ScenariosGetScenarioResponses, ScenariosListScenarioDocumentsData, ScenariosListScenarioDocumentsErrors, ScenariosListScenarioDocumentsResponses, ScenariosListScenariosData, ScenariosListScenariosResponses, ScenariosPublishScenarioData, ScenariosPublishScenarioErrors, ScenariosPublishScenarioResponses, ScenariosUpdateScenarioData, ScenariosUpdateScenarioErrors, ScenariosUpdateScenarioResponses, ScenariosUploadScenarioDocumentData, ScenariosUploadScenarioDocumentErrors, ScenariosUploadScenarioDocumentResponses, ToolsChunkPlainTextData, ToolsChunkPlainTextErrors, ToolsChunkPlainTextResponses, ToolsEntityExtractToolData, ToolsEntityExtractToolErrors, ToolsEntityExtractToolResponses, UsersGetAllData, UsersGetAllResponses, UsersGetMeData, UsersGetMeResponses, WebsocketIssueWsTicketData, WebsocketIssueWsTicketResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -42,6 +42,39 @@ export class AuthService {
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/auth/me',
             ...options
+        });
+    }
+    
+    /**
+     * update current user profile
+     */
+    public static updateMe<ThrowOnError extends boolean = true>(options: Options<AuthUpdateMeData, ThrowOnError>) {
+        return (options.client ?? client).patch<AuthUpdateMeResponses, AuthUpdateMeErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/auth/me',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+    
+    /**
+     * upload avatar image
+     */
+    public static uploadAvatar<ThrowOnError extends boolean = true>(options: Options<AuthUploadAvatarData, ThrowOnError>) {
+        return (options.client ?? client).post<AuthUploadAvatarResponses, AuthUploadAvatarErrors, ThrowOnError>({
+            ...formDataBodySerializer,
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/auth/me/avatar',
+            ...options,
+            headers: {
+                'Content-Type': null,
+                ...options.headers
+            }
         });
     }
     
@@ -380,6 +413,22 @@ export class RoomsService {
     }
     
     /**
+     * 選擇角色卡（準備中且未就緒才可操作）
+     */
+    public static selectCharacter<ThrowOnError extends boolean = true>(options: Options<RoomsSelectCharacterData, ThrowOnError>) {
+        return (options.client ?? client).post<RoomsSelectCharacterResponses, RoomsSelectCharacterErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/rooms/{room_id}/character',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+    
+    /**
      * 設定自己的準備狀態
      */
     public static setReady<ThrowOnError extends boolean = true>(options: Options<RoomsSetReadyData, ThrowOnError>) {
@@ -423,6 +472,38 @@ export class RoomsService {
             responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/rooms/{room_id}/messages',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+    
+    /**
+     * 擲骰（普通模式，aDb 格式）
+     */
+    public static rollDice<ThrowOnError extends boolean = true>(options: Options<RoomsRollDiceData, ThrowOnError>) {
+        return (options.client ?? client).post<RoomsRollDiceResponses, RoomsRollDiceErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/rooms/{room_id}/dice/roll',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+    
+    /**
+     * 技能檢定（輸入技能名稱與數值，自動擲 1d100 判定成敗）
+     */
+    public static skillCheck<ThrowOnError extends boolean = true>(options: Options<RoomsSkillCheckData, ThrowOnError>) {
+        return (options.client ?? client).post<RoomsSkillCheckResponses, RoomsSkillCheckErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/rooms/{room_id}/dice/skill-check',
             ...options,
             headers: {
                 'Content-Type': 'application/json',

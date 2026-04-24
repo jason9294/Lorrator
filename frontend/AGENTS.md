@@ -11,6 +11,23 @@
 - To regenerate the API client, run:
   - `pnpm openapi-ts`
 
+## VueUse Usage Policy
+
+- Prefer using VueUse over writing custom logic for:
+  - Browser APIs (e.g., localStorage, clipboard, resize, visibility)
+  - Event listeners
+  - Timers (interval, timeout)
+  - State utilities (e.g., useToggle, useCounter)
+  - Async state handling (e.g., useAsyncState)
+  - Reactive utilities (e.g., useDebounce, useThrottle)
+
+### Guidelines
+
+- Avoid re-implementing logic already covered by VueUse
+- Always check VueUse before creating a new composable
+- Wrap VueUse functions only when adding business logic abstraction
+- Do NOT wrap VueUse unnecessarily
+
 ## Component Guidelines
 
 ### General Principles

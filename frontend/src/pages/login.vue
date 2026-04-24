@@ -101,8 +101,11 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
 import { setStoredAccessToken } from '@/lib/accessToken'
 import { AuthService } from '@/services'
+import { useMeStore } from '@/stores/me'
 
 const router = useRouter()
+
+const meStore = useMeStore()
 
 const form = ref({ username: '', password: '' })
 const isLoading = ref(false)
@@ -123,8 +126,9 @@ async function handleLogin() {
       },
     })
     setStoredAccessToken(data.access_token)
+    await meStore.fetchMe()
     toast.success('登入成功', { description: '歡迎回來' })
-    await router.push('/scenarios')
+    await router.push('/dashboard')
   } catch {
     // 錯誤訊息由 axios response interceptor（showAxiosErrorToast）顯示
   } finally {

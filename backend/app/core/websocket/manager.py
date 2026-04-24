@@ -1,4 +1,5 @@
 import asyncio
+import traceback
 from collections import defaultdict
 from typing import Any
 from uuid import UUID
@@ -52,9 +53,7 @@ class WebSocketConnectionManager:
         message_type: str,
         payload: dict[str, Any] | None = None,
     ) -> None:
-        body = WsMessageEnvelope(
-            type=message_type, payload=payload or {}
-        ).model_dump()
+        body = WsMessageEnvelope(type=message_type, payload=payload or {}).model_dump()
         async with self._lock:
             sockets = list(self._by_user.get(user_id, ()))
         for ws in sockets:

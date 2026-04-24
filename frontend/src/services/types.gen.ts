@@ -5,6 +5,16 @@ export type ClientOptions = {
 };
 
 /**
+ * Body_auth-upload_avatar
+ */
+export type BodyAuthUploadAvatar = {
+    /**
+     * File
+     */
+    file: Blob | File;
+};
+
+/**
  * Body_scenarios-upload_scenario_document
  */
 export type BodyScenariosUploadScenarioDocument = {
@@ -91,11 +101,11 @@ export type CharacterSkillInput = {
     /**
      * Occupation Value
      */
-    occupation_value?: number;
+    occupation_value?: number | null;
     /**
      * Interest Value
      */
-    interest_value?: number;
+    interest_value?: number | null;
     /**
      * Adjustments
      */
@@ -119,11 +129,11 @@ export type CharacterSkillOutput = {
     /**
      * Occupation Value
      */
-    occupation_value?: number;
+    occupation_value?: number | null;
     /**
      * Interest Value
      */
-    interest_value?: number;
+    interest_value?: number | null;
     /**
      * Adjustments
      */
@@ -303,10 +313,6 @@ export type CoCCharacterDataInput = {
      * Skills
      */
     skills?: Array<CharacterSkillInput>;
-    /**
-     * Skill Adjustments
-     */
-    skill_adjustments?: Array<SkillAdjustment>;
 };
 
 /**
@@ -424,10 +430,6 @@ export type CoCCharacterDataOutput = {
      * Skills
      */
     skills?: Array<CharacterSkillOutput>;
-    /**
-     * Skill Adjustments
-     */
-    skill_adjustments?: Array<SkillAdjustment>;
 };
 
 /**
@@ -442,7 +444,7 @@ export type CoCSkillAdjustmentType = 'GROWTH' | 'CUSTOM';
  *
  * COC 技能分類
  */
-export type CoCSkillCategory = 'NEGOTIATION' | 'INVESTIGATION' | 'LANGUAGE' | 'MEDICAL' | 'PILOT' | 'SURVIVAL' | 'ART_AND_CRAFT' | 'SCIENCE' | 'CUSTOM';
+export type CoCSkillCategory = 'NEGOTIATION' | 'INVESTIGATION' | 'LANGUAGE' | 'MEDICAL' | 'PILOT' | 'SURVIVAL' | 'ART_AND_CRAFT' | 'SCIENCE' | 'MOVEMENT' | 'COMBAT' | 'OCCUPATION' | 'CUSTOM';
 
 /**
  * CoCSkillType
@@ -460,7 +462,6 @@ export type CreateCharacterRequest = {
      */
     name: string;
     game_system?: GameSystem;
-    data?: CoCCharacterDataInput;
 };
 
 /**
@@ -618,6 +619,14 @@ export type MeResponse = {
      * Username
      */
     username: string;
+    /**
+     * Nickname
+     */
+    nickname?: string | null;
+    /**
+     * Avatar Url
+     */
+    avatar_url?: string | null;
 };
 
 /**
@@ -711,38 +720,17 @@ export type RerankResponse = {
 };
 
 /**
- * RoomDetailResponse
+ * RollDiceRequest
  */
-export type RoomDetailResponse = {
+export type RollDiceRequest = {
     /**
-     * Id
+     * Count
      */
-    id: string;
+    count?: number;
     /**
-     * Scenario Id
+     * Faces
      */
-    scenario_id: string;
-    /**
-     * Host Id
-     */
-    host_id: string;
-    /**
-     * Name
-     */
-    name: string;
-    /**
-     * Description
-     */
-    description: string | null;
-    status: RoomStatus;
-    /**
-     * Invite Code
-     */
-    invite_code: string;
-    /**
-     * Participants
-     */
-    participants: Array<RoomParticipantResponse>;
+    faces?: number;
 };
 
 /**
@@ -762,6 +750,7 @@ export type RoomMessageResponse = {
      */
     sender_id: string | null;
     role: RoomMessageRole;
+    type: RoomMessageType;
     /**
      * Content
      */
@@ -782,26 +771,9 @@ export type RoomMessageResponse = {
 export type RoomMessageRole = 'AGENT' | 'PLAYER' | 'SYSTEM';
 
 /**
- * RoomParticipantResponse
+ * RoomMessageType
  */
-export type RoomParticipantResponse = {
-    /**
-     * User Id
-     */
-    user_id: string;
-    /**
-     * Role
-     */
-    role: string;
-    /**
-     * Is Ready
-     */
-    is_ready: boolean;
-    /**
-     * Joined At
-     */
-    joined_at: string;
-};
+export type RoomMessageType = 'CHAT' | 'DICE';
 
 /**
  * RoomResponse
@@ -958,6 +930,16 @@ export type ScenarioResponse = {
 export type ScenarioStatus = 'DRAFT' | 'PUBLISHED';
 
 /**
+ * SelectCharacterRequest
+ */
+export type SelectCharacterRequest = {
+    /**
+     * Character Id
+     */
+    character_id?: string | null;
+};
+
+/**
  * SendMessageRequest
  */
 export type SendMessageRequest = {
@@ -983,6 +965,20 @@ export type SkillAdjustment = {
 };
 
 /**
+ * SkillCheckRequest
+ */
+export type SkillCheckRequest = {
+    /**
+     * Skill Name
+     */
+    skill_name: string;
+    /**
+     * Skill Value
+     */
+    skill_value: number;
+};
+
+/**
  * TokenResponse
  */
 export type TokenResponse = {
@@ -1005,6 +1001,20 @@ export type UpdateCharacterRequest = {
      */
     name?: string | null;
     data?: CoCCharacterDataInput | null;
+};
+
+/**
+ * UpdateProfileRequest
+ */
+export type UpdateProfileRequest = {
+    /**
+     * Nickname
+     */
+    nickname?: string | null;
+    /**
+     * Avatar Url
+     */
+    avatar_url?: string | null;
 };
 
 /**
@@ -1084,6 +1094,140 @@ export type WsTicketResponse = {
 };
 
 /**
+ * RoomDetailResponse
+ */
+export type AppFeaturesRoomsSchemasResponsesRoomDetailResponse = {
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Scenario Id
+     */
+    scenario_id: string;
+    /**
+     * Host Id
+     */
+    host_id: string;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Description
+     */
+    description: string | null;
+    status: RoomStatus;
+    /**
+     * Invite Code
+     */
+    invite_code: string;
+    /**
+     * Participants
+     */
+    participants: Array<AppFeaturesRoomsSchemasResponsesRoomParticipantResponse>;
+};
+
+/**
+ * RoomParticipantResponse
+ */
+export type AppFeaturesRoomsSchemasResponsesRoomParticipantResponse = {
+    /**
+     * User Id
+     */
+    user_id: string;
+    /**
+     * Username
+     */
+    username: string;
+    /**
+     * Nickname
+     */
+    nickname?: string | null;
+    /**
+     * Avatar Url
+     */
+    avatar_url?: string | null;
+    /**
+     * Role
+     */
+    role: string;
+    /**
+     * Is Ready
+     */
+    is_ready: boolean;
+    /**
+     * Joined At
+     */
+    joined_at: string;
+    /**
+     * Character Id
+     */
+    character_id?: string | null;
+    /**
+     * Character Name
+     */
+    character_name?: string | null;
+};
+
+/**
+ * RoomDetailResponse
+ */
+export type AppFeaturesScenariosSchemasResponsesRoomDetailResponse = {
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Scenario Id
+     */
+    scenario_id: string;
+    /**
+     * Host Id
+     */
+    host_id: string;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Description
+     */
+    description: string | null;
+    status: RoomStatus;
+    /**
+     * Invite Code
+     */
+    invite_code: string;
+    /**
+     * Participants
+     */
+    participants: Array<AppFeaturesScenariosSchemasResponsesRoomParticipantResponse>;
+};
+
+/**
+ * RoomParticipantResponse
+ */
+export type AppFeaturesScenariosSchemasResponsesRoomParticipantResponse = {
+    /**
+     * User Id
+     */
+    user_id: string;
+    /**
+     * Role
+     */
+    role: string;
+    /**
+     * Is Ready
+     */
+    is_ready: boolean;
+    /**
+     * Joined At
+     */
+    joined_at: string;
+};
+
+/**
  * CharacterDetailResponse
  */
 export type CharacterDetailResponseWritable = {
@@ -1133,11 +1277,11 @@ export type CharacterSkillOutputWritable = {
     /**
      * Occupation Value
      */
-    occupation_value?: number;
+    occupation_value?: number | null;
     /**
      * Interest Value
      */
-    interest_value?: number;
+    interest_value?: number | null;
     /**
      * Adjustments
      */
@@ -1259,10 +1403,6 @@ export type CoCCharacterDataOutputWritable = {
      * Skills
      */
     skills?: Array<CharacterSkillOutputWritable>;
-    /**
-     * Skill Adjustments
-     */
-    skill_adjustments?: Array<SkillAdjustment>;
 };
 
 export type WebsocketIssueWsTicketData = {
@@ -1296,6 +1436,56 @@ export type AuthMeResponses = {
 };
 
 export type AuthMeResponse = AuthMeResponses[keyof AuthMeResponses];
+
+export type AuthUpdateMeData = {
+    body: UpdateProfileRequest;
+    path?: never;
+    query?: never;
+    url: '/auth/me';
+};
+
+export type AuthUpdateMeErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type AuthUpdateMeError = AuthUpdateMeErrors[keyof AuthUpdateMeErrors];
+
+export type AuthUpdateMeResponses = {
+    /**
+     * Successful Response
+     */
+    200: MeResponse;
+};
+
+export type AuthUpdateMeResponse = AuthUpdateMeResponses[keyof AuthUpdateMeResponses];
+
+export type AuthUploadAvatarData = {
+    body: BodyAuthUploadAvatar;
+    path?: never;
+    query?: never;
+    url: '/auth/me/avatar';
+};
+
+export type AuthUploadAvatarErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type AuthUploadAvatarError = AuthUploadAvatarErrors[keyof AuthUploadAvatarErrors];
+
+export type AuthUploadAvatarResponses = {
+    /**
+     * Successful Response
+     */
+    200: MeResponse;
+};
+
+export type AuthUploadAvatarResponse = AuthUploadAvatarResponses[keyof AuthUploadAvatarResponses];
 
 export type AuthLoginData = {
     body: LoginRequest;
@@ -1658,7 +1848,7 @@ export type ScenariosCreateRoomResponses = {
     /**
      * Successful Response
      */
-    200: RoomDetailResponse;
+    200: AppFeaturesScenariosSchemasResponsesRoomDetailResponse;
 };
 
 export type ScenariosCreateRoomResponse = ScenariosCreateRoomResponses[keyof ScenariosCreateRoomResponses];
@@ -1859,7 +2049,7 @@ export type RoomsGetRoomResponses = {
     /**
      * Successful Response
      */
-    200: RoomDetailResponse;
+    200: AppFeaturesRoomsSchemasResponsesRoomDetailResponse;
 };
 
 export type RoomsGetRoomResponse = RoomsGetRoomResponses[keyof RoomsGetRoomResponses];
@@ -1884,7 +2074,7 @@ export type RoomsJoinRoomResponses = {
     /**
      * Successful Response
      */
-    200: RoomDetailResponse;
+    200: AppFeaturesRoomsSchemasResponsesRoomDetailResponse;
 };
 
 export type RoomsJoinRoomResponse = RoomsJoinRoomResponses[keyof RoomsJoinRoomResponses];
@@ -1914,7 +2104,7 @@ export type RoomsRegenerateInviteCodeResponses = {
     /**
      * Successful Response
      */
-    200: RoomDetailResponse;
+    200: AppFeaturesRoomsSchemasResponsesRoomDetailResponse;
 };
 
 export type RoomsRegenerateInviteCodeResponse = RoomsRegenerateInviteCodeResponses[keyof RoomsRegenerateInviteCodeResponses];
@@ -1948,10 +2138,40 @@ export type RoomsKickParticipantResponses = {
     /**
      * Successful Response
      */
-    200: RoomDetailResponse;
+    200: AppFeaturesRoomsSchemasResponsesRoomDetailResponse;
 };
 
 export type RoomsKickParticipantResponse = RoomsKickParticipantResponses[keyof RoomsKickParticipantResponses];
+
+export type RoomsSelectCharacterData = {
+    body: SelectCharacterRequest;
+    path: {
+        /**
+         * Room Id
+         */
+        room_id: string;
+    };
+    query?: never;
+    url: '/rooms/{room_id}/character';
+};
+
+export type RoomsSelectCharacterErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type RoomsSelectCharacterError = RoomsSelectCharacterErrors[keyof RoomsSelectCharacterErrors];
+
+export type RoomsSelectCharacterResponses = {
+    /**
+     * Successful Response
+     */
+    200: AppFeaturesRoomsSchemasResponsesRoomDetailResponse;
+};
+
+export type RoomsSelectCharacterResponse = RoomsSelectCharacterResponses[keyof RoomsSelectCharacterResponses];
 
 export type RoomsSetReadyData = {
     body?: never;
@@ -1983,7 +2203,7 @@ export type RoomsSetReadyResponses = {
     /**
      * Successful Response
      */
-    200: RoomDetailResponse;
+    200: AppFeaturesRoomsSchemasResponsesRoomDetailResponse;
 };
 
 export type RoomsSetReadyResponse = RoomsSetReadyResponses[keyof RoomsSetReadyResponses];
@@ -2013,7 +2233,7 @@ export type RoomsStartSessionResponses = {
     /**
      * Successful Response
      */
-    200: RoomDetailResponse;
+    200: AppFeaturesRoomsSchemasResponsesRoomDetailResponse;
 };
 
 export type RoomsStartSessionResponse = RoomsStartSessionResponses[keyof RoomsStartSessionResponses];
@@ -2079,6 +2299,66 @@ export type RoomsSendRoomMessageResponses = {
 };
 
 export type RoomsSendRoomMessageResponse = RoomsSendRoomMessageResponses[keyof RoomsSendRoomMessageResponses];
+
+export type RoomsRollDiceData = {
+    body: RollDiceRequest;
+    path: {
+        /**
+         * Room Id
+         */
+        room_id: string;
+    };
+    query?: never;
+    url: '/rooms/{room_id}/dice/roll';
+};
+
+export type RoomsRollDiceErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type RoomsRollDiceError = RoomsRollDiceErrors[keyof RoomsRollDiceErrors];
+
+export type RoomsRollDiceResponses = {
+    /**
+     * Successful Response
+     */
+    200: RoomMessageResponse;
+};
+
+export type RoomsRollDiceResponse = RoomsRollDiceResponses[keyof RoomsRollDiceResponses];
+
+export type RoomsSkillCheckData = {
+    body: SkillCheckRequest;
+    path: {
+        /**
+         * Room Id
+         */
+        room_id: string;
+    };
+    query?: never;
+    url: '/rooms/{room_id}/dice/skill-check';
+};
+
+export type RoomsSkillCheckErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type RoomsSkillCheckError = RoomsSkillCheckErrors[keyof RoomsSkillCheckErrors];
+
+export type RoomsSkillCheckResponses = {
+    /**
+     * Successful Response
+     */
+    200: RoomMessageResponse;
+};
+
+export type RoomsSkillCheckResponse = RoomsSkillCheckResponses[keyof RoomsSkillCheckResponses];
 
 export type CharactersListCharactersData = {
     body?: never;

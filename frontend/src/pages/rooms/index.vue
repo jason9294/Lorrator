@@ -151,6 +151,7 @@ import AppHeader from '@/components/layout/AppHeader.vue'
 import { Card, CardContent } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
 import { MeService, RoomsService, type RoomResponse, type RoomStatus } from '@/services'
+import { colorFromId } from '@/utils/color'
 
 const router = useRouter()
 
@@ -161,13 +162,6 @@ const joinDialogOpen = ref(false)
 const joinCode = ref('')
 const isJoining = ref(false)
 const joinError = ref<string | null>(null)
-
-function colorFromId(id: string) {
-  let hash = 0
-  for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) | 0
-  const hue = Math.abs(hash) % 360
-  return `hsl(${hue} 80% 45%)`
-}
 
 function statusLabel(status: RoomStatus) {
   if (status === 'RUNNING') return '跑團中'

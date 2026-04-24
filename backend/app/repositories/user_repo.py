@@ -1,3 +1,4 @@
+from typing import Optional
 from uuid import UUID
 
 from sqlmodel import select
@@ -26,8 +27,19 @@ class UserRepository(BaseRepository):
         return result.scalars().first()
 
     async def create(self, username: str, hashed_password: str) -> UserModel:
-        """創建新用戶"""
         user = UserModel(username=username, password=hashed_password)
+        self.session.add(user)
+        await self.session.flush()
+        return user
+
+    async def update_profile(
+        self,
+        user: UserModel,
+        nickname: Optional[str],
+        avatar_url: Optional[str],
+    ) -> UserModel:
+        user.nickname = nickname
+        user.avatar_url = avatar_url
         self.session.add(user)
         await self.session.flush()
         return user
