@@ -11,7 +11,7 @@ export default defineConfig({
   plugins: [
     VueRouter(),
     vue(), // ⚠️ Vue must be placed after VueRouter()
-    vueDevTools(),
+    // vueDevTools(),
     tailwindcss(),
   ],
   resolve: {

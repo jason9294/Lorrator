@@ -127,7 +127,7 @@ async def _process_document_job(
             content = path.read_text(encoding="utf-8")
             chunks = chunk_text(content)
 
-            if False:
+            if True:
                 graphiti = Graphiti(
                     settings.NEO4J_URI, settings.NEO4J_USER, settings.NEO4J_PASSWORD
                 )
