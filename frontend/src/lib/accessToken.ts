@@ -1,14 +1,15 @@
-const STORAGE_KEY = 'lorrator_access_token'
+import { useStorage } from '@vueuse/core'
+
+const accessToken = useStorage<string | null>('lorrator_access_token', null)
 
 export function getStoredAccessToken(): string | null {
-  if (typeof localStorage === 'undefined') return null
-  return localStorage.getItem(STORAGE_KEY)
+  return accessToken.value
 }
 
 export function setStoredAccessToken(token: string): void {
-  localStorage.setItem(STORAGE_KEY, token)
+  accessToken.value = token
 }
 
 export function clearStoredAccessToken(): void {
-  localStorage.removeItem(STORAGE_KEY)
+  accessToken.value = null
 }

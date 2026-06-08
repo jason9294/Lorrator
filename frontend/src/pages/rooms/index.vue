@@ -1,6 +1,5 @@
 <template>
   <div class="min-h-screen flex flex-col bg-background text-foreground">
-
     <AppHeader>
       <template #actions>
         <Button variant="outline" size="sm" class="gap-2" @click="joinDialogOpen = true">
@@ -42,7 +41,6 @@
     <!-- 主體 -->
     <main class="flex-1 p-6">
       <div class="max-w-4xl mx-auto space-y-6">
-
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-xl font-bold">我的跑團房間</h2>
@@ -84,7 +82,13 @@
                   </div>
                   <span
                     class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-background"
-                    :class="room.status === 'RUNNING' ? 'bg-green-500' : room.status === 'COMPLETED' ? 'bg-muted-foreground/40' : 'bg-yellow-500'"
+                    :class="
+                      room.status === 'RUNNING'
+                        ? 'bg-green-500'
+                        : room.status === 'COMPLETED'
+                          ? 'bg-muted-foreground/40'
+                          : 'bg-yellow-500'
+                    "
                   />
                 </div>
 
@@ -98,7 +102,9 @@
                       {{ statusLabel(room.status) }}
                     </Badge>
                   </div>
-                  <p class="text-xs text-muted-foreground mt-0.5">{{ room.description || '無簡介' }}</p>
+                  <p class="text-xs text-muted-foreground mt-0.5">
+                    {{ room.description || '無簡介' }}
+                  </p>
                 </div>
 
                 <!-- 進入按鈕 -->
@@ -120,7 +126,9 @@
         >
           <DoorOpen class="size-12 text-muted-foreground/30 mb-4" />
           <p class="font-medium text-muted-foreground">還沒有房間</p>
-          <p class="text-sm text-muted-foreground/60 mt-1 mb-4">可以從劇本列表創建房間，或透過邀請碼加入</p>
+          <p class="text-sm text-muted-foreground/60 mt-1 mb-4">
+            可以從劇本列表創建房間，或透過邀請碼加入
+          </p>
           <div class="flex items-center gap-2">
             <Button size="sm" class="gap-1.5" variant="outline" @click="joinDialogOpen = true">
               <LogIn class="size-3.5" />
@@ -134,15 +142,14 @@
             </RouterLink>
           </div>
         </div>
-
       </div>
     </main>
-
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { useAsyncState, useToggle } from '@vueuse/core'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { DoorOpen, LogIn } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
@@ -150,15 +157,20 @@ import { Badge } from '@/components/ui/badge'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import { Card, CardContent } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
-import { MeService, RoomsService, type RoomResponse, type RoomStatus } from '@/services'
+import { MeService, RoomsService, type RoomStatus } from '@/services'
 import { colorFromId } from '@/utils/color'
 
 const router = useRouter()
 
-const isLoading = ref(false)
-const rooms = ref<RoomResponse[]>([])
+const { state: rooms, isLoading } = useAsyncState(
+  async () => (await MeService.listMyRooms()).data ?? [],
+  [],
+  {
+    immediate: true,
+  },
+)
 
-const joinDialogOpen = ref(false)
+const [joinDialogOpen] = useToggle(false)
 const joinCode = ref('')
 const isJoining = ref(false)
 const joinError = ref<string | null>(null)
@@ -167,19 +179,6 @@ function statusLabel(status: RoomStatus) {
   if (status === 'RUNNING') return '跑團中'
   if (status === 'COMPLETED') return '已結束'
   return '準備中'
-}
-
-async function loadRooms() {
-  isLoading.value = true
-  try {
-    const res = await MeService.listMyRooms()
-    rooms.value = res.data ?? []
-  } catch (err) {
-    console.error('載入我的房間失敗', err)
-    rooms.value = []
-  } finally {
-    isLoading.value = false
-  }
 }
 
 async function handleJoinRoom() {
@@ -199,6 +198,4 @@ async function handleJoinRoom() {
     isJoining.value = false
   }
 }
-
-onMounted(loadRooms)
 </script>

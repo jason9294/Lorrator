@@ -1,13 +1,20 @@
 from datetime import timedelta
 
-from fastapi import APIRouter, Depends, Response, UploadFile, File
+from fastapi import APIRouter, Depends, File, Response, UploadFile
 
 from app.core.deps import JWTDependency
 from app.core.security import TOKEN_COOKIE_NAME
 
 from .schemas.requests import LoginRequest, RegisterRequest, UpdateProfileRequest
 from .schemas.responses import MeResponse, TokenResponse
-from .services import LoginService, LogoutService, MeService, RegisterService, UpdateProfileService, UploadAvatarService
+from .services import (
+    LoginService,
+    LogoutService,
+    MeService,
+    RegisterService,
+    UpdateProfileService,
+    UploadAvatarService,
+)
 
 _ACCESS_TOKEN_EXPIRE = timedelta(days=7)
 

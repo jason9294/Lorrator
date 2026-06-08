@@ -46,5 +46,6 @@ class RoomMessageResponse(BaseModel):
     role: RoomMessageRole
     type: RoomMessageType
     content: str
+    detail: str | None = None
     created_at: datetime
     updated_at: datetime

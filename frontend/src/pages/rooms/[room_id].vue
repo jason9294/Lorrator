@@ -293,7 +293,7 @@
 
       <!-- ═══ 聊天介面（跑團進行中） ═══ -->
       <template v-else-if="room.status === 'RUNNING'">
-        <main ref="messageListRef" class="flex-1 overflow-y-auto px-4 py-4 space-y-4 scroll-smooth">
+        <main ref="messageListRef" class="flex-1 overflow-y-auto px-4 py-4 scroll-smooth">
           <!-- 系統提示訊息 -->
           <div class="flex justify-center">
             <div class="bg-muted/50 text-muted-foreground text-xs px-3 py-1.5 rounded-full">
@@ -302,119 +302,15 @@
           </div>
 
           <!-- 訊息氣泡 -->
-          <template v-for="msg in messages" :key="msg.id">
-            <!-- 擲骰結果 -->
-            <div v-if="msg.type === 'DICE'" class="flex justify-center">
-              <div
-                class="flex items-start gap-2.5 bg-amber-500/10 border border-amber-500/25 text-amber-800 dark:text-amber-300 text-sm px-4 py-2.5 rounded-xl max-w-sm w-full"
-              >
-                <span class="text-lg leading-none shrink-0">🎲</span>
-                <div class="flex-1 min-w-0">
-                  <p class="text-[10px] font-medium text-amber-600 dark:text-amber-400 mb-0.5">
-                    {{
-                      msg.sender_id === meStore.id
-                        ? '你'
-                        : room.participants.find((p) => p.user_id === msg.sender_id)?.nickname ||
-                          room.participants.find((p) => p.user_id === msg.sender_id)?.username ||
-                          '玩家'
-                    }}
-                  </p>
-                  <p class="leading-snug">{{ msg.content.replace(/^🎲\s*/, '') }}</p>
-                </div>
-              </div>
-            </div>
+          <MessageRenderer
+            v-for="(msg, index) in messages"
+            :key="msg.id"
+            :data="msg"
+            :participants="room.participants"
+            :show-author="shouldShowMessageAuthor(messages, index)"
+          />
 
-            <!-- 系統公告 -->
-            <div v-else-if="msg.role === 'SYSTEM'" class="flex justify-center">
-              <div class="bg-muted/50 text-muted-foreground text-xs px-3 py-1.5 rounded-full">
-                {{ msg.content }}
-              </div>
-            </div>
-
-            <!-- AI 守門人訊息 -->
-            <div v-else-if="msg.role === 'AGENT'" class="flex items-start gap-3 max-w-[85%]">
-              <div
-                class="w-8 h-8 rounded-full bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center shrink-0 shadow-sm mt-0.5"
-              >
-                <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
-                  <path
-                    d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"
-                  />
-                </svg>
-              </div>
-              <div class="flex flex-col gap-1">
-                <div class="flex items-center gap-2">
-                  <span class="text-xs font-semibold">Keeper Agent</span>
-                  <span class="text-[10px] text-muted-foreground">{{ msg.created_at }}</span>
-                </div>
-                <div
-                  class="agent-markdown bg-muted/60 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm leading-relaxed max-w-prose"
-                  v-html="renderMarkdown(msg.content)"
-                />
-              </div>
-            </div>
-
-            <!-- 玩家訊息 -->
-            <div v-else class="flex items-start gap-3 max-w-[85%] ml-auto flex-row-reverse">
-              <UserAvatar
-                :user-id="msg.sender_id ?? ''"
-                :avatar-url="room.participants.find((p) => p.user_id === msg.sender_id)?.avatar_url"
-                :nickname="room.participants.find((p) => p.user_id === msg.sender_id)?.nickname"
-                :username="room.participants.find((p) => p.user_id === msg.sender_id)?.username"
-                size="sm"
-                class="mt-0.5"
-              />
-              <div class="flex flex-col gap-1 items-end">
-                <div class="flex items-center gap-2">
-                  <span class="text-[10px] text-muted-foreground">{{ msg.created_at }}</span>
-                  <span class="text-xs font-semibold">{{
-                    msg.sender_id === meStore.id
-                      ? '你'
-                      : room.participants.find((p) => p.user_id === msg.sender_id)?.nickname ||
-                        room.participants.find((p) => p.user_id === msg.sender_id)?.username ||
-                        '玩家'
-                  }}</span>
-                </div>
-                <div
-                  class="rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap"
-                  :class="
-                    msg.sender_id === meStore.id
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted/60'
-                  "
-                >
-                  {{ msg.content }}
-                </div>
-              </div>
-            </div>
-          </template>
-
-          <!-- AI 輸入中 -->
-          <div v-if="isAiTyping" class="flex items-start gap-3 max-w-[85%]">
-            <div
-              class="w-8 h-8 rounded-full bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center shrink-0 shadow-sm mt-0.5"
-            >
-              <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
-                <path
-                  d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"
-                />
-              </svg>
-            </div>
-            <div class="flex flex-col gap-1">
-              <span class="text-xs font-semibold">AI 守門人</span>
-              <div class="bg-muted/60 rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-1">
-                <span
-                  class="w-1.5 h-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:0ms]"
-                />
-                <span
-                  class="w-1.5 h-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:150ms]"
-                />
-                <span
-                  class="w-1.5 h-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:300ms]"
-                />
-              </div>
-            </div>
-          </div>
+          <TypingIndicator v-if="isAiTyping" />
 
           <div ref="bottomRef" />
         </main>
@@ -455,7 +351,7 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref } from 'vue'
-import MarkdownIt from 'markdown-it'
+import { useAsyncState, useToggle } from '@vueuse/core'
 import { useRoute, useRouter } from 'vue-router'
 import {
   ArrowLeft,
@@ -471,8 +367,10 @@ import {
 } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { useColorMode } from '@/composables/useColorMode'
+import { useCopyFeedback } from '@/composables/useCopyFeedback'
 
 const { isDark, toggle } = useColorMode()
+const { copy, copied: copiedToast } = useCopyFeedback()
 import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
 import {
@@ -488,12 +386,14 @@ import {
   RoomsService,
   type CharacterResponse,
   type RoomMessageResponse,
-  type AppFeaturesRoomsSchemasResponsesRoomDetailResponse as RoomDetailResponse,
-  type AppFeaturesRoomsSchemasResponsesRoomParticipantResponse as RoomParticipantResponse,
+  type RoomDetailResponse,
+  type RoomParticipantResponse,
 } from '@/services'
 import { useSocketOnType } from '@/composables/useSocketOnType'
 import { useMeStore } from '@/stores/me'
 
+import MessageRenderer from '@/components/rooms/messages/MessageRenderer.vue'
+import TypingIndicator from '@/components/rooms/messages/TypingIndicator.vue'
 import DiceRollerDialog from '@/components/rooms/DiceRollerDialog.vue'
 import RoomMessageComposer from '@/components/rooms/RoomMessageComposer.vue'
 import RoomKickedDialog from '@/components/rooms/RoomKickedDialog.vue'
@@ -501,12 +401,7 @@ import RoomParticipantInfoCard from '@/components/rooms/RoomParticipantInfoCard.
 import RoomParticipantContextMenu from '@/components/rooms/RoomParticipantContextMenu.vue'
 import UserAvatar from '@/components/user/UserAvatar.vue'
 import { colorFromId } from '@/utils/color'
-
-const md = new MarkdownIt({ breaks: true, linkify: true })
-
-function renderMarkdown(content: string): string {
-  return md.render(content)
-}
+import { shouldShowMessageAuthor } from '@/utils/messageGrouping'
 
 import {
   roomsAiThinkingPayloadSchema,
@@ -523,19 +418,15 @@ const route = useRoute()
 const router = useRouter()
 const roomId = String(route.params.room_id ?? '')
 
-const isLoading = ref(true)
-const loadError = ref<string | null>(null)
-const room = ref<RoomDetail | null>(null)
 const meStore = useMeStore()
 
 const actionError = ref<string | null>(null)
-const copiedToast = ref(false)
 const isRegenerating = ref(false)
 const isStarting = ref(false)
 const isKicking = ref<string | null>(null)
 const isSettingReady = ref(false)
 const isSending = ref(false)
-const kickedDialogOpen = ref(false)
+const [kickedDialogOpen] = useToggle(false)
 
 // 角色卡
 const characters = ref<CharacterResponse[]>([])
@@ -547,48 +438,9 @@ const isAiTyping = ref(false)
 const bottomRef = ref<HTMLElement | null>(null)
 const messages = ref<RoomMessageResponse[]>([])
 
-const isHost = computed(() => room.value?.host_id === meStore.id)
-
-const myParticipant = computed((): RoomParticipantResponse | undefined =>
-  room.value?.participants.find((p) => p.user_id === meStore.id),
-)
-
-const allReady = computed(
-  () =>
-    (room.value?.participants.length ?? 0) > 0 && room.value!.participants.every((p) => p.is_ready),
-)
-
-const notReadyCount = computed(
-  () => room.value?.participants.filter((p) => !p.is_ready).length ?? 0,
-)
-
-function handleKickedConfirm() {
-  void router.push('/rooms')
-}
-
-async function bootstrap() {
-  isLoading.value = true
-  loadError.value = null
-  try {
-    const [roomRes] = await Promise.all([
-      RoomsService.getRoom({ path: { room_id: roomId } }),
-      meStore.ensureMe(),
-    ])
-    room.value = roomRes.data
-
-    if (room.value.status === 'RUNNING') {
-      await loadMessages()
-    } else if (room.value.status === 'PREPARING') {
-      await loadCharacters()
-    }
-  } catch (e) {
-    const status = (e as { response?: { status?: number } })?.response?.status
-    const detail = (e as { response?: { data?: { detail?: unknown } } })?.response?.data?.detail
-    loadError.value =
-      status === 403 ? '你不是此房間的參與者' : typeof detail === 'string' ? detail : '無法載入房間'
-  } finally {
-    isLoading.value = false
-  }
+async function scrollToBottom() {
+  await nextTick()
+  bottomRef.value?.scrollIntoView({ behavior: 'smooth' })
 }
 
 async function loadCharacters() {
@@ -610,6 +462,62 @@ async function loadMessages() {
   }
 }
 
+const {
+  state: room,
+  isLoading,
+  error: bootstrapError,
+  execute: bootstrap,
+} = useAsyncState(
+  async () => {
+    const [roomRes] = await Promise.all([
+      RoomsService.getRoom({ path: { room_id: roomId } }),
+      meStore.ensureMe(),
+    ])
+    const data = roomRes.data
+    if (data.status === 'RUNNING') {
+      await loadMessages()
+    } else if (data.status === 'PREPARING') {
+      await loadCharacters()
+    }
+    return data
+  },
+  null as RoomDetail | null,
+  { immediate: false },
+)
+
+const loadError = computed(() => {
+  if (!bootstrapError.value) return null
+  const e = bootstrapError.value as {
+    response?: { status?: number; data?: { detail?: unknown } }
+  }
+  const status = e.response?.status
+  const detail = e.response?.data?.detail
+  return status === 403
+    ? '你不是此房間的參與者'
+    : typeof detail === 'string'
+      ? detail
+      : '無法載入房間'
+})
+
+const isHost = computed(() => room.value?.host_id === meStore.id)
+
+const myParticipant = computed((): RoomParticipantResponse | undefined =>
+  room.value?.participants.find((p) => p.user_id === meStore.id),
+)
+
+const allReady = computed(
+  () =>
+    (room.value?.participants.length ?? 0) > 0 && room.value!.participants.every((p) => p.is_ready),
+)
+
+const notReadyCount = computed(
+  () => room.value?.participants.filter((p) => !p.is_ready).length ?? 0,
+)
+
+function handleKickedConfirm() {
+  void router.push('/rooms')
+}
+
 async function handleRegenerateInvite() {
   isRegenerating.value = true
   actionError.value = null
@@ -623,27 +531,9 @@ async function handleRegenerateInvite() {
   }
 }
 
-async function copyInviteCode() {
+function copyInviteCode() {
   if (!room.value) return
-  try {
-    await navigator.clipboard.writeText(room.value.invite_code)
-  } catch {
-    const textarea = document.createElement('textarea')
-    textarea.value = room.value.invite_code
-    textarea.style.position = 'fixed'
-    textarea.style.opacity = '0'
-
-    document.body.appendChild(textarea)
-    textarea.focus()
-    textarea.select()
-
-    document.execCommand('copy')
-    document.body.removeChild(textarea)
-  }
-  copiedToast.value = true
-  setTimeout(() => {
-    copiedToast.value = false
-  }, 2000)
+  void copy(room.value.invite_code)
 }
 
 async function handleKick(userId: string) {
@@ -728,7 +618,6 @@ async function sendMessage(text: string) {
     updated_at: new Date().toISOString(),
   }
   messages.value.push(tempMessage)
-  isAiTyping.value = true
   inputText.value = ''
   await nextTick()
   await scrollToBottom()
@@ -748,7 +637,6 @@ async function sendMessage(text: string) {
     if (idx !== -1) {
       messages.value.splice(idx, 1)
     }
-    isAiTyping.value = false
   }
 
   isSending.value = false
@@ -758,14 +646,8 @@ async function sendMessage(text: string) {
 
 async function handleDiceRolled(message: RoomMessageResponse) {
   messages.value.push(message)
-  isAiTyping.value = true
   await nextTick()
   await scrollToBottom()
-}
-
-async function scrollToBottom() {
-  await nextTick()
-  bottomRef.value?.scrollIntoView({ behavior: 'smooth' })
 }
 
 // WebSocket
@@ -808,11 +690,6 @@ useSocketOnType('rooms.create_message', (payload) => {
 
   const data = parsed.data
 
-  // AI 回覆到達時，解除輸入鎖定（所有人都會收到，包括自己）
-  if (data.role === 'AGENT') {
-    isAiTyping.value = false
-  }
-
   // 自己發的玩家訊息已透過 HTTP 回應加入，跳過避免重複
   if (data.sender_id === meStore.id) {
     return
@@ -825,6 +702,7 @@ useSocketOnType('rooms.create_message', (payload) => {
     role: data.role,
     type: data.type,
     content: data.content,
+    detail: data.detail ?? null,
     created_at: data.created_at,
     updated_at: data.updated_at,
   })
@@ -836,8 +714,10 @@ useSocketOnType('rooms.ai_thinking', (payload) => {
   if (!parsed.success) return
   if (parsed.data.room_id !== roomId) return
 
-  isAiTyping.value = true
-  void scrollToBottom()
+  isAiTyping.value = parsed.data.active
+  if (parsed.data.active) {
+    void scrollToBottom()
+  }
 })
 
 useSocketOnType('rooms.set_ready', (payload) => {
@@ -936,9 +816,15 @@ onMounted(async () => {
   margin-top: 0.75em;
   margin-bottom: 0.4em;
 }
-.agent-markdown :deep(h1) { font-size: 1.15em; }
-.agent-markdown :deep(h2) { font-size: 1.05em; }
-.agent-markdown :deep(h3) { font-size: 0.97em; }
+.agent-markdown :deep(h1) {
+  font-size: 1.15em;
+}
+.agent-markdown :deep(h2) {
+  font-size: 1.05em;
+}
+.agent-markdown :deep(h3) {
+  font-size: 0.97em;
+}
 .agent-markdown :deep(ul),
 .agent-markdown :deep(ol) {
   padding-left: 1.4em;

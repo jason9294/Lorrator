@@ -17,3 +17,7 @@ class _Relationship(BaseModel):
 class ExtractedEntities(BaseModel):
     entities: list[_Entity]
     relationships: list[_Relationship]
+
+
+class SummaryRound(BaseModel):
+    summaries: list[str] | None

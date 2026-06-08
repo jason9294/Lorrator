@@ -1,7 +1,9 @@
 <template>
   <div class="min-h-screen flex flex-col bg-background text-foreground">
     <!-- 頂部導覽 -->
-    <header class="shrink-0 flex items-center gap-3 px-5 h-13 border-b bg-card/80 backdrop-blur-sm z-30">
+    <header
+      class="shrink-0 flex items-center gap-3 px-5 h-13 border-b bg-card/80 backdrop-blur-sm z-30"
+    >
       <RouterLink to="/characters">
         <Button variant="ghost" size="icon-sm">
           <ArrowLeft class="size-4" />
@@ -58,7 +60,6 @@
     <!-- 主體內容 -->
     <main class="flex-1 p-6">
       <div class="max-w-3xl mx-auto">
-
         <!-- 載入中 -->
         <div v-if="isLoading" class="space-y-4">
           <div v-for="n in 4" :key="n" class="rounded-xl border bg-card p-5 animate-pulse">
@@ -135,18 +136,29 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { useAsyncState, useToggle } from '@vueuse/core'
+import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ArrowLeft, Pencil, Trash2, User, X } from 'lucide-vue-next'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel,
-  AlertDialogContent, AlertDialogDescription,
-  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { CharactersService, type CoCCharacterDataInput, type CoCCharacterDataOutput, type CharacterDetailResponse } from '@/services'
+import {
+  CharactersService,
+  type CoCCharacterDataInput,
+  type CoCCharacterDataOutput,
+  type CharacterDetailResponse,
+} from '@/services'
 import CoCCharacterSheet from '@/components/characters/coc/CoCCharacterSheet.vue'
 import CoCCharacterForm from '@/components/characters/coc/CoCCharacterForm.vue'
 
@@ -154,30 +166,29 @@ const route = useRoute()
 const router = useRouter()
 const characterId = route.params.character_id as string
 
-const isLoading = ref(false)
-const character = ref<CharacterDetailResponse | null>(null)
+const { state: character, isLoading } = useAsyncState(
+  async () => {
+    try {
+      const res = await CharactersService.getCharacter({ path: { character_id: characterId } })
+      return res.data
+    } catch {
+      return null
+    }
+  },
+  null as CharacterDetailResponse | null,
+  { immediate: true },
+)
+
 const editMode = ref(false)
 const isSaving = ref(false)
 const isDeleting = ref(false)
-const confirmDeleteOpen = ref(false)
+const [confirmDeleteOpen] = useToggle(false)
 
 const cocData = computed<CoCCharacterDataOutput | null>(() => {
   const d = character.value?.data
   if (!d || typeof d !== 'object' || Array.isArray(d)) return null
   return d as CoCCharacterDataOutput
 })
-
-async function loadCharacter() {
-  isLoading.value = true
-  try {
-    const res = await CharactersService.getCharacter({ path: { character_id: characterId } })
-    character.value = res.data
-  } catch {
-    character.value = null
-  } finally {
-    isLoading.value = false
-  }
-}
 
 async function handleSave(data: CoCCharacterDataInput) {
   if (!character.value) return
@@ -209,6 +220,4 @@ async function handleDelete() {
 function handleCancelEdit() {
   editMode.value = false
 }
-
-onMounted(loadCharacter)
 </script>

@@ -4,6 +4,7 @@ from scalar_fastapi import get_scalar_api_reference
 
 from app.core.setting import get_settings
 
+from ..logging_config import setup_logging
 from ..middlewares import register_middlewares
 from .lifespan import lifespan
 from .register_routers import register_routers
@@ -18,6 +19,8 @@ def custom_generate_unique_id(route: APIRoute):
 
 
 def create_app() -> FastAPI:
+    setup_logging()
+
     settings = get_settings()
 
     app = FastAPI(

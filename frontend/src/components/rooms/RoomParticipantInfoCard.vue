@@ -1,43 +1,21 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { useCopyFeedback } from '@/composables/useCopyFeedback'
 import { Check, Copy } from 'lucide-vue-next'
-import {
-  PopoverArrow,
-  PopoverContent,
-  PopoverPortal,
-  PopoverRoot,
-  PopoverTrigger,
-} from 'reka-ui'
+import { PopoverArrow, PopoverContent, PopoverPortal, PopoverRoot, PopoverTrigger } from 'reka-ui'
 import UserAvatar from '@/components/user/UserAvatar.vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import type { AppFeaturesRoomsSchemasResponsesRoomParticipantResponse as RoomParticipantResponse } from '@/services'
+import type { RoomParticipantResponse } from '@/services'
 
 const props = defineProps<{
   participant: RoomParticipantResponse
   isHost?: boolean
 }>()
 
-const copied = ref(false)
+const { copy, copied } = useCopyFeedback()
 
-async function copyId() {
-  try {
-    await navigator.clipboard.writeText(props.participant.user_id)
-  } catch {
-    const ta = document.createElement('textarea')
-    ta.value = props.participant.user_id
-    ta.style.position = 'fixed'
-    ta.style.opacity = '0'
-    document.body.appendChild(ta)
-    ta.focus()
-    ta.select()
-    document.execCommand('copy')
-    document.body.removeChild(ta)
-  }
-  copied.value = true
-  setTimeout(() => {
-    copied.value = false
-  }, 2000)
+function copyId() {
+  void copy(props.participant.user_id)
 }
 </script>
 

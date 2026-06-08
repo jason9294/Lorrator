@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { AuthLoginData, AuthLoginErrors, AuthLoginResponses, AuthLogoutData, AuthLogoutResponses, AuthMeData, AuthMeResponses, AuthRegisterData, AuthRegisterErrors, AuthRegisterResponses, AuthUpdateMeData, AuthUpdateMeErrors, AuthUpdateMeResponses, AuthUploadAvatarData, AuthUploadAvatarErrors, AuthUploadAvatarResponses, CharactersCreateCharacterData, CharactersCreateCharacterErrors, CharactersCreateCharacterResponses, CharactersDeleteCharacterData, CharactersDeleteCharacterErrors, CharactersDeleteCharacterResponses, CharactersGetCharacterData, CharactersGetCharacterErrors, CharactersGetCharacterResponses, CharactersListCharactersData, CharactersListCharactersResponses, CharactersUpdateCharacterData, CharactersUpdateCharacterErrors, CharactersUpdateCharacterResponses, DocumentsDownloadOriginalDocumentData, DocumentsDownloadOriginalDocumentErrors, DocumentsDownloadOriginalDocumentResponses, DocumentsGetDocumentMarkdownData, DocumentsGetDocumentMarkdownErrors, DocumentsGetDocumentMarkdownResponses, DocumentsProcessDocumentData, DocumentsProcessDocumentErrors, DocumentsProcessDocumentResponses, MeListMyRoomsData, MeListMyRoomsResponses, RerankerRerankEndpointData, RerankerRerankEndpointErrors, RerankerRerankEndpointResponses, RoomsGetRoomData, RoomsGetRoomErrors, RoomsGetRoomResponses, RoomsJoinRoomData, RoomsJoinRoomErrors, RoomsJoinRoomResponses, RoomsKickParticipantData, RoomsKickParticipantErrors, RoomsKickParticipantResponses, RoomsListRoomMessagesData, RoomsListRoomMessagesErrors, RoomsListRoomMessagesResponses, RoomsRegenerateInviteCodeData, RoomsRegenerateInviteCodeErrors, RoomsRegenerateInviteCodeResponses, RoomsRollDiceData, RoomsRollDiceErrors, RoomsRollDiceResponses, RoomsSelectCharacterData, RoomsSelectCharacterErrors, RoomsSelectCharacterResponses, RoomsSendRoomMessageData, RoomsSendRoomMessageErrors, RoomsSendRoomMessageResponses, RoomsSetReadyData, RoomsSetReadyErrors, RoomsSetReadyResponses, RoomsSkillCheckData, RoomsSkillCheckErrors, RoomsSkillCheckResponses, RoomsStartSessionData, RoomsStartSessionErrors, RoomsStartSessionResponses, ScenariosCreateRoomData, ScenariosCreateRoomErrors, ScenariosCreateRoomResponses, ScenariosCreateScenarioData, ScenariosCreateScenarioErrors, ScenariosCreateScenarioResponses, ScenariosGetScenarioData, ScenariosGetScenarioErrors, ScenariosGetScenarioGraphData, ScenariosGetScenarioGraphErrors, ScenariosGetScenarioGraphResponses, ScenariosGetScenarioResponses, ScenariosListScenarioDocumentsData, ScenariosListScenarioDocumentsErrors, ScenariosListScenarioDocumentsResponses, ScenariosListScenariosData, ScenariosListScenariosResponses, ScenariosPublishScenarioData, ScenariosPublishScenarioErrors, ScenariosPublishScenarioResponses, ScenariosUpdateScenarioData, ScenariosUpdateScenarioErrors, ScenariosUpdateScenarioResponses, ScenariosUploadScenarioDocumentData, ScenariosUploadScenarioDocumentErrors, ScenariosUploadScenarioDocumentResponses, ToolsChunkPlainTextData, ToolsChunkPlainTextErrors, ToolsChunkPlainTextResponses, ToolsEntityExtractToolData, ToolsEntityExtractToolErrors, ToolsEntityExtractToolResponses, UsersGetAllData, UsersGetAllResponses, UsersGetMeData, UsersGetMeResponses, WebsocketIssueWsTicketData, WebsocketIssueWsTicketResponses } from './types.gen';
+import type { AuthLoginData, AuthLoginErrors, AuthLoginResponses, AuthLogoutData, AuthLogoutResponses, AuthMeData, AuthMeResponses, AuthRegisterData, AuthRegisterErrors, AuthRegisterResponses, AuthUpdateMeData, AuthUpdateMeErrors, AuthUpdateMeResponses, AuthUploadAvatarData, AuthUploadAvatarErrors, AuthUploadAvatarResponses, CharactersCreateCharacterData, CharactersCreateCharacterErrors, CharactersCreateCharacterResponses, CharactersDeleteCharacterData, CharactersDeleteCharacterErrors, CharactersDeleteCharacterResponses, CharactersGetCharacterData, CharactersGetCharacterErrors, CharactersGetCharacterResponses, CharactersListCharactersData, CharactersListCharactersResponses, CharactersUpdateCharacterData, CharactersUpdateCharacterErrors, CharactersUpdateCharacterResponses, DocumentsDownloadOriginalDocumentData, DocumentsDownloadOriginalDocumentErrors, DocumentsDownloadOriginalDocumentResponses, DocumentsGetDocumentMarkdownData, DocumentsGetDocumentMarkdownErrors, DocumentsGetDocumentMarkdownResponses, DocumentsGetDocumentProcessingPipelineData, DocumentsGetDocumentProcessingPipelineErrors, DocumentsGetDocumentProcessingPipelineResponses, DocumentsProcessDocumentData, DocumentsProcessDocumentErrors, DocumentsProcessDocumentResponses, DocumentsReprocessDocumentData, DocumentsReprocessDocumentErrors, DocumentsReprocessDocumentResponses, MeListMyRoomsData, MeListMyRoomsResponses, RerankerRerankEndpointData, RerankerRerankEndpointErrors, RerankerRerankEndpointResponses, RoomsGetRoomData, RoomsGetRoomErrors, RoomsGetRoomResponses, RoomsJoinRoomData, RoomsJoinRoomErrors, RoomsJoinRoomResponses, RoomsKickParticipantData, RoomsKickParticipantErrors, RoomsKickParticipantResponses, RoomsListRoomMessagesData, RoomsListRoomMessagesErrors, RoomsListRoomMessagesResponses, RoomsRegenerateInviteCodeData, RoomsRegenerateInviteCodeErrors, RoomsRegenerateInviteCodeResponses, RoomsRollDiceData, RoomsRollDiceErrors, RoomsRollDiceResponses, RoomsSelectCharacterData, RoomsSelectCharacterErrors, RoomsSelectCharacterResponses, RoomsSendRoomMessageData, RoomsSendRoomMessageErrors, RoomsSendRoomMessageResponses, RoomsSetReadyData, RoomsSetReadyErrors, RoomsSetReadyResponses, RoomsSkillCheckData, RoomsSkillCheckErrors, RoomsSkillCheckResponses, RoomsStartSessionData, RoomsStartSessionErrors, RoomsStartSessionResponses, ScenariosCreateRoomData, ScenariosCreateRoomErrors, ScenariosCreateRoomResponses, ScenariosCreateScenarioData, ScenariosCreateScenarioErrors, ScenariosCreateScenarioResponses, ScenariosGetScenarioData, ScenariosGetScenarioErrors, ScenariosGetScenarioGraphData, ScenariosGetScenarioGraphErrors, ScenariosGetScenarioGraphResponses, ScenariosGetScenarioResponses, ScenariosListScenarioDocumentsData, ScenariosListScenarioDocumentsErrors, ScenariosListScenarioDocumentsResponses, ScenariosListScenariosData, ScenariosListScenariosResponses, ScenariosPublishScenarioData, ScenariosPublishScenarioErrors, ScenariosPublishScenarioResponses, ScenariosUpdateScenarioData, ScenariosUpdateScenarioErrors, ScenariosUpdateScenarioResponses, ScenariosUploadScenarioDocumentData, ScenariosUploadScenarioDocumentErrors, ScenariosUploadScenarioDocumentResponses, ToolsChunkPlainTextData, ToolsChunkPlainTextErrors, ToolsChunkPlainTextResponses, ToolsEntityExtractToolData, ToolsEntityExtractToolErrors, ToolsEntityExtractToolResponses, UsersGetAllData, UsersGetAllResponses, UsersGetMeData, UsersGetMeResponses, WebsocketIssueWsTicketData, WebsocketIssueWsTicketResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -319,6 +319,18 @@ export class DocumentsService {
     }
     
     /**
+     * 取得文件處理流程結果
+     */
+    public static getDocumentProcessingPipeline<ThrowOnError extends boolean = true>(options: Options<DocumentsGetDocumentProcessingPipelineData, ThrowOnError>) {
+        return (options.client ?? client).get<DocumentsGetDocumentProcessingPipelineResponses, DocumentsGetDocumentProcessingPipelineErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/documents/{document_id}/processing-pipeline',
+            ...options
+        });
+    }
+    
+    /**
      * 處理文件（解析／索引等後續流程）
      */
     public static processDocument<ThrowOnError extends boolean = true>(options: Options<DocumentsProcessDocumentData, ThrowOnError>) {
@@ -326,6 +338,18 @@ export class DocumentsService {
             responseType: 'json',
             security: [{ scheme: 'bearer', type: 'http' }],
             url: '/documents/{document_id}/process',
+            ...options
+        });
+    }
+    
+    /**
+     * 重新處理文件（清除舊圖譜資料後重新解析）
+     */
+    public static reprocessDocument<ThrowOnError extends boolean = true>(options: Options<DocumentsReprocessDocumentData, ThrowOnError>) {
+        return (options.client ?? client).post<DocumentsReprocessDocumentResponses, DocumentsReprocessDocumentErrors, ThrowOnError>({
+            responseType: 'json',
+            security: [{ scheme: 'bearer', type: 'http' }],
+            url: '/documents/{document_id}/reprocess',
             ...options
         });
     }

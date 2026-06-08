@@ -5,8 +5,8 @@ from fastapi import HTTPException
 from app.db.uow import UnitOfWorkDependency
 from app.features.scenarios.schemas.requests import CreateRoomRequest
 from app.features.scenarios.schemas.responses import (
-    RoomDetailResponse,
-    RoomParticipantResponse,
+    CreateRoomParticipantResponse,
+    CreateRoomResponse,
 )
 from app.shared.enums import ScenarioStatus
 
@@ -20,7 +20,7 @@ class CreateRoomService:
         scenario_id: UUID,
         body: CreateRoomRequest,
         host_id: UUID,
-    ) -> RoomDetailResponse:
+    ) -> CreateRoomResponse:
         scenario = await self._uow.scenario_repo.get_by_id(scenario_id)
         if scenario is None:
             raise HTTPException(status_code=404, detail="Scenario not found")
@@ -41,7 +41,7 @@ class CreateRoomService:
             room_id=room.id, user_id=host_id, role="gm"
         )
 
-        room_data = RoomDetailResponse(
+        room_data = CreateRoomResponse(
             id=room.id,
             scenario_id=scenario_id,
             host_id=host_id,
@@ -49,6 +49,6 @@ class CreateRoomService:
             description=body.description,
             status=room.status,
             invite_code=room.invite_code,
-            participants=[RoomParticipantResponse.model_validate(participant)],
+            participants=[CreateRoomParticipantResponse.model_validate(participant)],
         )
         return room_data

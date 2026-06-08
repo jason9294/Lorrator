@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { Moon, Sun, LogOut, Settings } from 'lucide-vue-next'
 import { useRoute, useRouter } from 'vue-router'
 import { onClickOutside } from '@vueuse/core'
@@ -9,6 +9,20 @@ import { useMeStore } from '@/stores/me'
 import { clearStoredAccessToken } from '@/lib/accessToken'
 import UserAvatar from '@/components/user/UserAvatar.vue'
 import EditProfileDialog from '@/components/user/EditProfileDialog.vue'
+
+const props = withDefaults(defineProps<{
+  showNav?: boolean
+  showUserMenu?: boolean
+  showThemeToggle?: boolean
+  alwaysShowLogoText?: boolean
+  sticky?: boolean
+}>(), {
+  showNav: true,
+  showUserMenu: true,
+  showThemeToggle: true,
+  alwaysShowLogoText: false,
+  sticky: false,
+})
 
 const route = useRoute()
 const router = useRouter()
@@ -45,22 +59,33 @@ function openEditProfile() {
   dropdownOpen.value = false
   editProfileOpen.value = true
 }
+
+const headerClass = computed(() => [
+  'shrink-0 items-center gap-3 px-5 h-13 border-b bg-card/80 backdrop-blur-sm z-30',
+  props.sticky && 'sticky top-0',
+  props.showNav ? 'grid grid-cols-[auto_1fr_auto]' : 'flex justify-between',
+])
 </script>
 
 <template>
-  <header class="shrink-0 grid grid-cols-[auto_1fr_auto] items-center gap-3 px-5 h-13 border-b bg-card/80 backdrop-blur-sm z-30">
+  <header :class="headerClass">
     <!-- 左側：Logo -->
     <RouterLink to="/" class="flex items-center gap-2.5">
-      <div class="w-7 h-7 rounded-lg bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-sm shrink-0">
-        <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" />
-        </svg>
-      </div>
-      <span class="text-sm font-semibold hidden sm:block">Lorrator</span>
+      <img
+        src="/logo.png"
+        alt="Lorrator"
+        class="w-7 h-7 rounded-lg object-contain shrink-0"
+      />
+      <span
+        class="text-sm font-semibold"
+        :class="alwaysShowLogoText ? undefined : 'hidden sm:block'"
+      >
+        Lorrator
+      </span>
     </RouterLink>
 
     <!-- 中間：導航 tabs -->
-    <nav class="flex justify-center">
+    <nav v-if="showNav" class="flex justify-center">
       <div class="flex items-center gap-0.5 p-1 rounded-lg bg-muted/50 border">
         <RouterLink
           v-for="link in navLinks"
@@ -82,6 +107,7 @@ function openEditProfile() {
 
       <!-- 主題切換 -->
       <Button
+        v-if="showThemeToggle"
         variant="outline"
         size="icon-sm"
         :title="isDark ? '切換為亮色模式' : '切換為暗色模式'"
@@ -94,7 +120,7 @@ function openEditProfile() {
       </Button>
 
       <!-- 使用者頭像 / 選單 -->
-      <div v-if="meStore.me" ref="dropdownRef" class="relative">
+      <div v-if="showUserMenu && meStore.me" ref="dropdownRef" class="relative">
         <button
           class="flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-muted/60 transition-colors"
           @click="dropdownOpen = !dropdownOpen"

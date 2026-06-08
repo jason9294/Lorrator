@@ -5,6 +5,7 @@ from neo4j.graph import Node, Relationship
 
 from app.db.graph import neo4j_driver
 from app.db.uow import UnitOfWorkDependency
+from app.repositories.graph_repo import GraphRepo
 
 from ..schemas.responses import (
     ScenarioGraphEdgeResponse,
@@ -54,47 +55,40 @@ class GetScenarioGraphService:
 
         # get graph
         async with neo4j_driver.session() as session:
-            query = """
-                MATCH (a:Entity {group_id: $group_id})
-                OPTIONAL MATCH (a)-[r]-(b:Entity {group_id: $group_id})
-                RETURN a, r, b
-            """
-            result = await session.run(
-                query,
-                group_id=str(scenario.graph_group_id),
-            )
+            repo = GraphRepo(session)
+            result = await repo.query_scenario_graph(str(scenario.graph_group_id))
 
             async for record in result:
-                a: Node | None = record["a"]
+                n: Node | None = record["n"]
                 r: Relationship | None = record["r"]
-                b: Node | None = record["b"]
-                if a is not None:
-                    aid = _node_id(a)
+                m: Node | None = record["m"]
+                if n is not None:
+                    aid = _node_id(n)
                     if aid not in nodes_by_id:
                         nodes_by_id[aid] = ScenarioGraphNodeResponse(
                             id=aid,
-                            type=_node_type(a),
-                            label=_node_label(a),
-                            description=_node_description(a),
+                            type=_node_type(n),
+                            label=_node_label(n),
+                            description=_node_description(n),
                         )
-                if b is not None:
-                    bid = _node_id(b)
+                if m is not None:
+                    bid = _node_id(m)
                     if bid not in nodes_by_id:
                         nodes_by_id[bid] = ScenarioGraphNodeResponse(
                             id=bid,
-                            type=_node_type(b),
-                            label=_node_label(b),
-                            description=_node_description(b),
+                            type=_node_type(m),
+                            label=_node_label(m),
+                            description=_node_description(m),
                         )
-                if a is not None and b is not None and r is not None:
+                if n is not None and m is not None and r is not None:
                     rid = getattr(r, "element_id", None) or str(getattr(r, "id", ""))
                     if rid and rid not in edges_by_id:
                         edges_by_id[rid] = ScenarioGraphEdgeResponse(
                             id=rid,
-                            source=_node_id(a),
-                            target=_node_id(b),
+                            source=_node_id(n),
+                            target=_node_id(m),
                             type=str(getattr(r, "type", "") or ""),
-                            directed=False,
+                            directed=True,
                         )
 
         return ScenarioGraphResponse(

@@ -6,7 +6,6 @@ from .prompts.entity_extraction import PROMPTS
 
 
 async def entity_extract(text: str) -> ExtractedEntities:
-    print(f"entity_extract: {text[:100]} + ...")
     messages: ResponseInputParam = [
         {
             "role": "system",

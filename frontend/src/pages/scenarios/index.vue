@@ -195,7 +195,8 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { useAsyncState, useToggle } from '@vueuse/core'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { BookOpen, Clock, Globe, Info, Lock, PencilLine, Plus, Users } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
@@ -210,7 +211,7 @@ import { colorFromId } from '@/utils/color'
 const router = useRouter()
 
 const creatingRoomId = ref<string | null>(null)
-const createDialogOpen = ref(false)
+const [createDialogOpen] = useToggle(false)
 const newScenarioName = ref('')
 const newScenarioSystem = ref('')
 const newScenarioDescription = ref('')
@@ -303,28 +304,30 @@ async function handleCreateScenario() {
   }
 }
 
-const scenarios = ref<ScenarioResponse[]>([])
-const isLoadingScenarios = ref(false)
 const scenariosLoadError = ref<string | null>(null)
 
-async function fetchScenarios() {
-  isLoadingScenarios.value = true
-  scenariosLoadError.value = null
-  try {
-    const res = await ScenariosService.listScenarios()
-    scenarios.value = res.data
-  } catch (e) {
-    const err = e as unknown
-    scenariosLoadError.value =
-      typeof (err as { message?: unknown })?.message === 'string'
-        ? (err as { message: string }).message
-        : '請稍後再試'
-  } finally {
-    isLoadingScenarios.value = false
-  }
-}
-
-onMounted(fetchScenarios)
+const {
+  state: scenarios,
+  isLoading: isLoadingScenarios,
+  execute: fetchScenarios,
+} = useAsyncState(
+  async () => {
+    scenariosLoadError.value = null
+    try {
+      const res = await ScenariosService.listScenarios()
+      return res.data
+    } catch (e) {
+      const err = e as unknown
+      scenariosLoadError.value =
+        typeof (err as { message?: unknown })?.message === 'string'
+          ? (err as { message: string }).message
+          : '請稍後再試'
+      return []
+    }
+  },
+  [] as ScenarioResponse[],
+  { immediate: true },
+)
 
 async function createRoom(scenarioId: string) {
   creatingRoomId.value = scenarioId

@@ -3,12 +3,18 @@ from typing import Annotated, Optional
 from fastapi import Depends, HTTPException
 from fastapi.security import APIKeyCookie, HTTPAuthorizationCredentials, HTTPBearer
 from jwt.exceptions import InvalidTokenError
+from openai import AsyncOpenAI
 
+from app.core import get_settings
 from app.core.security import TOKEN_COOKIE_NAME, decode_jwt
 from app.core.security.schema import JWTPayload
 
+settings = get_settings()
+
 http_bearer = HTTPBearer(auto_error=False)
 api_key_cookie = APIKeyCookie(name=TOKEN_COOKIE_NAME, auto_error=False)
+
+OPENAI_CLIENT = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
 
 
 def _provide_token_form_header(
@@ -39,3 +45,7 @@ def _provide_jwt_payload(
 
 
 JWTDependency = Annotated[JWTPayload, Depends(_provide_jwt_payload)]
+
+
+def _provide_openai_client() -> AsyncOpenAI:
+    return OPENAI_CLIENT

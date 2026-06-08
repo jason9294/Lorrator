@@ -1,6 +1,7 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { AuthService, type MeResponse, type UpdateProfileRequest } from '@/services'
+import { getStoredAccessToken } from '@/lib/accessToken'
 
 export const useMeStore = defineStore('me', () => {
   const me = ref<MeResponse | null>(null)
@@ -14,9 +15,16 @@ export const useMeStore = defineStore('me', () => {
   const displayName = computed(() => me.value?.nickname || me.value?.username || null)
 
   async function fetchMe() {
-    console.log('[me-store] fetchMe')
+    console.log('[me-store] fetchMe()')
     isLoading.value = true
     error.value = null
+
+    const token = getStoredAccessToken()
+    if (!token) {
+      console.log('[me-store] fetchMe() no token')
+      me.value = null
+      return null
+    }
     try {
       const res = await AuthService.me()
       me.value = res.data
@@ -32,6 +40,7 @@ export const useMeStore = defineStore('me', () => {
   }
 
   async function ensureMe() {
+    console.log('[me-store] ensureMe()')
     if (me.value) return me.value
     return await fetchMe()
   }

@@ -11,6 +11,7 @@ export type NodeType =
   | 'Event'
   | 'Entity'
   | 'Ending'
+  | 'UNKNOWN'
 
 export interface GraphNode {
   id: string
@@ -26,6 +27,15 @@ export interface GraphEdge {
   target: string
   directed: boolean
 }
+
+export interface GraphEdgeDetail extends GraphEdge {
+  sourceLabel: string
+  targetLabel: string
+}
+
+export type GraphSelection =
+  | { kind: 'node'; data: GraphNode }
+  | { kind: 'edge'; data: GraphEdgeDetail }
 
 export interface Graph {
   nodes: GraphNode[]
@@ -45,6 +55,7 @@ export const NODE_TYPE_LABELS: Record<NodeType, string> = {
   Event: '事件',
   Entity: '實體',
   Ending: '結局',
+  UNKNOWN: '未知',
 }
 
 export const NODE_COLORS: Record<NodeType, string> = {
@@ -60,4 +71,5 @@ export const NODE_COLORS: Record<NodeType, string> = {
   Event: '#ef4444',
   Entity: '#10b981',
   Ending: '#a855f7',
+  UNKNOWN: '#6b7280',
 }

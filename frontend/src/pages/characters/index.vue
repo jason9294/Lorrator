@@ -71,36 +71,30 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { useAsyncState, useToggle } from '@vueuse/core'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { User, UserPlus } from 'lucide-vue-next'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import AppHeader from '@/components/layout/AppHeader.vue'
-import { CharactersService, type CharacterResponse } from '@/services'
+import { CharactersService } from '@/services'
 import CharacterCard from '@/components/characters/CharacterCard.vue'
 import CreateCharacterDialog from '@/components/characters/CreateCharacterDialog.vue'
 
 const router = useRouter()
 
-const isLoading = ref(false)
-const characters = ref<CharacterResponse[]>([])
+const { state: characters, isLoading } = useAsyncState(
+  async () => (await CharactersService.listCharacters()).data ?? [],
+  [],
+  {
+    immediate: true,
+  },
+)
 
-const createDialogOpen = ref(false)
+const [createDialogOpen] = useToggle(false)
 const isCreating = ref(false)
 const createError = ref<string | null>(null)
-
-async function loadCharacters() {
-  isLoading.value = true
-  try {
-    const res = await CharactersService.listCharacters()
-    characters.value = res.data ?? []
-  } catch {
-    characters.value = []
-  } finally {
-    isLoading.value = false
-  }
-}
 
 async function handleCreate(payload: { name: string; game_system: 'COC' }) {
   isCreating.value = true
@@ -117,6 +111,4 @@ async function handleCreate(payload: { name: string; game_system: 'COC' }) {
     isCreating.value = false
   }
 }
-
-onMounted(loadCharacters)
 </script>

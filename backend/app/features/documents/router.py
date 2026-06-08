@@ -6,10 +6,13 @@ from fastapi.responses import FileResponse
 from app.core.deps import JWTDependency
 
 from .schemas.responses import DocumentMarkdownResponse, ProcessDocumentResponse
+from .schemas.processing_pipeline import DocumentProcessingPipelineResponse
 from .services import (
     DownloadOriginalDocumentService,
     GetDocumentMarkdownService,
+    GetDocumentProcessingPipelineService,
     ProcessDocumentService,
+    ReprocessDocumentService,
 )
 
 router = APIRouter(prefix="/documents", tags=["documents"])
@@ -44,6 +47,19 @@ async def download_original_document(
     )
 
 
+@router.get(
+    path="/{document_id}/processing-pipeline",
+    response_model=DocumentProcessingPipelineResponse,
+    summary="取得文件處理流程結果",
+)
+async def get_document_processing_pipeline(
+    document_id: UUID,
+    jwt: JWTDependency,
+    svc: GetDocumentProcessingPipelineService = Depends(),
+) -> DocumentProcessingPipelineResponse:
+    return await svc.execute(document_id)
+
+
 @router.post(
     path="/{document_id}/process",
     response_model=ProcessDocumentResponse,
@@ -53,5 +69,18 @@ async def process_document(
     document_id: UUID,
     jwt: JWTDependency,
     svc: ProcessDocumentService = Depends(),
+) -> ProcessDocumentResponse:
+    return await svc.execute(document_id)
+
+
+@router.post(
+    path="/{document_id}/reprocess",
+    response_model=ProcessDocumentResponse,
+    summary="重新處理文件（清除舊圖譜資料後重新解析）",
+)
+async def reprocess_document(
+    document_id: UUID,
+    jwt: JWTDependency,
+    svc: ReprocessDocumentService = Depends(),
 ) -> ProcessDocumentResponse:
     return await svc.execute(document_id)

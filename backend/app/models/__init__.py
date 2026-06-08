@@ -2,6 +2,7 @@ from sqlmodel import SQLModel
 
 from .character_model import CharacterModel
 from .document_model import DocumentModel
+from .document_processing_run_model import DocumentProcessingRunModel
 from .embedding_cache_model import EmbeddingCacheModel
 from .embedding_model import EmbeddingModel
 from .fact_model import FactModel
@@ -16,6 +17,7 @@ __all__ = [
     "SQLModel",
     "CharacterModel",
     "DocumentModel",
+    "DocumentProcessingRunModel",
     "EmbeddingCacheModel",
     "EmbeddingModel",
     "FactModel",

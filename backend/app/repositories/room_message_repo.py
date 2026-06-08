@@ -16,9 +16,15 @@ class RoomMessageRepository(BaseRepository):
         role: RoomMessageRole,
         content: str,
         type: RoomMessageType = RoomMessageType.CHAT,
+        detail: str | None = None,
     ) -> RoomMessageModel:
         msg = RoomMessageModel(
-            room_id=room_id, sender_id=sender_id, role=role, type=type, content=content
+            room_id=room_id,
+            sender_id=sender_id,
+            role=role,
+            type=type,
+            content=content,
+            detail=detail,
         )
         self.session.add(msg)
         await self.session.flush()

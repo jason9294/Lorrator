@@ -1,41 +1,44 @@
 <script setup lang="ts">
-import type { Graph, GraphNode, NodeType } from '@/types/graph'
-import { NODE_COLORS } from '@/types/graph'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import cytoscape from 'cytoscape'
 import fcose from 'cytoscape-fcose'
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+
+import type { Graph, GraphEdgeDetail, GraphNode, GraphSelection, NodeType } from '@/types/graph'
+import { NODE_COLORS } from '@/types/graph'
+
+// Icons
 import { ZoomIn, ZoomOut, Maximize2, RefreshCw } from 'lucide-vue-next'
+
+// Components
 import GraphDetailCard from './GraphDetailCard.vue'
+
+// Low-level components
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 cytoscape.use(fcose)
 
-// ─── Props / Emits ─────────────────────────────────────────────────────────────
+// Props / Emits
 const props = defineProps<{
   graph: Graph
   isDark?: boolean
   hiddenTypes?: NodeType[]
+  highlightType?: NodeType | null
 }>()
 
 const emit = defineEmits<{
   (e: 'nodeUpdated', node: GraphNode): void
 }>()
 
-// ─── Template Ref ──────────────────────────────────────────────────────────────
+// Template Ref
 const containerRef = ref<HTMLDivElement | null>(null)
 
 // Cytoscape 實例不放入 ref（有循環參照，Vue Proxy 會出問題）
 let cy: cytoscape.Core | null = null
 
 // ─── 選取狀態 ──────────────────────────────────────────────────────────────────
-const selectedNode = ref<GraphNode | null>(null)
+const selection = ref<GraphSelection | null>(null)
 let isSelected = false
 
 // ─── 顏色工具 ──────────────────────────────────────────────────────────────────
@@ -49,9 +52,11 @@ function themeTokens(dark: boolean) {
   return {
     edgeColor: dark ? '#475569' : '#94a3b8',
     edgeHl: '#f59e0b',
+    typeHl: '#0ea5e9',
     labelColor: dark ? '#94a3b8' : '#64748b',
     labelBg: dark ? '#0f172a' : '#f8fafc',
     dimOpacity: 0.12,
+    typeDimOpacity: 0.18,
   }
 }
 
@@ -97,7 +102,10 @@ function buildStylesheet(dark: boolean) {
         'text-background-color': t.labelBg,
         'text-background-opacity': 0.85,
         'text-background-padding': '2px',
-        'text-background-shape': 'roundrectangle' as cytoscape.Css.PropertyValue<cytoscape.EdgeSingular, 'circle' | 'rectangle' | 'roundrectangle'>,
+        'text-background-shape': 'roundrectangle' as cytoscape.Css.PropertyValue<
+          cytoscape.EdgeSingular,
+          'circle' | 'rectangle' | 'roundrectangle'
+        >,
         width: 1.5,
         'line-color': t.edgeColor,
         'target-arrow-color': t.edgeColor,
@@ -111,7 +119,10 @@ function buildStylesheet(dark: boolean) {
     // ── 有向邊 ────────────────────────────────────────────────────────────
     {
       selector: 'edge[directed="true"]',
-      style: { 'target-arrow-shape': 'triangle' as cytoscape.Css.PropertyValueEdge<cytoscape.Css.ArrowShape> },
+      style: {
+        'target-arrow-shape':
+          'triangle' as cytoscape.Css.PropertyValueEdge<cytoscape.Css.ArrowShape>,
+      },
     },
     // ── Highlight：主節點 ─────────────────────────────────────────────────
     {
@@ -145,6 +156,18 @@ function buildStylesheet(dark: boolean) {
         opacity: 1,
       } as cytoscape.Css.Edge,
     },
+    // ── 選取中的邊 ────────────────────────────────────────────────────────
+    {
+      selector: '.selected-edge',
+      style: {
+        'line-color': t.edgeHl,
+        'target-arrow-color': t.edgeHl,
+        color: t.edgeHl,
+        'text-background-color': dark ? '#1e293b' : '#fff',
+        width: 4,
+        opacity: 1,
+      } as cytoscape.Css.Edge,
+    },
     // ── 暗化（非鄰居） ─────────────────────────────────────────────────────
     {
       selector: '.dim',
@@ -163,6 +186,25 @@ function buildStylesheet(dark: boolean) {
         'shadow-color': t.edgeHl,
         'shadow-opacity': 0.5,
       } as cytoscape.Css.Node,
+    },
+    // ── 類型篩選：符合類型的節點 ─────────────────────────────────────────
+    {
+      selector: '.type-match',
+      style: {
+        'border-color': t.typeHl,
+        'border-width': 3,
+        'border-opacity': 1,
+        width: 58,
+        height: 58,
+        'shadow-blur': 12,
+        'shadow-color': `${t.typeHl}80`,
+        'shadow-opacity': 0.55,
+      } as cytoscape.Css.Node,
+    },
+    // ── 類型篩選：非符合類型的節點 ─────────────────────────────────────────
+    {
+      selector: '.type-dim',
+      style: { opacity: t.typeDimOpacity },
     },
   ]
 }
@@ -194,12 +236,61 @@ function buildElements(graph: Graph): cytoscape.ElementDefinition[] {
 }
 
 // ─── Highlight 工具 ────────────────────────────────────────────────────────────
+function clearSelectionHighlight() {
+  cy?.elements().removeClass('hl-main hl-neighbor hl-edge dim selected selected-edge')
+}
+
+function nodeLabel(id: string): string {
+  return props.graph.nodes.find((n) => n.id === id)?.label ?? id
+}
+
+function buildEdgeDetail(edge: cytoscape.EdgeSingular): GraphEdgeDetail {
+  const source = edge.data('source') as string
+  const target = edge.data('target') as string
+  return {
+    id: edge.id(),
+    type: edge.data('type') as string,
+    source,
+    target,
+    directed: edge.data('directed') === 'true',
+    sourceLabel: nodeLabel(source),
+    targetLabel: nodeLabel(target),
+  }
+}
+
+function clearTypeHighlight() {
+  cy?.nodes().removeClass('type-match type-dim')
+}
+
+function applyTypeHighlight(type: NodeType | null | undefined) {
+  if (!cy || !type) {
+    clearTypeHighlight()
+    return
+  }
+  cy.batch(() => {
+    clearTypeHighlight()
+    cy!.nodes().forEach((node) => {
+      if (node.data('type') === type) {
+        node.addClass('type-match')
+      } else {
+        node.addClass('type-dim')
+      }
+    })
+  })
+}
+
+function restoreTypeFilterIfActive() {
+  if (props.highlightType) applyTypeHighlight(props.highlightType)
+}
+
 function clearHighlight() {
-  cy?.elements().removeClass('hl-main hl-neighbor hl-edge dim selected')
+  clearSelectionHighlight()
+  restoreTypeFilterIfActive()
 }
 
 function applyHighlight(node: cytoscape.NodeSingular, mode: 'hover' | 'select') {
   if (!cy) return
+  clearTypeHighlight()
   cy.batch(() => {
     cy!.elements().addClass('dim')
     const hood = node.closedNeighborhood()
@@ -210,6 +301,24 @@ function applyHighlight(node: cytoscape.NodeSingular, mode: 'hover' | 'select') 
   })
 }
 
+function applyEdgeHighlight(edge: cytoscape.EdgeSingular, mode: 'hover' | 'select') {
+  if (!cy) return
+  clearTypeHighlight()
+  cy.batch(() => {
+    cy!.elements().addClass('dim')
+    const endpoints = edge.connectedNodes()
+    edge.removeClass('dim')
+    endpoints.removeClass('dim')
+    edge.addClass(mode === 'select' ? 'selected-edge hl-edge' : 'hl-edge')
+    endpoints.addClass('hl-neighbor')
+  })
+}
+
+function isNodeInteractive(node: cytoscape.NodeSingular): boolean {
+  if (!props.highlightType) return true
+  return node.data('type') === props.highlightType
+}
+
 // ─── 事件綁定 ──────────────────────────────────────────────────────────────────
 function bindEvents() {
   if (!cy) return
@@ -217,41 +326,72 @@ function bindEvents() {
 
   cy.on('mouseover', 'node', (evt) => {
     if (isSelected) return
-    applyHighlight(evt.target as cytoscape.NodeSingular, 'hover')
+    const node = evt.target as cytoscape.NodeSingular
+    if (!isNodeInteractive(node)) return
+    applyHighlight(node, 'hover')
     container.style.cursor = 'pointer'
   })
 
-  cy.on('mouseout', 'node', () => {
+  cy.on('mouseout', 'node', (evt) => {
     if (isSelected) return
-    clearHighlight()
+    const node = evt.target as cytoscape.NodeSingular
+    if (!isNodeInteractive(node)) return
+    clearSelectionHighlight()
+    restoreTypeFilterIfActive()
+    container.style.cursor = 'default'
+  })
+
+  cy.on('mouseover', 'edge', () => {
+    if (isSelected) return
+    container.style.cursor = 'pointer'
+  })
+
+  cy.on('mouseout', 'edge', () => {
+    if (isSelected) return
     container.style.cursor = 'default'
   })
 
   cy.on('tap', 'node', (evt) => {
     const node = evt.target as cytoscape.NodeSingular
-    // 點擊同一節點 → 取消選取
-    if (isSelected && selectedNode.value?.id === node.id()) {
+    if (isSelected && selection.value?.kind === 'node' && selection.value.data.id === node.id()) {
       isSelected = false
-      selectedNode.value = null
+      selection.value = null
       clearHighlight()
       return
     }
     isSelected = true
-    selectedNode.value = {
-      id: node.id(),
-      type: node.data('type') as NodeType,
-      label: node.data('label'),
-      description: node.data('description'),
+    selection.value = {
+      kind: 'node',
+      data: {
+        id: node.id(),
+        type: node.data('type') as NodeType,
+        label: node.data('label'),
+        description: node.data('description'),
+      },
     }
     clearHighlight()
     applyHighlight(node, 'select')
+  })
+
+  cy.on('tap', 'edge', (evt) => {
+    const edge = evt.target as cytoscape.EdgeSingular
+    if (isSelected && selection.value?.kind === 'edge' && selection.value.data.id === edge.id()) {
+      isSelected = false
+      selection.value = null
+      clearHighlight()
+      return
+    }
+    isSelected = true
+    selection.value = { kind: 'edge', data: buildEdgeDetail(edge) }
+    clearHighlight()
+    applyEdgeHighlight(edge, 'select')
   })
 
   // 點背景 → 取消選取
   cy.on('tap', (evt) => {
     if (evt.target !== cy) return
     isSelected = false
-    selectedNode.value = null
+    selection.value = null
     clearHighlight()
   })
 }
@@ -292,6 +432,7 @@ function initCy() {
   })
   bindEvents()
   if (props.hiddenTypes?.length) applyTypeFilter(props.hiddenTypes)
+  if (props.highlightType) applyTypeHighlight(props.highlightType)
 }
 
 // ─── 節點類型篩選 ─────────────────────────────────────────────────────────────
@@ -319,11 +460,14 @@ function focusNode(id: string) {
   const node = cy.$id(id) as cytoscape.NodeSingular
   if (!node || node.empty()) return
   isSelected = true
-  selectedNode.value = {
-    id: node.id(),
-    type: node.data('type') as NodeType,
-    label: node.data('label'),
-    description: node.data('description'),
+  selection.value = {
+    kind: 'node',
+    data: {
+      id: node.id(),
+      type: node.data('type') as NodeType,
+      label: node.data('label'),
+      description: node.data('description'),
+    },
   }
   clearHighlight()
   applyHighlight(node, 'select')
@@ -353,17 +497,27 @@ watch(
     cy.add(buildElements(newGraph))
     cy.layout(fcoseLayout).run()
     isSelected = false
-    selectedNode.value = null
-    clearHighlight()
+    selection.value = null
+    clearSelectionHighlight()
+    applyTypeHighlight(props.highlightType)
   },
   { deep: true },
 )
 
-// ─── 監聽篩選類型變化 ─────────────────────────────────────────────────────────
+// ─── 監聽隱藏類型變化 ─────────────────────────────────────────────────────────
 watch(
   () => props.hiddenTypes,
   (types) => applyTypeFilter(types ?? []),
   { deep: true },
+)
+
+// ─── 監聽類型高亮篩選 ─────────────────────────────────────────────────────────
+watch(
+  () => props.highlightType,
+  (type) => {
+    if (isSelected) return
+    applyTypeHighlight(type)
+  },
 )
 
 // ─── 工具列動作 ────────────────────────────────────────────────────────────────
@@ -391,13 +545,15 @@ function onNodeUpdate(updated: GraphNode) {
     description: updated.description,
     color: getColor(updated.type),
   })
-  selectedNode.value = { ...updated }
+  if (selection.value?.kind === 'node' && selection.value.data.id === updated.id) {
+    selection.value = { kind: 'node', data: { ...updated } }
+  }
   emit('nodeUpdated', updated)
 }
 
 function onCardClose() {
   isSelected = false
-  selectedNode.value = null
+  selection.value = null
   clearHighlight()
 }
 
@@ -413,7 +569,6 @@ defineExpose({ focusNode })
 
 <template>
   <div class="relative w-full h-full overflow-hidden rounded-xl border bg-background flex flex-col">
-
     <!-- 工具列 -->
     <TooltipProvider :delay-duration="400">
       <div class="absolute top-3 left-3 z-10 flex flex-col gap-1.5">
@@ -458,23 +613,17 @@ defineExpose({ focusNode })
     </TooltipProvider>
 
     <!-- 操作提示 -->
-    <div class="absolute bottom-3 left-3 z-10 text-[10px] text-muted-foreground/60 select-none space-y-0.5">
+    <div
+      class="absolute bottom-3 left-3 z-10 text-[10px] text-muted-foreground/60 select-none space-y-0.5"
+    >
       <div>滾輪縮放・拖曳平移</div>
-      <div>點擊節點選取・再次點擊取消</div>
+      <div>點擊節點或關係選取・再次點擊取消</div>
     </div>
 
     <!-- Cytoscape 畫布 -->
-    <div
-      ref="containerRef"
-      class="w-full h-full"
-    />
+    <div ref="containerRef" class="w-full h-full" />
 
     <!-- 右側詳細資訊卡 -->
-    <GraphDetailCard
-      :node="selectedNode"
-      @update="onNodeUpdate"
-      @close="onCardClose"
-    />
-
+    <GraphDetailCard :selection="selection" @update="onNodeUpdate" @close="onCardClose" />
   </div>
 </template>

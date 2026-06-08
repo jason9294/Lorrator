@@ -1,42 +1,20 @@
 <template>
   <div class="min-h-screen flex flex-col bg-background text-foreground overflow-x-hidden">
-    <!-- 頂部導覽 -->
-    <header
-      class="shrink-0 flex items-center justify-between px-6 h-14 border-b bg-card/80 backdrop-blur-sm sticky top-0 z-30"
+    <AppHeader
+      :show-nav="false"
+      :show-user-menu="false"
+      always-show-logo-text
+      sticky
     >
-      <div class="flex items-center gap-2.5">
-        <div
-          class="w-7 h-7 rounded-lg bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-sm shrink-0"
-        >
-          <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
-            <path
-              d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"
-            />
-          </svg>
-        </div>
-        <span class="text-sm font-semibold">Lorrator</span>
-      </div>
-
-      <div class="flex items-center gap-2">
-        <Button
-          variant="outline"
-          size="icon-sm"
-          :title="isDark ? '切換為亮色模式' : '切換為暗色模式'"
-          @click="toggle"
-        >
-          <Transition name="icon-swap" mode="out-in">
-            <Moon v-if="!isDark" :key="'moon'" class="size-3.5" />
-            <Sun v-else :key="'sun'" class="size-3.5" />
-          </Transition>
-        </Button>
+      <template #actions>
         <RouterLink to="/login">
           <Button variant="outline" size="sm">登入</Button>
         </RouterLink>
         <RouterLink to="/register">
           <Button size="sm">免費註冊</Button>
         </RouterLink>
-      </div>
-    </header>
+      </template>
+    </AppHeader>
 
     <main class="flex-1">
       <!-- Hero 區塊 -->
@@ -165,14 +143,13 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { BookOpen, MessageCircle, Moon, Sparkles, Sun, User } from 'lucide-vue-next'
+import { BookOpen, MessageCircle, Sparkles, User } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
-import { useColorMode } from '@/composables/useColorMode'
+import AppHeader from '@/components/layout/AppHeader.vue'
 import { getStoredAccessToken } from '@/lib/accessToken'
 import { AuthService } from '@/services'
 
 const router = useRouter()
-const { isDark, toggle } = useColorMode()
 
 onMounted(async () => {
   const token = getStoredAccessToken()

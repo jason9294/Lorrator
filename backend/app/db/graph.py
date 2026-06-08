@@ -12,12 +12,15 @@ neo4j_driver = AsyncGraphDatabase.driver(
 
 async def init_neo4j():
     async with neo4j_driver.session() as session:
+        # Create indexes
+        # entity.group_id
         await session.run("""
             CREATE INDEX entity_group_id_index IF NOT EXISTS
             FOR (e:Entity)
             ON (e.group_id)
         """)
 
+        # Create indexes
         await session.run("""
             CREATE INDEX relates_to_scenario_id_index IF NOT EXISTS
             FOR ()-[r:RELATES_TO]-()

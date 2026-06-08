@@ -144,7 +144,8 @@ import { NODE_COLORS, NODE_TYPE_LABELS } from '@/types/graph'
 import KnowledgeGraph from '@/components/graph/KnowledgeGraph.vue'
 import { useColorMode } from '@/composables/useColorMode'
 import { Moon, Sun, Search } from 'lucide-vue-next'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { useEventListener, useTimeoutFn, useToggle } from '@vueuse/core'
+import { computed, ref } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Kbd, KbdGroup } from '@/components/ui/kbd'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
@@ -163,23 +164,30 @@ const { isDark, toggle } = useColorMode()
 // ─── Graph Ref（用於 focusNode）─────────────────────────────────────────────
 const graphRef = ref<InstanceType<typeof KnowledgeGraph> | null>(null)
 
-// ─── 搜尋 Palette ─────────────────────────────────────────────────────────────
-const searchOpen = ref(false)
+// 搜尋 Palette
+const [searchOpen, toggleSearchOpen] = useToggle(false)
+
+const pendingFocusNodeId = ref<string | null>(null)
+const { start: startFocusNode } = useTimeoutFn(() => {
+  if (pendingFocusNodeId.value) {
+    graphRef.value?.focusNode(pendingFocusNodeId.value)
+    pendingFocusNodeId.value = null
+  }
+}, 100)
 
 function onSearchSelect(nodeId: string) {
   searchOpen.value = false
-  setTimeout(() => graphRef.value?.focusNode(nodeId), 100)
+  pendingFocusNodeId.value = nodeId
+  startFocusNode()
 }
 
 // Cmd+K 快捷鍵
-function onKeydown(e: KeyboardEvent) {
+useEventListener(window, 'keydown', (e: KeyboardEvent) => {
   if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
     e.preventDefault()
-    searchOpen.value = !searchOpen.value
+    toggleSearchOpen()
   }
-}
-onMounted(() => window.addEventListener('keydown', onKeydown))
-onUnmounted(() => window.removeEventListener('keydown', onKeydown))
+})
 
 // ─── 節點類型篩選 ─────────────────────────────────────────────────────────────
 const allTypes = Object.keys(NODE_TYPE_LABELS) as NodeType[]

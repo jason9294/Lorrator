@@ -4,10 +4,14 @@ from fastapi import APIRouter, Depends, File, UploadFile
 
 from app.core.deps import JWTDependency
 
-from .schemas.requests import CreateRoomRequest, CreateScenarioRequest, UpdateScenarioRequest
+from .schemas.requests import (
+    CreateRoomRequest,
+    CreateScenarioRequest,
+    UpdateScenarioRequest,
+)
 from .schemas.responses import (
+    CreateRoomResponse,
     DocumentResponse,
-    RoomDetailResponse,
     ScenarioGraphResponse,
     ScenarioResponse,
 )
@@ -124,7 +128,7 @@ async def list_scenario_documents(
 
 @router.post(
     path="/{scenario_id}/rooms",
-    response_model=RoomDetailResponse,
+    response_model=CreateRoomResponse,
     summary="在已發布的劇本建立跑團房間",
 )
 async def create_room(
@@ -132,7 +136,7 @@ async def create_room(
     body: CreateRoomRequest,
     jwt: JWTDependency,
     svc: CreateRoomService = Depends(),
-) -> RoomDetailResponse:
+) -> CreateRoomResponse:
     return await svc.execute(scenario_id, body, jwt.sub)
 
 

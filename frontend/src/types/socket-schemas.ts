@@ -4,9 +4,10 @@ export const roomsCreateMessagePayloadSchema = z.object({
   id: z.string(),
   room_id: z.string(),
   role: z.enum(['PLAYER', 'AGENT', 'SYSTEM']),
-  type: z.enum(['CHAT', 'DICE']),
+  type: z.enum(['CHAT', 'DICE', 'DEBUG']),
   sender_id: z.string().nullable(),
   content: z.string(),
+  detail: z.string().nullable().optional(),
   created_at: z.string(),
   updated_at: z.string(),
 })
@@ -46,6 +47,7 @@ export const documentProcessUpdatedPayloadSchema = z.object({
 
 export const roomsAiThinkingPayloadSchema = z.object({
   room_id: z.string(),
+  active: z.boolean().default(true),
 })
 
 export type DocumentProcessUpdatedPayload = z.infer<typeof documentProcessUpdatedPayloadSchema>

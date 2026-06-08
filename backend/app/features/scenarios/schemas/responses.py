@@ -3,7 +3,13 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
 
-from app.shared.enums import DocumentStatus, RoomStatus, ScenarioStatus
+from app.shared.enums import (
+    DocumentStatus,
+    GraphEntityType,
+    GraphRelationshipType,
+    RoomStatus,
+    ScenarioStatus,
+)
 
 
 class ScenarioResponse(BaseModel):
@@ -39,7 +45,7 @@ class DocumentResponse(BaseModel):
 
 class ScenarioGraphNodeResponse(BaseModel):
     id: str
-    type: str
+    type: GraphEntityType | str
     label: str
     description: str = ""
 
@@ -48,7 +54,7 @@ class ScenarioGraphEdgeResponse(BaseModel):
     id: str
     source: str
     target: str
-    type: str = ""
+    type: GraphRelationshipType | str = ""
     directed: bool = False
 
 
@@ -57,7 +63,7 @@ class ScenarioGraphResponse(BaseModel):
     edges: list[ScenarioGraphEdgeResponse]
 
 
-class RoomParticipantResponse(BaseModel):
+class CreateRoomParticipantResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     user_id: UUID
@@ -66,9 +72,8 @@ class RoomParticipantResponse(BaseModel):
     joined_at: datetime
 
 
-class RoomResponse(BaseModel):
+class CreateRoomResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-
     id: UUID
     scenario_id: UUID
     host_id: UUID
@@ -76,7 +81,4 @@ class RoomResponse(BaseModel):
     description: str | None
     status: RoomStatus
     invite_code: str
-
-
-class RoomDetailResponse(RoomResponse):
-    participants: list[RoomParticipantResponse]
+    participants: list[CreateRoomParticipantResponse]

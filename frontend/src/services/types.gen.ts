@@ -145,6 +145,50 @@ export type CharacterSkillOutput = {
 };
 
 /**
+ * ChunkExtractionResult
+ */
+export type ChunkExtractionResult = {
+    /**
+     * Chunk Index
+     */
+    chunk_index: number;
+    /**
+     * Entities
+     */
+    entities: Array<ExtractedEntityResult>;
+    /**
+     * Relationships
+     */
+    relationships: Array<ExtractedRelationshipResult>;
+};
+
+/**
+ * ChunkItemResult
+ */
+export type ChunkItemResult = {
+    /**
+     * Index
+     */
+    index: number;
+    /**
+     * Start Token
+     */
+    start_token: number;
+    /**
+     * End Token
+     */
+    end_token: number;
+    /**
+     * Token Count
+     */
+    token_count: number;
+    /**
+     * Text
+     */
+    text: string;
+};
+
+/**
  * ChunkResponse
  */
 export type ChunkResponse = {
@@ -168,6 +212,60 @@ export type ChunkResponse = {
      * Index
      */
     index: number;
+};
+
+/**
+ * ChunkStepResponse
+ */
+export type ChunkStepResponse = {
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Description
+     */
+    description: string;
+    status: ProcessingStepStatus;
+    /**
+     * Duration Ms
+     */
+    duration_ms?: number;
+    /**
+     * Summary
+     */
+    summary?: string | null;
+    /**
+     * Error
+     */
+    error?: string | null;
+    /**
+     * Id
+     */
+    id?: 'chunk';
+    result?: ChunkStepResult | null;
+};
+
+/**
+ * ChunkStepResult
+ */
+export type ChunkStepResult = {
+    /**
+     * Chunk Size
+     */
+    chunk_size: number;
+    /**
+     * Overlap
+     */
+    overlap: number;
+    /**
+     * Total Tokens
+     */
+    total_tokens: number;
+    /**
+     * Chunks
+     */
+    chunks: Array<ChunkItemResult>;
 };
 
 /**
@@ -196,6 +294,56 @@ export type ChunkTextResponse = {
      * Chunks
      */
     chunks: Array<ChunkResponse>;
+};
+
+/**
+ * ClearGraphStepResponse
+ */
+export type ClearGraphStepResponse = {
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Description
+     */
+    description: string;
+    status: ProcessingStepStatus;
+    /**
+     * Duration Ms
+     */
+    duration_ms?: number;
+    /**
+     * Summary
+     */
+    summary?: string | null;
+    /**
+     * Error
+     */
+    error?: string | null;
+    /**
+     * Id
+     */
+    id?: 'clear_graph';
+    result?: ClearGraphStepResult | null;
+};
+
+/**
+ * ClearGraphStepResult
+ */
+export type ClearGraphStepResult = {
+    /**
+     * Chunks Deleted
+     */
+    chunks_deleted: number;
+    /**
+     * Legacy Chunks Deleted
+     */
+    legacy_chunks_deleted: number;
+    /**
+     * Orphan Entities Deleted
+     */
+    orphan_entities_deleted: number;
 };
 
 /**
@@ -465,6 +613,28 @@ export type CreateCharacterRequest = {
 };
 
 /**
+ * CreateRoomParticipantResponse
+ */
+export type CreateRoomParticipantResponse = {
+    /**
+     * User Id
+     */
+    user_id: string;
+    /**
+     * Role
+     */
+    role: string;
+    /**
+     * Is Ready
+     */
+    is_ready: boolean;
+    /**
+     * Joined At
+     */
+    joined_at: string;
+};
+
+/**
  * CreateRoomRequest
  */
 export type CreateRoomRequest = {
@@ -476,6 +646,41 @@ export type CreateRoomRequest = {
      * Description
      */
     description?: string | null;
+};
+
+/**
+ * CreateRoomResponse
+ */
+export type CreateRoomResponse = {
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Scenario Id
+     */
+    scenario_id: string;
+    /**
+     * Host Id
+     */
+    host_id: string;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Description
+     */
+    description: string | null;
+    status: RoomStatus;
+    /**
+     * Invite Code
+     */
+    invite_code: string;
+    /**
+     * Participants
+     */
+    participants: Array<CreateRoomParticipantResponse>;
 };
 
 /**
@@ -525,6 +730,48 @@ export type DocumentMarkdownResponse = {
 };
 
 /**
+ * DocumentProcessingPipelineResponse
+ */
+export type DocumentProcessingPipelineResponse = {
+    /**
+     * Document Id
+     */
+    document_id: string;
+    /**
+     * Filename
+     */
+    filename: string;
+    /**
+     * Started At
+     */
+    started_at: string;
+    /**
+     * Completed At
+     */
+    completed_at: string | null;
+    /**
+     * Total Duration Ms
+     */
+    total_duration_ms: number | null;
+    /**
+     * Steps
+     */
+    steps: Array<({
+        id: 'prepare';
+    } & PrepareStepResponse) | ({
+        id: 'clear_graph';
+    } & ClearGraphStepResponse) | ({
+        id: 'chunk';
+    } & ChunkStepResponse) | ({
+        id: 'entity_extraction';
+    } & EntityExtractionStepResponse) | ({
+        id: 'graph_build';
+    } & GraphBuildStepResponse) | ({
+        id: 'entity_embedding';
+    } & EntityEmbeddingStepResponse)>;
+};
+
+/**
  * DocumentResponse
  */
 export type DocumentResponse = {
@@ -569,9 +816,285 @@ export type DocumentResponse = {
 export type DocumentStatus = 'READY' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
 
 /**
+ * EntityEmbeddingStepResponse
+ */
+export type EntityEmbeddingStepResponse = {
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Description
+     */
+    description: string;
+    status: ProcessingStepStatus;
+    /**
+     * Duration Ms
+     */
+    duration_ms?: number;
+    /**
+     * Summary
+     */
+    summary?: string | null;
+    /**
+     * Error
+     */
+    error?: string | null;
+    /**
+     * Id
+     */
+    id?: 'entity_embedding';
+    result?: EntityEmbeddingStepResult | null;
+};
+
+/**
+ * EntityEmbeddingStepResult
+ */
+export type EntityEmbeddingStepResult = {
+    /**
+     * Model Key
+     */
+    model_key: string;
+    /**
+     * Entities Embedded
+     */
+    entities_embedded: number;
+    /**
+     * Cache Hits
+     */
+    cache_hits: number;
+    /**
+     * Cache Misses
+     */
+    cache_misses: number;
+    /**
+     * Similarity Edges Created
+     */
+    similarity_edges_created: number;
+};
+
+/**
+ * EntityExtractionStepResponse
+ */
+export type EntityExtractionStepResponse = {
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Description
+     */
+    description: string;
+    status: ProcessingStepStatus;
+    /**
+     * Duration Ms
+     */
+    duration_ms?: number;
+    /**
+     * Summary
+     */
+    summary?: string | null;
+    /**
+     * Error
+     */
+    error?: string | null;
+    /**
+     * Id
+     */
+    id?: 'entity_extraction';
+    result?: EntityExtractionStepResult | null;
+};
+
+/**
+ * EntityExtractionStepResult
+ */
+export type EntityExtractionStepResult = {
+    /**
+     * Model
+     */
+    model: string;
+    /**
+     * Chunk Results
+     */
+    chunk_results: Array<ChunkExtractionResult>;
+    /**
+     * Total Entities
+     */
+    total_entities: number;
+    /**
+     * Total Relationships
+     */
+    total_relationships: number;
+};
+
+/**
+ * ExtractedEntityResult
+ */
+export type ExtractedEntityResult = {
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Type
+     */
+    type: string;
+    /**
+     * Description
+     */
+    description: string;
+};
+
+/**
+ * ExtractedRelationshipResult
+ */
+export type ExtractedRelationshipResult = {
+    /**
+     * Source Name
+     */
+    source_name: string;
+    /**
+     * Target Name
+     */
+    target_name: string;
+    /**
+     * Type
+     */
+    type: string;
+    /**
+     * Description
+     */
+    description: string;
+};
+
+/**
  * GameSystem
  */
 export type GameSystem = 'COC' | 'DND';
+
+/**
+ * GraphBuildStepResponse
+ */
+export type GraphBuildStepResponse = {
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Description
+     */
+    description: string;
+    status: ProcessingStepStatus;
+    /**
+     * Duration Ms
+     */
+    duration_ms?: number;
+    /**
+     * Summary
+     */
+    summary?: string | null;
+    /**
+     * Error
+     */
+    error?: string | null;
+    /**
+     * Id
+     */
+    id?: 'graph_build';
+    result?: GraphBuildStepResult | null;
+};
+
+/**
+ * GraphBuildStepResult
+ */
+export type GraphBuildStepResult = {
+    /**
+     * Chunks Created
+     */
+    chunks_created: number;
+    /**
+     * Entities Created
+     */
+    entities_created: number;
+    /**
+     * Entities Merged
+     */
+    entities_merged: number;
+    /**
+     * Relationships Created
+     */
+    relationships_created: number;
+    /**
+     * Nodes
+     */
+    nodes: Array<GraphNodeCreatedResult>;
+    /**
+     * Edges
+     */
+    edges: Array<GraphEdgeCreatedResult>;
+};
+
+/**
+ * GraphEdgeCreatedResult
+ */
+export type GraphEdgeCreatedResult = {
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Source Name
+     */
+    source_name: string;
+    /**
+     * Target Name
+     */
+    target_name: string;
+    /**
+     * Type
+     */
+    type: string;
+    /**
+     * Description
+     */
+    description: string;
+};
+
+/**
+ * GraphEntityType
+ */
+export type GraphEntityType = 'CHUNK' | 'LOCATION' | 'CHARACTER' | 'FACTION' | 'EVENT' | 'ITEM' | 'SAN_CHECK';
+
+/**
+ * GraphNodeCreatedResult
+ */
+export type GraphNodeCreatedResult = {
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Type
+     */
+    type: string;
+    /**
+     * Description
+     */
+    description: string;
+    /**
+     * Source Chunk Index
+     */
+    source_chunk_index: number;
+};
+
+/**
+ * GraphRelationshipType
+ */
+export type GraphRelationshipType = 'MENTIONS' | 'RELATES_TO' | 'SIMILAR_TO';
 
 /**
  * HTTPValidationError
@@ -637,6 +1160,60 @@ export type MeResponse = {
 export type OccupationFeatureType = 'EDU' | 'EDU_STR' | 'EDU_DEX' | 'EDU_APP' | 'EDU_POW';
 
 /**
+ * PrepareStepResponse
+ */
+export type PrepareStepResponse = {
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Description
+     */
+    description: string;
+    status: ProcessingStepStatus;
+    /**
+     * Duration Ms
+     */
+    duration_ms?: number;
+    /**
+     * Summary
+     */
+    summary?: string | null;
+    /**
+     * Error
+     */
+    error?: string | null;
+    /**
+     * Id
+     */
+    id?: 'prepare';
+    result?: PrepareStepResult | null;
+};
+
+/**
+ * PrepareStepResult
+ */
+export type PrepareStepResult = {
+    /**
+     * Md Path
+     */
+    md_path: string;
+    /**
+     * Character Count
+     */
+    character_count: number;
+    /**
+     * Line Count
+     */
+    line_count: number;
+    /**
+     * Preview
+     */
+    preview: string;
+};
+
+/**
  * ProcessDocumentResponse
  */
 export type ProcessDocumentResponse = {
@@ -658,6 +1235,11 @@ export type ProcessDocumentResponse = {
      */
     relationships: Array<unknown>;
 };
+
+/**
+ * ProcessingStepStatus
+ */
+export type ProcessingStepStatus = 'pending' | 'running' | 'completed' | 'failed' | 'skipped';
 
 /**
  * RankedDocument
@@ -734,6 +1316,41 @@ export type RollDiceRequest = {
 };
 
 /**
+ * RoomDetailResponse
+ */
+export type RoomDetailResponse = {
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Scenario Id
+     */
+    scenario_id: string;
+    /**
+     * Host Id
+     */
+    host_id: string;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Description
+     */
+    description: string | null;
+    status: RoomStatus;
+    /**
+     * Invite Code
+     */
+    invite_code: string;
+    /**
+     * Participants
+     */
+    participants: Array<RoomParticipantResponse>;
+};
+
+/**
  * RoomMessageResponse
  */
 export type RoomMessageResponse = {
@@ -756,6 +1373,10 @@ export type RoomMessageResponse = {
      */
     content: string;
     /**
+     * Detail
+     */
+    detail?: string | null;
+    /**
      * Created At
      */
     created_at: string;
@@ -773,7 +1394,49 @@ export type RoomMessageRole = 'AGENT' | 'PLAYER' | 'SYSTEM';
 /**
  * RoomMessageType
  */
-export type RoomMessageType = 'CHAT' | 'DICE';
+export type RoomMessageType = 'CHAT' | 'DICE' | 'DEBUG';
+
+/**
+ * RoomParticipantResponse
+ */
+export type RoomParticipantResponse = {
+    /**
+     * User Id
+     */
+    user_id: string;
+    /**
+     * Username
+     */
+    username: string;
+    /**
+     * Nickname
+     */
+    nickname?: string | null;
+    /**
+     * Avatar Url
+     */
+    avatar_url?: string | null;
+    /**
+     * Role
+     */
+    role: string;
+    /**
+     * Is Ready
+     */
+    is_ready: boolean;
+    /**
+     * Joined At
+     */
+    joined_at: string;
+    /**
+     * Character Id
+     */
+    character_id?: string | null;
+    /**
+     * Character Name
+     */
+    character_name?: string | null;
+};
 
 /**
  * RoomResponse
@@ -830,7 +1493,7 @@ export type ScenarioGraphEdgeResponse = {
     /**
      * Type
      */
-    type?: string;
+    type?: GraphRelationshipType | string;
     /**
      * Directed
      */
@@ -848,7 +1511,7 @@ export type ScenarioGraphNodeResponse = {
     /**
      * Type
      */
-    type: string;
+    type: GraphEntityType | string;
     /**
      * Label
      */
@@ -1091,140 +1754,6 @@ export type WsTicketResponse = {
      * Expires In Seconds
      */
     expires_in_seconds: number;
-};
-
-/**
- * RoomDetailResponse
- */
-export type AppFeaturesRoomsSchemasResponsesRoomDetailResponse = {
-    /**
-     * Id
-     */
-    id: string;
-    /**
-     * Scenario Id
-     */
-    scenario_id: string;
-    /**
-     * Host Id
-     */
-    host_id: string;
-    /**
-     * Name
-     */
-    name: string;
-    /**
-     * Description
-     */
-    description: string | null;
-    status: RoomStatus;
-    /**
-     * Invite Code
-     */
-    invite_code: string;
-    /**
-     * Participants
-     */
-    participants: Array<AppFeaturesRoomsSchemasResponsesRoomParticipantResponse>;
-};
-
-/**
- * RoomParticipantResponse
- */
-export type AppFeaturesRoomsSchemasResponsesRoomParticipantResponse = {
-    /**
-     * User Id
-     */
-    user_id: string;
-    /**
-     * Username
-     */
-    username: string;
-    /**
-     * Nickname
-     */
-    nickname?: string | null;
-    /**
-     * Avatar Url
-     */
-    avatar_url?: string | null;
-    /**
-     * Role
-     */
-    role: string;
-    /**
-     * Is Ready
-     */
-    is_ready: boolean;
-    /**
-     * Joined At
-     */
-    joined_at: string;
-    /**
-     * Character Id
-     */
-    character_id?: string | null;
-    /**
-     * Character Name
-     */
-    character_name?: string | null;
-};
-
-/**
- * RoomDetailResponse
- */
-export type AppFeaturesScenariosSchemasResponsesRoomDetailResponse = {
-    /**
-     * Id
-     */
-    id: string;
-    /**
-     * Scenario Id
-     */
-    scenario_id: string;
-    /**
-     * Host Id
-     */
-    host_id: string;
-    /**
-     * Name
-     */
-    name: string;
-    /**
-     * Description
-     */
-    description: string | null;
-    status: RoomStatus;
-    /**
-     * Invite Code
-     */
-    invite_code: string;
-    /**
-     * Participants
-     */
-    participants: Array<AppFeaturesScenariosSchemasResponsesRoomParticipantResponse>;
-};
-
-/**
- * RoomParticipantResponse
- */
-export type AppFeaturesScenariosSchemasResponsesRoomParticipantResponse = {
-    /**
-     * User Id
-     */
-    user_id: string;
-    /**
-     * Role
-     */
-    role: string;
-    /**
-     * Is Ready
-     */
-    is_ready: boolean;
-    /**
-     * Joined At
-     */
-    joined_at: string;
 };
 
 /**
@@ -1848,7 +2377,7 @@ export type ScenariosCreateRoomResponses = {
     /**
      * Successful Response
      */
-    200: AppFeaturesScenariosSchemasResponsesRoomDetailResponse;
+    200: CreateRoomResponse;
 };
 
 export type ScenariosCreateRoomResponse = ScenariosCreateRoomResponses[keyof ScenariosCreateRoomResponses];
@@ -1941,6 +2470,36 @@ export type DocumentsDownloadOriginalDocumentResponses = {
     200: unknown;
 };
 
+export type DocumentsGetDocumentProcessingPipelineData = {
+    body?: never;
+    path: {
+        /**
+         * Document Id
+         */
+        document_id: string;
+    };
+    query?: never;
+    url: '/documents/{document_id}/processing-pipeline';
+};
+
+export type DocumentsGetDocumentProcessingPipelineErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type DocumentsGetDocumentProcessingPipelineError = DocumentsGetDocumentProcessingPipelineErrors[keyof DocumentsGetDocumentProcessingPipelineErrors];
+
+export type DocumentsGetDocumentProcessingPipelineResponses = {
+    /**
+     * Successful Response
+     */
+    200: DocumentProcessingPipelineResponse;
+};
+
+export type DocumentsGetDocumentProcessingPipelineResponse = DocumentsGetDocumentProcessingPipelineResponses[keyof DocumentsGetDocumentProcessingPipelineResponses];
+
 export type DocumentsProcessDocumentData = {
     body?: never;
     path: {
@@ -1970,6 +2529,36 @@ export type DocumentsProcessDocumentResponses = {
 };
 
 export type DocumentsProcessDocumentResponse = DocumentsProcessDocumentResponses[keyof DocumentsProcessDocumentResponses];
+
+export type DocumentsReprocessDocumentData = {
+    body?: never;
+    path: {
+        /**
+         * Document Id
+         */
+        document_id: string;
+    };
+    query?: never;
+    url: '/documents/{document_id}/reprocess';
+};
+
+export type DocumentsReprocessDocumentErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type DocumentsReprocessDocumentError = DocumentsReprocessDocumentErrors[keyof DocumentsReprocessDocumentErrors];
+
+export type DocumentsReprocessDocumentResponses = {
+    /**
+     * Successful Response
+     */
+    200: ProcessDocumentResponse;
+};
+
+export type DocumentsReprocessDocumentResponse = DocumentsReprocessDocumentResponses[keyof DocumentsReprocessDocumentResponses];
 
 export type ToolsChunkPlainTextData = {
     body: ChunkTextRequest;
@@ -2049,7 +2638,7 @@ export type RoomsGetRoomResponses = {
     /**
      * Successful Response
      */
-    200: AppFeaturesRoomsSchemasResponsesRoomDetailResponse;
+    200: RoomDetailResponse;
 };
 
 export type RoomsGetRoomResponse = RoomsGetRoomResponses[keyof RoomsGetRoomResponses];
@@ -2074,7 +2663,7 @@ export type RoomsJoinRoomResponses = {
     /**
      * Successful Response
      */
-    200: AppFeaturesRoomsSchemasResponsesRoomDetailResponse;
+    200: RoomDetailResponse;
 };
 
 export type RoomsJoinRoomResponse = RoomsJoinRoomResponses[keyof RoomsJoinRoomResponses];
@@ -2104,7 +2693,7 @@ export type RoomsRegenerateInviteCodeResponses = {
     /**
      * Successful Response
      */
-    200: AppFeaturesRoomsSchemasResponsesRoomDetailResponse;
+    200: RoomDetailResponse;
 };
 
 export type RoomsRegenerateInviteCodeResponse = RoomsRegenerateInviteCodeResponses[keyof RoomsRegenerateInviteCodeResponses];
@@ -2138,7 +2727,7 @@ export type RoomsKickParticipantResponses = {
     /**
      * Successful Response
      */
-    200: AppFeaturesRoomsSchemasResponsesRoomDetailResponse;
+    200: RoomDetailResponse;
 };
 
 export type RoomsKickParticipantResponse = RoomsKickParticipantResponses[keyof RoomsKickParticipantResponses];
@@ -2168,7 +2757,7 @@ export type RoomsSelectCharacterResponses = {
     /**
      * Successful Response
      */
-    200: AppFeaturesRoomsSchemasResponsesRoomDetailResponse;
+    200: RoomDetailResponse;
 };
 
 export type RoomsSelectCharacterResponse = RoomsSelectCharacterResponses[keyof RoomsSelectCharacterResponses];
@@ -2203,7 +2792,7 @@ export type RoomsSetReadyResponses = {
     /**
      * Successful Response
      */
-    200: AppFeaturesRoomsSchemasResponsesRoomDetailResponse;
+    200: RoomDetailResponse;
 };
 
 export type RoomsSetReadyResponse = RoomsSetReadyResponses[keyof RoomsSetReadyResponses];
@@ -2233,7 +2822,7 @@ export type RoomsStartSessionResponses = {
     /**
      * Successful Response
      */
-    200: AppFeaturesRoomsSchemasResponsesRoomDetailResponse;
+    200: RoomDetailResponse;
 };
 
 export type RoomsStartSessionResponse = RoomsStartSessionResponses[keyof RoomsStartSessionResponses];

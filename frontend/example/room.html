@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html class="light" lang="zh-TW">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>調查紀錄 - 神話檔案館</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Playfair+Display:ital,wght@0,600;0,700;1,600&amp;display=swap"
+    rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet">
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "tertiary-fixed-dim": "#ccc2db",
+            "inverse-on-surface": "#f2f0ed",
+            "on-secondary": "#ffffff",
+            "surface-container-highest": "#e4e2de",
+            "on-background": "#1b1c1a",
+            "on-primary-container": "#949393",
+            "background": "#fbf9f5",
+            "on-surface": "#1b1c1a",
+            "inverse-primary": "#c8c6c5",
+            "primary-fixed": "#e4e2e1",
+            "surface-container": "#efeeea",
+            "on-error-container": "#93000a",
+            "on-tertiary-fixed-variant": "#4a4458",
+            "primary-fixed-dim": "#c8c6c5",
+            "on-surface-variant": "#444748",
+            "error-container": "#ffdad6",
+            "on-primary": "#ffffff",
+            "on-secondary-fixed-variant": "#58431a",
+            "tertiary-container": "#2f293c",
+            "inverse-surface": "#30312e",
+            "outline": "#747878",
+            "secondary-fixed": "#ffdea7",
+            "outline-variant": "#c4c7c7",
+            "primary-container": "#2c2c2c",
+            "surface": "#fbf9f5",
+            "surface-container-lowest": "#ffffff",
+            "error": "#ba1a1a",
+            "surface-tint": "#5f5e5e",
+            "tertiary": "#1a1526",
+            "secondary-fixed-dim": "#e1c28e",
+            "primary": "#171818",
+            "on-tertiary": "#ffffff",
+            "on-primary-fixed": "#1b1c1c",
+            "on-primary-fixed-variant": "#474747",
+            "surface-container-high": "#eae8e4",
+            "on-secondary-container": "#796135",
+            "surface-dim": "#dbdad6",
+            "secondary-container": "#ffdea7",
+            "on-secondary-fixed": "#271900",
+            "surface-container-low": "#f5f3ef",
+            "surface-variant": "#e4e2de",
+            "surface-bright": "#fbf9f5",
+            "on-error": "#ffffff",
+            "on-tertiary-container": "#9890a7",
+            "secondary": "#725b2f",
+            "tertiary-fixed": "#e8def8",
+            "on-tertiary-fixed": "#1e192b"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "stack-sm": "12px",
+            "margin-mobile": "20px",
+            "stack-lg": "48px",
+            "gutter": "24px",
+            "container-max": "1280px",
+            "margin-desktop": "64px",
+            "stack-xs": "4px",
+            "stack-md": "24px",
+            "unit": "8px"
+          },
+          "fontFamily": {
+            "body-lg": ["Inter"],
+            "label-sm": ["JetBrains Mono"],
+            "headline-md": ["Playfair Display"],
+            "headline-lg": ["Playfair Display"],
+            "headline-lg-mobile": ["Playfair Display"],
+            "label-md": ["JetBrains Mono"],
+            "body-md": ["Inter"]
+          },
+          "fontSize": {
+            "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+            "label-sm": ["12px", { "lineHeight": "1.4", "fontWeight": "400" }],
+            "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+            "headline-lg": ["40px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "headline-lg-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+            "label-md": ["14px", { "lineHeight": "1.4", "letterSpacing": "0.05em", "fontWeight": "500" }],
+            "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+              .scrollbar-hide::-webkit-scrollbar {
+                  display: none;
+              }
+              .scrollbar-hide {
+                  -ms-overflow-style: none;
+                  scrollbar-width: none;
+              }
+              .archival-shadow {
+                  box-shadow: 0 0 0 1px rgba(44, 44, 44, 0.05);
+              }
+          }
+      </style>
+</head>
+
+<body class="bg-background text-on-background font-body-md h-screen overflow-hidden flex">
+  <!-- JSON Component: SideNavBar -->
+  <nav
+    class="bg-surface-container-low dark:bg-surface-container-lowest h-screen w-64 fixed left-0 top-0 border-r border-outline-variant/30 dark:border-outline-variant/10 z-40 flex flex-col justify-between py-margin-mobile md:py-margin-desktop">
+    <div>
+      <!-- Header -->
+      <div class="px-stack-md mb-stack-lg">
+        <div class="flex items-center gap-stack-sm mb-stack-sm">
+          <div
+            class="w-10 h-10 rounded-full bg-surface-container-highest border border-outline-variant/50 overflow-hidden flex-shrink-0">
+            <img alt="Archivist Profile" class="w-full h-full object-cover"
+              data-alt="A black and white studio portrait of an intense, scholarly individual wearing round spectacles and a 1920s tweed jacket. The lighting is moody and dramatic, casting deep shadows across half the face to suggest hidden knowledge. The aesthetic is strictly archival, slightly grainy, and evokes a feeling of historical mystery within a light-mode layout."
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6X7igs-SgzdEqD72-q3WnoHgWqljQdPRqtiUMtk5uIas7Cj1nFcjFJDmXDvgKXu8TNaWEH-F6lSwLa6InY710vJunfFnykGztM2bYLZhHgWqkMoe6aqKCUdAOmY92F2yClVINJZ8zXUoKMjRRjvRbFd7AX4FGN58Yb3UCiK0-vmnRUmNVAqfujL74ROksFpiM4ATkNmUE6cA4YVLCyZJjyFXIV3q6ZCjMXLyZvaI9uSwSKMIMQnEc5FpQ5tB2PD_Eohh5gZ-knw">
+          </div>
+          <div>
+            <h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed tracking-tight">
+              神話檔案館</h1>
+            <p class="font-label-sm text-label-sm text-on-surface-variant">當前會話：阿卡姆</p>
+          </div>
+        </div>
+        <button
+          class="w-full py-stack-sm px-stack-sm bg-primary-container text-surface font-label-md text-label-md rounded flex items-center justify-center gap-2 hover:bg-primary transition-colors">
+          <span class="material-symbols-outlined text-[18px]">add</span>
+          新增調查
+        </button>
+      </div>
+      <!-- Tabs -->
+      <ul class="flex flex-col">
+        <li>
+          <a class="flex items-center gap-stack-sm px-stack-md py-stack-sm text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed hover:bg-secondary-fixed/10 dark:hover:bg-secondary-fixed-dim/10 transition-colors duration-200 opacity-90 hover:scale-[0.98] transition-transform font-label-md text-label-md"
+            href="#">
+            <span class="material-symbols-outlined">visibility</span>
+            調查
+          </a>
+        </li>
+        <li>
+          <a class="flex items-center gap-stack-sm px-stack-md py-stack-sm text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed hover:bg-secondary-fixed/10 dark:hover:bg-secondary-fixed-dim/10 transition-colors duration-200 opacity-90 hover:scale-[0.98] transition-transform font-label-md text-label-md"
+            href="#">
+            <span class="material-symbols-outlined">menu_book</span>
+            劇本
+          </a>
+        </li>
+        <li>
+          <!-- Active State -->
+          <a class="flex items-center gap-stack-sm px-stack-md py-stack-sm text-primary dark:text-primary-fixed font-bold bg-surface-container-highest dark:bg-surface-container border-r-2 border-secondary opacity-90 scale-[0.98] transition-transform font-label-md text-label-md"
+            href="#">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">meeting_room</span>
+            我的房間
+          </a>
+        </li>
+        <li>
+          <a class="flex items-center gap-stack-sm px-stack-md py-stack-sm text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed hover:bg-secondary-fixed/10 dark:hover:bg-secondary-fixed-dim/10 transition-colors duration-200 opacity-90 hover:scale-[0.98] transition-transform font-label-md text-label-md"
+            href="#">
+            <span class="material-symbols-outlined">groups</span>
+            調查員
+          </a>
+        </li>
+      </ul>
+    </div>
+    <!-- Footer -->
+    <div class="px-stack-md mt-auto pt-stack-lg">
+      <div
+        class="flex items-center gap-stack-sm px-stack-sm py-stack-sm text-on-surface-variant border-t border-outline-variant/30 font-label-sm text-label-sm">
+        <span class="material-symbols-outlined text-[16px]">psychology</span>
+        理智/SAN: 45/99
+      </div>
+    </div>
+  </nav>
+  <!-- Main Content Area -->
+  <div class="flex-1 flex flex-col h-screen overflow-hidden ml-64 max-w-[calc(100%-16rem)]">
+    <!-- JSON Component: TopAppBar -->
+    <header
+      class="bg-surface dark:bg-surface docked full-width top-0 sticky z-50 border-b border-outline-variant/20 flex justify-between items-center w-full h-16 px-margin-mobile md:px-margin-desktop focus-within:border-secondary transition-all">
+      <div class="flex items-center gap-stack-md">
+        <div class="font-label-md text-label-md uppercase tracking-widest text-secondary dark:text-secondary-fixed">
+          神話檔案館
+        </div>
+        <nav class="hidden md:flex gap-stack-md border-l border-outline-variant/30 pl-stack-md">
+          <a class="font-label-sm text-label-sm text-on-surface-variant dark:text-on-surface-variant hover:text-secondary dark:hover:text-secondary-fixed-dim transition-colors"
+            href="#">檔案庫</a>
+          <a class="font-label-sm text-label-sm text-primary dark:text-primary-fixed font-bold hover:text-secondary dark:hover:text-secondary-fixed-dim transition-colors"
+            href="#">阿卡姆療養院</a>
+        </nav>
+      </div>
+      <div class="flex items-center gap-stack-sm">
+        <div class="relative hidden md:block">
+          <span
+            class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
+          <input
+            class="pl-8 pr-4 py-1 bg-surface-container-lowest border-b border-outline-variant/50 focus:border-secondary font-label-sm text-label-sm text-on-surface outline-none w-48 transition-colors"
+            placeholder="搜尋檔案..." type="text">
+        </div>
+        <button class="p-2 text-on-surface-variant hover:text-secondary transition-colors">
+          <span class="material-symbols-outlined">settings</span>
+        </button>
+        <button class="p-2 text-on-surface-variant hover:text-secondary transition-colors">
+          <span class="material-symbols-outlined">notifications</span>
+        </button>
+        <div class="w-8 h-8 rounded-full border border-outline/30 overflow-hidden ml-2">
+          <img alt="Investigator Avatar" class="w-full h-full object-cover"
+            data-alt="A small circular avatar showing a vintage black and white photograph of an investigator. The image has a slight sepia tint and film grain, fitting seamlessly into a highly structured, paper-themed digital dossier layout."
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuATfWHlIgDXsCDU9fdqkoPO5Hm5x9dFI04U5EJFo0YgZKvn8djlh3ZTrAAwkCLBn2Liu1r_Btj_BaQAJxeeP0vuH-YqknweUrpNblZ_t5mkAGKOkVDm9okEranEEwMfvfUxruhcsUEiPjZ9D8gk3ProcOfPkzXDub8umlew5Pp6huoeQaqm7u9BXFCvcxWpNUIMXE3ye5HVAdIxU0WgsmEMplmkwRHxA9f96Her4WBO6_LUYKnaUnFwOG0gB-YBOksNIuJ043au8Q">
+        </div>
+      </div>
+    </header>
+    <!-- Gameplay Workspace -->
+    <main class="flex-1 flex overflow-hidden p-gutter gap-gutter bg-background">
+      <!-- Left Pane: Room & Member Info -->
+      <aside class="w-1/4 max-w-[300px] flex flex-col gap-stack-md overflow-y-auto scrollbar-hide">
+        <!-- Room Info Card -->
+        <div class="bg-surface-container-lowest border border-outline-variant/30 p-stack-md rounded archival-shadow">
+          <h2 class="font-headline-md text-[20px] font-bold text-primary mb-1">阿卡姆療養院</h2>
+          <p class="font-label-sm text-label-sm text-on-surface-variant mb-stack-sm">第03節 • 地下病房</p>
+          <div class="h-px w-full bg-outline-variant/30 mb-stack-sm"></div>
+          <p class="font-body-md text-[14px] leading-relaxed text-on-surface">空氣中瀰漫著濃重的消毒水和潮濕泥土的氣味。電力系統仍然不穩定。</p>
+        </div>
+        <!-- Member List -->
+        <div
+          class="bg-surface-container-lowest border border-outline-variant/30 p-stack-md rounded archival-shadow flex-1">
+          <h3
+            class="font-label-md text-label-md text-secondary uppercase tracking-wider mb-stack-md flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px]">group</span> 調查團隊 (3)
+          </h3>
+          <ul class="space-y-stack-sm">
+            <!-- Member 1 (Self) -->
+            <li
+              class="flex items-start gap-3 p-2 rounded bg-surface-container-high/50 border border-outline-variant/20">
+              <div
+                class="w-8 h-8 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center font-label-sm font-bold mt-1">
+                EV</div>
+              <div class="flex-1">
+                <div class="font-label-md text-[13px] font-bold text-primary flex justify-between">
+                  埃莉諾·萬斯 <span class="w-2 h-2 rounded-full bg-secondary mt-1"></span>
+                </div>
+                <div class="font-label-sm text-[11px] text-on-surface-variant">私家偵探 • 準備就緒</div>
+              </div>
+            </li>
+            <!-- Member 2 -->
+            <li class="flex items-start gap-3 p-2 rounded hover:bg-surface-container-low transition-colors">
+              <div
+                class="w-8 h-8 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center font-label-sm border border-outline/20 mt-1">
+                TR</div>
+              <div class="flex-1">
+                <div class="font-label-md text-[13px] font-bold text-primary flex justify-between">
+                  托馬斯·里德
+                </div>
+                <div class="font-label-sm text-[11px] text-on-surface-variant">記者 • 正在輸入...</div>
+              </div>
+            </li>
+            <!-- Keeper -->
+            <li
+              class="flex items-start gap-3 p-2 rounded mt-stack-md border-t border-dashed border-outline-variant/50 pt-3">
+              <div
+                class="w-8 h-8 rounded-sm bg-primary-container text-on-primary flex items-center justify-center font-headline-md text-[16px]">
+                K</div>
+              <div class="flex-1">
+                <div class="font-label-md text-[13px] font-bold text-primary">守秘人</div>
+                <div class="font-label-sm text-[11px] text-on-surface-variant">系統管理員</div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </aside>
+      <!-- Center Pane: Investigation Log (Chat) -->
+      <section
+        class="flex-1 flex flex-col bg-surface-container-lowest border border-outline-variant/30 rounded archival-shadow relative">
+        <!-- Log Header -->
+        <div
+          class="p-stack-sm border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-low/50">
+          <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">調查紀錄</span>
+          <button class="text-on-surface-variant hover:text-primary transition-colors">
+            <span class="material-symbols-outlined text-[18px]">more_horiz</span>
+          </button>
+        </div>
+        <!-- Messages Area -->
+        <div class="flex-1 overflow-y-auto p-stack-md flex flex-col gap-stack-md scrollbar-hide">
+          <!-- System Message -->
+          <div class="text-center w-full my-stack-sm">
+            <span
+              class="font-label-sm text-[11px] text-on-surface-variant uppercase tracking-[0.1em] border-b border-outline-variant/30 pb-1">會話恢復：1928年10月24日
+              - 下午11:45</span>
+          </div>
+          <!-- Keeper Text (Serif, Left) -->
+          <div class="flex flex-col items-start max-w-[85%]">
+            <div class="font-label-sm text-[11px] text-on-surface-variant mb-1 ml-1 flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">auto_stories</span> 守秘人
+            </div>
+            <div class="p-stack-md bg-surface-container-high border border-outline-variant/40 rounded shadow-sm">
+              <p class="font-headline-md text-[18px] text-primary leading-[1.6]">
+                你們站在地下病房沉重的鐵門前。托馬斯的提燈光芒閃爍，在潮濕的磚牆上投下長長而令人不安的陰影。從門的另一側可以聽到微弱、有節奏的抓撓聲。</p>
+            </div>
+          </div>
+          <!-- Player Text (Right) -->
+          <div class="flex flex-col items-end self-end max-w-[75%] mt-stack-sm">
+            <div class="font-label-sm text-[11px] text-on-surface-variant mb-1 mr-1">埃莉諾·萬斯</div>
+            <div
+              class="p-stack-sm px-stack-md bg-surface-container-lowest border border-outline-variant/30 rounded shadow-sm text-right">
+              <p class="font-body-md text-on-surface">「拿穩那盞提燈，托馬斯。我去檢查一下門有沒有上鎖。隨時準備應對任何情況。」</p>
+            </div>
+          </div>
+          <!-- Player Action (Right) -->
+          <div class="flex flex-col items-end self-end max-w-[75%] mt-1">
+            <div
+              class="p-stack-sm px-stack-md bg-surface-container-lowest border border-outline-variant/30 rounded shadow-sm text-right italic">
+              <p class="font-body-md text-on-surface-variant">我伸出手測試鐵門把手，盡量不發出聲音。</p>
+            </div>
+          </div>
+          <!-- Keeper Prompt (Left) -->
+          <div class="flex flex-col items-start max-w-[85%] mt-stack-sm">
+            <div class="font-label-sm text-[11px] text-on-surface-variant mb-1 ml-1">守秘人</div>
+            <div class="p-stack-md bg-surface-container-high border border-outline-variant/40 rounded shadow-sm">
+              <p class="font-headline-md text-[18px] text-primary leading-[1.6]">
+                把手冰冷且僵硬。當你轉動它時，它與生鏽的內部機械摩擦發出巨大的刺耳聲。請進行一次<span
+                  class="font-label-md text-secondary border-b border-secondary/50 pb-px">隱秘</span>檢定。</p>
+            </div>
+          </div>
+          <!-- Dice Roll Result (Stamped Appearance, Right) -->
+          <div class="flex flex-col items-end self-end max-w-[75%] mt-stack-sm">
+            <div
+              class="border-2 border-tertiary bg-surface-container-lowest text-tertiary px-stack-md py-stack-sm rounded rotate-[-1deg] shadow-sm flex flex-col items-end">
+              <div class="font-label-sm text-[10px] uppercase tracking-widest opacity-80 mb-1">官方結果</div>
+              <div class="font-label-md text-[16px] font-bold flex items-center gap-2">
+                <span class="material-symbols-outlined">casino</span>
+                隱秘: 12 / 50
+              </div>
+              <div class="font-headline-md text-[14px] font-bold mt-1 uppercase tracking-wider">困難成功</div>
+            </div>
+          </div>
+          <!-- Keeper Response (Left) -->
+          <div class="flex flex-col items-start max-w-[85%] mt-stack-sm">
+            <div class="font-label-sm text-[11px] text-on-surface-variant mb-1 ml-1">守秘人</div>
+            <div class="p-stack-md bg-surface-container-high border border-outline-variant/40 rounded shadow-sm">
+              <p class="font-headline-md text-[18px] text-primary leading-[1.6]">
+                儘管生鏽了，你經驗豐富的雙手卻出人意料地安靜地操作著門閂。門哢嗒一聲打開了一條縫。抓撓聲瞬間停止了。</p>
+            </div>
+          </div>
+          <!-- Scroll Anchor -->
+          <div class="h-4 w-full"></div>
+        </div>
+        <!-- Input Area -->
+        <div class="p-stack-md border-t border-outline-variant/30 bg-surface-container-lowest">
+          <div class="flex items-end gap-stack-sm">
+            <button
+              class="p-2 text-on-surface-variant hover:text-secondary transition-colors border border-outline-variant/30 rounded bg-surface-container-low hover:bg-surface-variant mb-1">
+              <span class="material-symbols-outlined text-[20px]">add_reaction</span>
+            </button>
+            <div class="flex-1 relative">
+              <textarea
+                class="w-full bg-transparent border-b border-outline-variant/50 focus:border-secondary font-body-md text-on-surface outline-none resize-none py-2 px-1 placeholder-outline-variant transition-colors"
+                placeholder="描述你的行動或說話..." rows="1" style="min-height: 40px;"></textarea>
+            </div>
+            <button
+              class="px-stack-md py-2 bg-primary-container text-surface font-label-md text-label-md rounded border border-primary-container hover:bg-primary transition-colors flex items-center gap-2 mb-1">
+              <span class="material-symbols-outlined text-[18px]">send</span> 發送
+            </button>
+            <button
+              class="px-stack-sm py-2 bg-surface-container-low text-secondary font-label-md text-label-md rounded border border-secondary/30 hover:bg-secondary/10 transition-colors flex items-center gap-1 mb-1 group"
+              title="快速檢定">
+              <span
+                class="material-symbols-outlined text-[18px] group-hover:rotate-180 transition-transform duration-500">casino</span>
+            </button>
+          </div>
+          <div class="flex gap-4 mt-2 px-1">
+            <span class="font-label-sm text-[10px] text-outline-variant">/roll [skill]</span>
+            <span class="font-label-sm text-[10px] text-outline-variant">/whisper [name]</span>
+          </div>
+        </div>
+      </section>
+      <!-- Right Pane: Active Investigator Sheet -->
+      <aside class="w-1/4 max-w-[320px] flex flex-col gap-stack-md overflow-y-auto scrollbar-hide">
+        <div
+          class="bg-surface-container-lowest border border-outline-variant/30 p-stack-md rounded archival-shadow h-full flex flex-col">
+          <!-- Sheet Header -->
+          <div class="flex justify-between items-start mb-stack-md border-b border-outline-variant/30 pb-stack-sm">
+            <div>
+              <h2 class="font-headline-md text-[22px] font-bold text-primary">埃莉諾·萬斯</h2>
+              <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">私家偵探</p>
+            </div>
+            <button class="text-on-surface-variant hover:text-primary transition-colors">
+              <span class="material-symbols-outlined text-[20px]">open_in_new</span>
+            </button>
+          </div>
+          <!-- Core Vitals (Bento Grid Style) -->
+          <div class="grid grid-cols-2 gap-stack-sm mb-stack-md">
+            <div
+              class="border border-outline-variant/30 p-stack-sm rounded bg-surface-container-low flex flex-col items-center justify-center">
+              <span
+                class="font-label-sm text-[11px] text-on-surface-variant uppercase tracking-widest mb-1">體力/HP</span>
+              <span class="font-label-md text-[24px] font-bold text-primary">12<span
+                  class="text-[14px] text-outline-variant font-normal">/12</span></span>
+            </div>
+            <div
+              class="border border-outline-variant/30 p-stack-sm rounded bg-surface-container-low flex flex-col items-center justify-center relative overflow-hidden">
+              <div class="absolute top-0 left-0 w-full h-1 bg-outline-variant/20">
+                <div class="h-full bg-secondary w-[45%]"></div>
+              </div>
+              <span
+                class="font-label-sm text-[11px] text-on-surface-variant uppercase tracking-widest mb-1">理智/SAN</span>
+              <span class="font-label-md text-[24px] font-bold text-primary">45<span
+                  class="text-[14px] text-outline-variant font-normal">/99</span></span>
+            </div>
+            <div
+              class="col-span-2 border border-outline-variant/30 p-stack-sm rounded bg-surface-container-low flex justify-between items-center px-stack-md">
+              <span class="font-label-sm text-[11px] text-on-surface-variant uppercase tracking-widest">幸運</span>
+              <span class="font-label-md text-[20px] font-bold text-primary">50</span>
+            </div>
+          </div>
+          <!-- Quick Skill Checks (Typewriter Table) -->
+          <div class="flex-1 flex flex-col">
+            <h3
+              class="font-label-md text-[12px] text-on-surface-variant uppercase tracking-widest mb-stack-sm flex items-center gap-2">
+              <span class="material-symbols-outlined text-[16px]">fact_check</span> 快速檢定
+            </h3>
+            <div class="border border-outline-variant/30 rounded overflow-hidden">
+              <!-- Table Row -->
+              <div
+                class="flex justify-between items-center p-2 border-b border-outline-variant/20 hover:bg-surface-container-low transition-colors group cursor-pointer">
+                <span class="font-label-sm text-primary">偵查</span>
+                <div class="flex items-center gap-3">
+                  <span class="font-label-md text-primary font-bold">65</span>
+                  <button class="opacity-0 group-hover:opacity-100 text-secondary transition-opacity">
+                    <span class="material-symbols-outlined text-[16px]">casino</span>
+                  </button>
+                </div>
+              </div>
+              <!-- Table Row -->
+              <div
+                class="flex justify-between items-center p-2 border-b border-outline-variant/20 hover:bg-surface-container-low transition-colors group cursor-pointer">
+                <span class="font-label-sm text-primary">聆聽</span>
+                <div class="flex items-center gap-3">
+                  <span class="font-label-md text-primary font-bold">50</span>
+                  <button class="opacity-0 group-hover:opacity-100 text-secondary transition-opacity">
+                    <span class="material-symbols-outlined text-[16px]">casino</span>
+                  </button>
+                </div>
+              </div>
+              <!-- Table Row -->
+              <div
+                class="flex justify-between items-center p-2 border-b border-outline-variant/20 hover:bg-surface-container-low transition-colors group cursor-pointer bg-secondary/5">
+                <span class="font-label-sm text-primary">隱秘</span>
+                <div class="flex items-center gap-3">
+                  <span class="font-label-md text-primary font-bold">50</span>
+                  <button class="opacity-0 group-hover:opacity-100 text-secondary transition-opacity">
+                    <span class="material-symbols-outlined text-[16px]">casino</span>
+                  </button>
+                </div>
+              </div>
+              <!-- Table Row -->
+              <div
+                class="flex justify-between items-center p-2 border-b border-outline-variant/20 hover:bg-surface-container-low transition-colors group cursor-pointer">
+                <span class="font-label-sm text-primary">心理學</span>
+                <div class="flex items-center gap-3">
+                  <span class="font-label-md text-primary font-bold">40</span>
+                  <button class="opacity-0 group-hover:opacity-100 text-secondary transition-opacity">
+                    <span class="material-symbols-outlined text-[16px]">casino</span>
+                  </button>
+                </div>
+              </div>
+              <!-- Table Row -->
+              <div
+                class="flex justify-between items-center p-2 hover:bg-surface-container-low transition-colors group cursor-pointer">
+                <span class="font-label-sm text-primary">射擊 (手槍)</span>
+                <div class="flex items-center gap-3">
+                  <span class="font-label-md text-primary font-bold">60</span>
+                  <button class="opacity-0 group-hover:opacity-100 text-secondary transition-opacity">
+                    <span class="material-symbols-outlined text-[16px]">casino</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Footer Stamp -->
+          <div class="mt-stack-md flex justify-end">
+            <div
+              class="border border-outline-variant/40 px-3 py-1 font-label-sm text-[10px] uppercase tracking-widest text-outline-variant rotate-[-2deg] opacity-60">
+              認證副本
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+</body>
+
+</html>

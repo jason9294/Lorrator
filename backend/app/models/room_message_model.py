@@ -28,6 +28,7 @@ class RoomMessageModel(TimestampMixin, SQLModel, table=True):
         sa_column=Column(String, nullable=False, server_default="CHAT"),
     )
     content: str = Field(sa_column=Column(Text, nullable=False))
+    detail: str | None = Field(default=None, sa_column=Column(Text, nullable=True))
 
     room: Optional["RoomModel"] = Relationship()
     sender: Optional["UserModel"] = Relationship()

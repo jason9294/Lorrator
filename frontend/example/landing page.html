@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html class="light" lang="zh-TW">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Mythos Archive</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Playfair+Display:wght@600;700&amp;display=swap"
+    rel="stylesheet">
+  <!-- Material Symbols -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet">
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <!-- Tailwind Config -->
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "tertiary-fixed-dim": "#ccc2db",
+            "inverse-on-surface": "#f2f0ed",
+            "on-secondary": "#ffffff",
+            "surface-container-highest": "#e4e2de",
+            "on-background": "#1b1c1a",
+            "on-primary-container": "#949393",
+            "background": "#fbf9f5",
+            "on-surface": "#1b1c1a",
+            "inverse-primary": "#c8c6c5",
+            "primary-fixed": "#e4e2e1",
+            "surface-container": "#efeeea",
+            "on-error-container": "#93000a",
+            "on-tertiary-fixed-variant": "#4a4458",
+            "primary-fixed-dim": "#c8c6c5",
+            "on-surface-variant": "#444748",
+            "error-container": "#ffdad6",
+            "on-primary": "#ffffff",
+            "on-secondary-fixed-variant": "#58431a",
+            "tertiary-container": "#2f293c",
+            "inverse-surface": "#30312e",
+            "outline": "#747878",
+            "secondary-fixed": "#ffdea7",
+            "outline-variant": "#c4c7c7",
+            "primary-container": "#2c2c2c",
+            "surface": "#fbf9f5",
+            "surface-container-lowest": "#ffffff",
+            "error": "#ba1a1a",
+            "surface-tint": "#5f5e5e",
+            "tertiary": "#1a1526",
+            "secondary-fixed-dim": "#e1c28e",
+            "primary": "#171818",
+            "on-tertiary": "#ffffff",
+            "on-primary-fixed": "#1b1c1c",
+            "on-primary-fixed-variant": "#474747",
+            "surface-container-high": "#eae8e4",
+            "on-secondary-container": "#796135",
+            "surface-dim": "#dbdad6",
+            "secondary-container": "#ffdea7",
+            "on-secondary-fixed": "#271900",
+            "surface-container-low": "#f5f3ef",
+            "surface-variant": "#e4e2de",
+            "surface-bright": "#fbf9f5",
+            "on-error": "#ffffff",
+            "on-tertiary-container": "#9890a7",
+            "secondary": "#725b2f",
+            "tertiary-fixed": "#e8def8",
+            "on-tertiary-fixed": "#1e192b"
+          },
+          borderRadius: {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          spacing: {
+            "stack-sm": "12px",
+            "margin-mobile": "20px",
+            "stack-lg": "48px",
+            "gutter": "24px",
+            "container-max": "1280px",
+            "margin-desktop": "64px",
+            "stack-xs": "4px",
+            "stack-md": "24px",
+            "unit": "8px"
+          },
+          fontFamily: {
+            "body-lg": ["Inter"],
+            "label-sm": ["JetBrains Mono"],
+            "headline-md": ["Playfair Display"],
+            "headline-lg": ["Playfair Display"],
+            "headline-lg-mobile": ["Playfair Display"],
+            "label-md": ["JetBrains Mono"],
+            "body-md": ["Inter"]
+          },
+          fontSize: {
+            "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+            "label-sm": ["12px", { "lineHeight": "1.4", "fontWeight": "400" }],
+            "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+            "headline-lg": ["40px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "headline-lg-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+            "label-md": ["14px", { "lineHeight": "1.4", "letterSpacing": "0.05em", "fontWeight": "500" }],
+            "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+    }
+
+    /* Ambient shadow utility */
+    .shadow-ambient {
+      box-shadow: 0 0 20px 0 rgba(44, 44, 44, 0.05);
+    }
+  </style>
+</head>
+
+<body
+  class="bg-background text-on-background font-body-md text-body-md antialiased flex selection:bg-secondary-fixed selection:text-on-secondary-fixed">
+  <!-- SideNavBar Component -->
+  <aside
+    class="h-screen w-64 fixed left-0 top-0 border-r border-outline-variant/30 bg-surface-container-low flex flex-col py-margin-desktop justify-between z-40 hidden md:flex">
+    <div class="flex flex-col gap-stack-lg px-margin-desktop">
+      <!-- Header -->
+      <div class="flex flex-col gap-stack-xs">
+        <div class="flex items-center gap-stack-sm mb-stack-sm">
+          <div
+            class="w-8 h-8 rounded-full bg-surface-container-highest border border-outline-variant overflow-hidden flex items-center justify-center">
+            <img alt="Archivist Profile" class="w-full h-full object-cover"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtKVq8tgsDcn5LVgHpq2Mpg3UARx9oPw6GXW8vupMkzeHyS-rgSHWefVga7KfHvQt-6vkwa8PIA2lyhuW3jwpcE2Amrp2CeqSWs7dQu5MlSIulx3yUEZapIjAERZ_RL1XiCCfVhc_hdQ54267WoZaraPdez-LCDN8XMRfYN6Zy0tLVwZKLcaIuSwJQleLd_ebfZQ7CKGIqDkF8Y1-4NADjlBpzcNw433err6-fZA07zKeszMyEU1I4RDxt6qEqU0zZvKEZPhQMag">
+          </div>
+        </div>
+        <h1 class="font-headline-md text-headline-md font-bold text-primary tracking-tight">Mythos Archive</h1>
+        <p class="font-label-sm text-label-sm text-on-surface-variant">當前會話：阿卡漢</p>
+      </div>
+      <!-- CTA -->
+      <button
+        class="w-full bg-primary-container text-on-primary rounded font-label-md text-label-md py-2 px-4 hover:bg-primary transition-colors flex items-center justify-center gap-2">
+        <span class="material-symbols-outlined text-[18px]">add</span>
+        新增調查
+      </button>
+      <!-- Navigation -->
+      <nav class="flex flex-col gap-unit -mx-margin-desktop">
+        <!-- Active Tab -->
+        <a class="flex items-center gap-stack-sm px-stack-md py-stack-sm text-primary font-bold bg-surface-container-highest border-r-2 border-secondary opacity-90 scale-[0.98] transition-transform"
+          href="#">
+          <span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+          <span class="font-label-md text-label-md">調查</span>
+        </a>
+        <!-- Inactive Tabs -->
+        <a class="flex items-center gap-stack-sm px-stack-md py-stack-sm text-on-surface-variant hover:text-primary hover:bg-secondary-fixed/10 transition-colors duration-200"
+          href="#">
+          <span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+          <span class="font-label-md text-label-md">劇本</span>
+        </a>
+        <a class="flex items-center gap-stack-sm px-stack-md py-stack-sm text-on-surface-variant hover:text-primary hover:bg-secondary-fixed/10 transition-colors duration-200"
+          href="#">
+          <span class="material-symbols-outlined" data-icon="meeting_room">meeting_room</span>
+          <span class="font-label-md text-label-md">我的房間</span>
+        </a>
+        <a class="flex items-center gap-stack-sm px-stack-md py-stack-sm text-on-surface-variant hover:text-primary hover:bg-secondary-fixed/10 transition-colors duration-200"
+          href="#">
+          <span class="material-symbols-outlined" data-icon="groups">groups</span>
+          <span class="font-label-md text-label-md">調查員</span>
+        </a>
+      </nav>
+    </div>
+    <!-- Footer -->
+    <div class="px-margin-desktop mt-auto pt-stack-md border-t border-outline-variant/30">
+      <div class="flex items-center gap-stack-sm text-on-surface-variant font-label-sm text-label-sm">
+        <span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+        <span>理智值：45/99</span>
+      </div>
+    </div>
+  </aside>
+  <!-- Main Wrapper -->
+  <div class="flex-1 md:ml-64 flex flex-col min-h-screen">
+    <!-- TopAppBar Component -->
+    <header
+      class="bg-surface top-0 sticky z-50 border-b border-outline-variant/20 flex justify-between items-center w-full h-16 px-margin-mobile md:px-margin-desktop md:max-w-[calc(100%-16rem)]">
+      <div class="flex items-center gap-stack-lg">
+        <span class="font-label-md text-label-md uppercase tracking-widest text-secondary hidden md:block">Mythos
+          Archive</span>
+        <nav class="hidden lg:flex items-center gap-stack-md">
+          <a class="font-label-sm text-label-sm text-on-surface-variant hover:text-secondary transition-colors"
+            href="#">檔案庫</a>
+          <a class="font-label-sm text-label-sm text-on-surface-variant hover:text-secondary transition-colors"
+            href="#">阿卡漢療養院</a>
+        </nav>
+      </div>
+      <div class="flex items-center gap-stack-md">
+        <!-- Search Box Blank -->
+        <div
+          class="hidden md:flex border-b border-outline-variant pb-1 items-center gap-2 w-48 focus-within:border-secondary transition-all">
+          <span class="material-symbols-outlined text-outline text-[18px]">search</span>
+          <input
+            class="bg-transparent border-none p-0 font-label-sm text-label-sm focus:ring-0 w-full placeholder:text-outline-variant"
+            placeholder="搜尋檔案庫..." type="text">
+        </div>
+        <button class="text-on-surface-variant hover:text-secondary transition-colors">
+          <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+        </button>
+        <button class="text-on-surface-variant hover:text-secondary transition-colors">
+          <span class="material-symbols-outlined" data-icon="settings">settings</span>
+        </button>
+        <div class="w-8 h-8 rounded border border-outline-variant bg-surface-container overflow-hidden cursor-pointer">
+          <img alt="Investigator Avatar" class="w-full h-full object-cover"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuzLoX9G6VsMfX4fXm9UM4n1XBy2Ay3Gp2up3g86QBjVboeDlMNqhROb21IsI_bhSCOR_wfbzQtR_ExWPdOmjhLVMg7doidj8SBVy9_NeRk9wfj40C01llYla28UrnnpUhWW4B-Ps8DHWaMGqX1_Bt-lUEfME6J47Y3GQHsu5KQ7H6jFtJpIVfZRsvwgCU-GWsVoP8VcJsKCUmUFu0mmuHkv1SCpaC9Fdg4RCP36M9ix_98-1okH08QsvwQo66EljNFN3VN3q8LQ">
+        </div>
+      </div>
+    </header>
+    <!-- Canvas Area -->
+    <main class="flex-1 w-full flex flex-col">
+      <!-- Hero Section with Background -->
+      <section
+        class="relative w-full min-h-[819px] flex flex-col items-center justify-center pt-stack-lg pb-margin-desktop px-margin-mobile md:px-margin-desktop overflow-hidden border-b border-outline-variant/20">
+        <!-- Subtle Occult Background -->
+        <div class="absolute inset-0 z-0 opacity-10 bg-cover bg-center"
+          data-alt="A highly detailed, faded star map from the 19th century overlaid with faint, geometric occult symbols and constellations. The background is a pristine, light parchment white with the linework in a subtle, faded charcoal grey. The lighting is even and flat, creating a clean, minimalist aesthetic suitable for a modern light-mode user interface while maintaining a subtle Lovecraftian mystery mood."
+          style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA4wuKezegbOxrZ--hOuHCrstJ2c_3WcIq1j4ZTQ3ZkeqjpkNTCpV9MnNK_drKuW3g2nuzH91y6Ru52hpoAvXNjVjqggn0FSBKaiCFwXgKzTHmOk2UgJ4cKj6FJ96FumHSSw5_GLEEzgaCdmFG8S4wtgCWfctVqBfql_A1RVz5rSqKj1X6JAiqFlAK7SpEaVrHj5R7_5woAsLrl5xdePljr1KDRkcyhzIuGdQlfWJZzITbqLHDwhCCSH9YglL_PEitxqWRyuJSTJQ');">
+        </div>
+        <!-- Gradient Fade to Surface -->
+        <div class="absolute inset-0 z-0 bg-gradient-to-b from-surface/50 to-surface"></div>
+        <div class="relative z-10 max-w-[800px] text-center flex flex-col items-center gap-stack-md mt-stack-lg">
+          <span
+            class="font-label-sm text-label-sm uppercase tracking-widest text-secondary border border-secondary/30 px-3 py-1 rounded bg-surface/80 backdrop-blur-sm">v2.0
+            測試體驗</span>
+          <h2
+            class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary max-w-[600px] mx-auto leading-tight">
+            專為神秘學調查員打造的現代工作空間。
+          </h2>
+          <p class="font-body-lg text-body-lg text-on-surface-variant max-w-[500px] mx-auto">
+            在流暢、現代的環境中管理劇本、追蹤線索，體驗沉浸式的克蘇魯 TRPG 會話。
+          </p>
+          <div class="flex items-center gap-stack-sm mt-stack-sm">
+            <button
+              class="bg-primary-container text-on-primary px-6 py-3 rounded font-label-md text-label-md hover:bg-primary transition-colors flex items-center gap-2">
+              開啟檔案庫
+              <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+            </button>
+            <button
+              class="border border-secondary text-secondary px-6 py-3 rounded font-label-md text-label-md hover:bg-secondary-fixed/10 transition-colors">
+              檢視公開案件
+            </button>
+          </div>
+        </div>
+        <!-- Investigation Desk Preview (Bento Glassmorphism) -->
+        <div
+          class="relative z-10 w-full max-w-container-max mx-auto mt-margin-desktop grid grid-cols-1 md:grid-cols-12 gap-gutter">
+          <!-- Main Map/Clue Board Preview -->
+          <div
+            class="md:col-span-8 bg-surface border border-outline-variant/50 rounded-lg p-stack-md shadow-ambient backdrop-blur-md bg-opacity-90 flex flex-col gap-stack-sm h-[400px]">
+            <div class="flex justify-between items-center border-b border-outline-variant/30 pb-2">
+              <span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-2">
+                <span class="material-symbols-outlined text-[16px]">map</span>
+                阿卡漢鎮廣場
+              </span>
+              <span class="font-label-sm text-label-sm text-tertiary-container uppercase tracking-widest">現有線索：3</span>
+            </div>
+            <div
+              class="flex-1 relative w-full h-full bg-surface-container-lowest border border-outline-variant/20 rounded overflow-hidden">
+              <div class="absolute inset-0 bg-cover bg-center opacity-40"
+                data-alt="A vintage top-down street map of a fictional 1920s New England town, rendered in clean, minimalist line art. The map features sharp, precise strokes resembling ink on a bright white paper background. Key locations are marked with subtle, elegant geometric pins. The overall mood is sterile, investigative, and highly organized, fitting a modern archival software interface."
+                data-location="Arkham"
+                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAs4DKcB3IWhXKa2GIzAAwxy1uE1tKs-wP5kEjVq015nFumn7Y-N95mV3VDxxXlGHZPXZwLCBwDlyBg2lGVCcPZi6Ti1z2mweU4n3aslRLO-fc-phiNIRYJhWnzgIE_XLlYB77vfE8MWLt8heovEvnabTkON79B-VmxmKBxAVgzjHhbmAjQEUYEKgAQchh7Uffwbm5vXalFuN1vxxUo2zTdx2sGPtNrFocPDzv5A8clbQzM-YAE4xUjLFUeZcw97lySNfHWqdgz-w');">
+              </div>
+              <!-- UI Overlay Elements on Map -->
+              <div
+                class="absolute top-1/4 left-1/3 bg-surface border border-outline-variant p-2 rounded shadow-ambient w-48 z-10">
+                <p class="font-label-sm text-label-sm font-bold text-primary">邪教徒目擊</p>
+                <p class="font-label-sm text-label-sm text-on-surface-variant text-[10px] mt-1">凌晨 2:00 - 小巷</p>
+              </div>
+              <!-- Connecting string simulation -->
+              <svg class="absolute inset-0 w-full h-full z-0 pointer-events-none">
+                <line opacity="0.5" stroke="#725b2f" stroke-dasharray="4" stroke-width="1" x1="45%" x2="60%" y1="30%"
+                  y2="50%"></line>
+              </svg>
+            </div>
+          </div>
+          <!-- Side Dossier/Sanity Track -->
+          <div class="md:col-span-4 flex flex-col gap-gutter">
+            <!-- Dossier Card -->
+            <div
+              class="bg-surface border border-outline-variant/50 rounded-lg p-stack-md shadow-ambient backdrop-blur-md bg-opacity-90 relative">
+              <span
+                class="absolute top-stack-sm right-stack-sm font-label-sm text-label-sm text-error border border-error/30 px-1 rotate-12 bg-surface">失蹤</span>
+              <h3 class="font-headline-md text-headline-md text-primary mb-1">阿米塔吉博士</h3>
+              <p
+                class="font-label-sm text-label-sm text-on-surface-variant border-b border-outline-variant/30 pb-stack-xs mb-stack-sm">
+                密斯卡托尼克大學</p>
+              <div class="font-label-sm text-label-sm flex flex-col gap-1">
+                <div class="flex justify-between">
+                  <span class="text-on-surface-variant">力量：</span><span class="text-primary font-medium">45</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-on-surface-variant">智力：</span><span class="text-primary font-medium">85</span>
+                </div>
+              </div>
+            </div>
+            <!-- Typewriter Table Snippet -->
+            <div
+              class="bg-surface border border-outline-variant/50 rounded-lg p-stack-md shadow-ambient backdrop-blur-md bg-opacity-90 flex-1">
+              <h4
+                class="font-label-md text-label-md text-primary border-b border-outline-variant/50 pb-2 mb-2 flex items-center gap-2">
+                <span class="material-symbols-outlined text-[16px]">receipt_long</span>
+                近期活動
+              </h4>
+              <div class="flex flex-col font-label-sm text-label-sm">
+                <div class="flex justify-between py-1 border-b border-outline-variant/20 text-on-surface-variant">
+                  <span>取得魔典</span>
+                  <span>10月12日</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-outline-variant/20 text-on-surface-variant">
+                  <span>干擾儀式</span>
+                  <span>10月14日</span>
+                </div>
+                <div class="flex justify-between py-1 text-on-surface-variant">
+                  <span>理智值損失 (-5)</span>
+                  <span class="text-error">10月15日</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+
+</html>

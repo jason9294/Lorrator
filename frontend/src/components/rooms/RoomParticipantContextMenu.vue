@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { useCopyFeedback } from '@/composables/useCopyFeedback'
 import { Check, Copy, UserMinus } from 'lucide-vue-next'
 import {
   ContextMenu,
@@ -20,26 +20,10 @@ const emit = defineEmits<{
   kick: []
 }>()
 
-const copied = ref(false)
+const { copy, copied } = useCopyFeedback()
 
-async function copyUserId() {
-  try {
-    await navigator.clipboard.writeText(props.userId)
-  } catch {
-    const ta = document.createElement('textarea')
-    ta.value = props.userId
-    ta.style.position = 'fixed'
-    ta.style.opacity = '0'
-    document.body.appendChild(ta)
-    ta.focus()
-    ta.select()
-    document.execCommand('copy')
-    document.body.removeChild(ta)
-  }
-  copied.value = true
-  setTimeout(() => {
-    copied.value = false
-  }, 2000)
+function copyUserId() {
+  void copy(props.userId)
 }
 </script>
 

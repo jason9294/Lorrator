@@ -4,13 +4,16 @@
 
     <main class="flex-1 p-6">
       <div class="max-w-4xl mx-auto space-y-10">
-
         <!-- 歡迎區塊 -->
         <div class="pt-6 space-y-2">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-sm shrink-0">
+            <div
+              class="w-10 h-10 rounded-xl bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-sm shrink-0"
+            >
               <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" />
+                <path
+                  d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"
+                />
               </svg>
             </div>
             <div>
@@ -22,18 +25,25 @@
 
         <!-- 快速入口 -->
         <section class="space-y-3">
-          <h2 class="text-sm font-semibold text-muted-foreground uppercase tracking-wider">快速入口</h2>
+          <h2 class="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+            快速入口
+          </h2>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-
             <!-- 我的房間 -->
             <RouterLink to="/rooms" class="group">
-              <Card class="h-full hover:shadow-md hover:border-primary/30 transition-all cursor-pointer">
+              <Card
+                class="h-full hover:shadow-md hover:border-primary/30 transition-all cursor-pointer"
+              >
                 <CardContent class="p-5 space-y-3">
-                  <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+                  <div
+                    class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center"
+                  >
                     <DoorOpen class="size-5 text-green-600 dark:text-green-400" />
                   </div>
                   <div>
-                    <div class="font-semibold text-sm group-hover:text-primary transition-colors">我的房間</div>
+                    <div class="font-semibold text-sm group-hover:text-primary transition-colors">
+                      我的房間
+                    </div>
                     <p class="text-xs text-muted-foreground mt-0.5">進入正在進行的跑團</p>
                   </div>
                   <div class="flex items-center gap-1 text-xs text-muted-foreground">
@@ -46,13 +56,19 @@
 
             <!-- 劇本庫 -->
             <RouterLink to="/scenarios" class="group">
-              <Card class="h-full hover:shadow-md hover:border-primary/30 transition-all cursor-pointer">
+              <Card
+                class="h-full hover:shadow-md hover:border-primary/30 transition-all cursor-pointer"
+              >
                 <CardContent class="p-5 space-y-3">
-                  <div class="w-10 h-10 rounded-lg bg-violet-500/10 flex items-center justify-center">
+                  <div
+                    class="w-10 h-10 rounded-lg bg-violet-500/10 flex items-center justify-center"
+                  >
                     <BookOpen class="size-5 text-violet-600 dark:text-violet-400" />
                   </div>
                   <div>
-                    <div class="font-semibold text-sm group-hover:text-primary transition-colors">劇本庫</div>
+                    <div class="font-semibold text-sm group-hover:text-primary transition-colors">
+                      劇本庫
+                    </div>
                     <p class="text-xs text-muted-foreground mt-0.5">瀏覽與建立跑團劇本</p>
                   </div>
                   <div class="flex items-center gap-1 text-xs text-muted-foreground">
@@ -65,13 +81,19 @@
 
             <!-- 角色卡 -->
             <RouterLink to="/characters" class="group">
-              <Card class="h-full hover:shadow-md hover:border-primary/30 transition-all cursor-pointer">
+              <Card
+                class="h-full hover:shadow-md hover:border-primary/30 transition-all cursor-pointer"
+              >
                 <CardContent class="p-5 space-y-3">
-                  <div class="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                  <div
+                    class="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center"
+                  >
                     <User class="size-5 text-amber-600 dark:text-amber-400" />
                   </div>
                   <div>
-                    <div class="font-semibold text-sm group-hover:text-primary transition-colors">角色卡</div>
+                    <div class="font-semibold text-sm group-hover:text-primary transition-colors">
+                      角色卡
+                    </div>
                     <p class="text-xs text-muted-foreground mt-0.5">管理你的 TRPG 角色</p>
                   </div>
                   <div class="flex items-center gap-1 text-xs text-muted-foreground">
@@ -81,7 +103,6 @@
                 </CardContent>
               </Card>
             </RouterLink>
-
           </div>
         </section>
 
@@ -92,7 +113,10 @@
             <Card>
               <CardContent class="p-5">
                 <div class="text-2xl font-bold">
-                  <span v-if="isLoadingStats" class="inline-block w-8 h-6 bg-muted rounded animate-pulse" />
+                  <span
+                    v-if="isLoadingStats"
+                    class="inline-block w-8 h-6 bg-muted rounded animate-pulse"
+                  />
                   <span v-else>{{ stats.rooms }}</span>
                 </div>
                 <div class="text-xs text-muted-foreground mt-1 flex items-center gap-1">
@@ -104,7 +128,10 @@
             <Card>
               <CardContent class="p-5">
                 <div class="text-2xl font-bold">
-                  <span v-if="isLoadingStats" class="inline-block w-8 h-6 bg-muted rounded animate-pulse" />
+                  <span
+                    v-if="isLoadingStats"
+                    class="inline-block w-8 h-6 bg-muted rounded animate-pulse"
+                  />
                   <span v-else>{{ stats.scenarios }}</span>
                 </div>
                 <div class="text-xs text-muted-foreground mt-1 flex items-center gap-1">
@@ -116,7 +143,10 @@
             <Card>
               <CardContent class="p-5">
                 <div class="text-2xl font-bold">
-                  <span v-if="isLoadingStats" class="inline-block w-8 h-6 bg-muted rounded animate-pulse" />
+                  <span
+                    v-if="isLoadingStats"
+                    class="inline-block w-8 h-6 bg-muted rounded animate-pulse"
+                  />
                   <span v-else>{{ stats.characters }}</span>
                 </div>
                 <div class="text-xs text-muted-foreground mt-1 flex items-center gap-1">
@@ -131,8 +161,13 @@
         <!-- 進行中的房間 -->
         <section class="space-y-3">
           <div class="flex items-center justify-between">
-            <h2 class="text-sm font-semibold text-muted-foreground uppercase tracking-wider">進行中的跑團</h2>
-            <RouterLink to="/rooms" class="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
+            <h2 class="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+              進行中的跑團
+            </h2>
+            <RouterLink
+              to="/rooms"
+              class="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+            >
               查看全部
               <ArrowRight class="size-3" />
             </RouterLink>
@@ -173,9 +208,13 @@
                     <div class="flex items-center gap-2">
                       <span class="font-semibold text-sm">{{ room.name }}</span>
                       <span class="w-2 h-2 rounded-full bg-green-500 shrink-0" />
-                      <span class="text-[10px] text-green-600 dark:text-green-400 font-medium">跑團中</span>
+                      <span class="text-[10px] text-green-600 dark:text-green-400 font-medium"
+                        >跑團中</span
+                      >
                     </div>
-                    <p class="text-xs text-muted-foreground truncate mt-0.5">{{ room.description || '無簡介' }}</p>
+                    <p class="text-xs text-muted-foreground truncate mt-0.5">
+                      {{ room.description || '無簡介' }}
+                    </p>
                   </div>
                   <Button variant="outline" size="sm" class="shrink-0 gap-1.5">
                     <DoorOpen class="size-3.5" />
@@ -200,14 +239,14 @@
             </CardContent>
           </Card>
         </section>
-
       </div>
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { useAsyncState } from '@vueuse/core'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ArrowRight, BookOpen, DoorOpen, User } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
@@ -218,40 +257,35 @@ import { colorFromId } from '@/utils/color'
 
 const router = useRouter()
 
-const isLoadingRooms = ref(false)
-const rooms = ref<RoomResponse[]>([])
-
-const isLoadingStats = ref(false)
-const stats = ref({ rooms: 0, scenarios: 0, characters: 0 })
-
-const runningRooms = computed(() =>
-  rooms.value.filter((r) => r.status === 'RUNNING').slice(0, 3),
-)
-
-async function loadData() {
-  isLoadingRooms.value = true
-  isLoadingStats.value = true
-  try {
+const { state: dashboardData, isLoading: isLoadingData } = useAsyncState(
+  async () => {
     const [roomsRes, scenariosRes, charactersRes] = await Promise.allSettled([
       MeService.listMyRooms(),
       ScenariosService.listScenarios(),
       CharactersService.listCharacters(),
     ])
 
-    if (roomsRes.status === 'fulfilled') {
-      rooms.value = roomsRes.value.data ?? []
+    return {
+      rooms: roomsRes.status === 'fulfilled' ? (roomsRes.value.data ?? []) : [],
+      stats: {
+        rooms: roomsRes.status === 'fulfilled' ? (roomsRes.value.data?.length ?? 0) : 0,
+        scenarios: scenariosRes.status === 'fulfilled' ? (scenariosRes.value.data?.length ?? 0) : 0,
+        characters:
+          charactersRes.status === 'fulfilled' ? (charactersRes.value.data?.length ?? 0) : 0,
+      },
     }
+  },
+  {
+    rooms: [] as RoomResponse[],
+    stats: { rooms: 0, scenarios: 0, characters: 0 },
+  },
+  { immediate: true },
+)
 
-    stats.value = {
-      rooms: roomsRes.status === 'fulfilled' ? (roomsRes.value.data?.length ?? 0) : 0,
-      scenarios: scenariosRes.status === 'fulfilled' ? (scenariosRes.value.data?.length ?? 0) : 0,
-      characters: charactersRes.status === 'fulfilled' ? (charactersRes.value.data?.length ?? 0) : 0,
-    }
-  } finally {
-    isLoadingRooms.value = false
-    isLoadingStats.value = false
-  }
-}
+const rooms = computed(() => dashboardData.value.rooms)
+const stats = computed(() => dashboardData.value.stats)
+const isLoadingRooms = isLoadingData
+const isLoadingStats = isLoadingData
 
-onMounted(loadData)
+const runningRooms = computed(() => rooms.value.filter((r) => r.status === 'RUNNING').slice(0, 3))
 </script>
