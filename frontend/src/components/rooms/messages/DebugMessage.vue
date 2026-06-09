@@ -3,7 +3,9 @@ import { Bug } from 'lucide-vue-next'
 import { computed, ref } from 'vue'
 
 import type { RoomMessageResponse } from '@/services'
+import { mapLlmCallResponse } from '@/types/llm-call'
 
+import PipelineLlmCallButton from '@/components/views/scenario/document-pipeline/PipelineLlmCallButton.vue'
 import {
   Dialog,
   DialogContent,
@@ -18,6 +20,10 @@ const props = defineProps<{
 const open = ref(false)
 
 const hasDetail = computed(() => Boolean(props.data.detail?.trim()))
+
+const llmCalls = computed(() =>
+  (props.data.llm_calls ?? []).map((call) => mapLlmCallResponse(call)),
+)
 </script>
 
 <template>
@@ -37,6 +43,9 @@ const hasDetail = computed(() => Boolean(props.data.detail?.trim()))
         >
           查看詳情
         </button>
+        <span v-for="call in llmCalls" :key="call.id" class="ml-1.5 inline-flex">
+          <PipelineLlmCallButton :call="call" :label="call.label" />
+        </span>
       </p>
     </div>
 

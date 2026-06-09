@@ -2,9 +2,10 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.shared.enums import RoomMessageRole, RoomMessageType, RoomStatus
+from app.shared.schemas.llm_call import LlmCallResponse
 
 
 class RoomParticipantResponse(BaseModel):
@@ -47,5 +48,6 @@ class RoomMessageResponse(BaseModel):
     type: RoomMessageType
     content: str
     detail: str | None = None
+    llm_calls: list[LlmCallResponse] = Field(default_factory=list)
     created_at: datetime
     updated_at: datetime

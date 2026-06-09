@@ -1,3 +1,5 @@
+import type { LlmCall } from './llm-call'
+
 export type ProcessingStepId =
   | 'prepare'
   | 'clear_graph'
@@ -152,16 +154,7 @@ export type ProcessingStep =
   | (ProcessingStepBase & { id: 'entity_embedding'; result?: EntityEmbeddingStepResult })
   | (ProcessingStepBase & { id: 'entity_grouping'; result?: EntityGroupingStepResult })
 
-export interface DocumentProcessingLlmCall {
-  id: string
-  stepId: ProcessingStepId
-  callKey: string
-  label: string
-  model: string
-  request: Array<Record<string, unknown>>
-  response: Record<string, unknown> | string
-  sequence: number
-}
+export type DocumentProcessingLlmCall = LlmCall & { stepId: ProcessingStepId }
 
 export interface DocumentProcessingPipeline {
   documentId: string

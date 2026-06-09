@@ -6,6 +6,7 @@ from sqlalchemy.orm import attributes
 
 from app.db.sql import async_engine
 from app.models import RoomModel
+from app.modules.document_pipeline.llm_recorder import InMemoryLlmCallRecorder
 from app.modules.rag.round_summarizer import summary_round
 from app.helpers.room_message_broadcast import broadcast_room_message
 from app.repositories.room_message_repo import RoomMessageRepository
@@ -60,8 +61,12 @@ async def run_round_summarizer_debug(
     participant_ids: list[UUID],
     history: list[RoundHistoryEntry],
 ) -> None:
+    recorder = InMemoryLlmCallRecorder()
     try:
-        result = await summary_round(format_history_for_summary(history))
+        result = await summary_round(
+            format_history_for_summary(history),
+            recorder=recorder,
+        )
     except Exception:
         logger.exception("round summarizer failed: room_id=%s", room_id)
         return
@@ -78,6 +83,20 @@ async def run_round_summarizer_debug(
             formatted_summaries.append(f"{i}. {summary}")
         formatted_detail = "\n".join(formatted_summaries)
 
+        llm_calls = [
+            {
+                "id": str(call.id),
+                "step_id": call.step_id,
+                "call_key": call.call_key,
+                "label": call.label,
+                "model": call.model,
+                "request": call.request,
+                "response": call.response,
+                "sequence": call.sequence,
+            }
+            for call in recorder.calls
+        ]
+
         async with AsyncSession(async_engine, expire_on_commit=False) as session:
             repo = RoomMessageRepository(session)
             debug_msg = await repo.create(
@@ -87,6 +106,7 @@ async def run_round_summarizer_debug(
                 type=RoomMessageType.DEBUG,
                 content=f"已新增 {added_count} 筆歷史",
                 detail=formatted_detail,
+                llm_calls=llm_calls,
             )
             await session.commit()
             await broadcast_room_message(debug_msg)

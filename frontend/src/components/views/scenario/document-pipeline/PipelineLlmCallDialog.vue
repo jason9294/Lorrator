@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { Braces } from 'lucide-vue-next'
-import type { DocumentProcessingLlmCall } from '@/types/document-processing'
+import type { LlmCall } from '@/types/llm-call'
 import {
   Dialog,
   DialogContent,
@@ -17,7 +17,7 @@ import { cn } from '@/lib/utils'
 const open = defineModel<boolean>('open', { required: true })
 
 const props = defineProps<{
-  call: DocumentProcessingLlmCall | null
+  call: LlmCall | null
 }>()
 
 const showRequestJson = ref(false)
@@ -82,6 +82,12 @@ const extractedRelationships = computed(() => {
   const relationships = responseObject.value?.relationships
   if (!Array.isArray(relationships)) return null
   return relationships as Array<Record<string, unknown>>
+})
+
+const summaryItems = computed(() => {
+  const summaries = responseObject.value?.summaries
+  if (!Array.isArray(summaries)) return null
+  return summaries.filter((item): item is string => typeof item === 'string')
 })
 
 function normalizeContent(value: unknown): string {
@@ -248,6 +254,17 @@ function fieldText(value: unknown) {
                 </div>
               </template>
 
+              <template v-if="summaryItems">
+                <p class="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  摘要 ({{ summaryItems.length }})
+                </p>
+                <ol class="list-decimal space-y-2 rounded-lg border bg-muted/20 p-4 pl-8 text-sm">
+                  <li v-for="(summary, summaryIndex) in summaryItems" :key="`summary-${summaryIndex}`">
+                    {{ summary }}
+                  </li>
+                </ol>
+              </template>
+
               <template v-if="extractedRelationships">
                 <p class="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                   關係 ({{ extractedRelationships.length }})
@@ -293,7 +310,7 @@ function fieldText(value: unknown) {
               </template>
 
               <p
-                v-if="!entityGroups && !extractedEntities && !extractedRelationships"
+                v-if="!entityGroups && !extractedEntities && !extractedRelationships && !summaryItems"
                 class="text-sm text-muted-foreground whitespace-pre-wrap rounded-lg border bg-muted/20 p-4"
               >
                 {{ typeof call.response === 'string' ? call.response : '無法以結構化方式顯示，請使用 JSON 檢視。' }}

@@ -55,6 +55,12 @@ def chunk_text(
     if total_tokens == 0:
         return []
 
+    # 將 token 邊界對應回原文的字元偏移，避免對子序列 decode 時
+    # 在 UTF-8 / BPE 邊界產生 ? 等替換字元。
+    char_offsets = [0]
+    for i in range(1, total_tokens + 1):
+        char_offsets.append(len(enc.decode(token_ids[:i])))
+
     step = chunk_size - overlap
     chunks: list[Chunk] = []
     index = 0
@@ -62,8 +68,7 @@ def chunk_text(
 
     while start < total_tokens:
         end = min(start + chunk_size, total_tokens)
-        window_ids = token_ids[start:end]
-        chunk_text_str = enc.decode(window_ids)
+        chunk_text_str = text[char_offsets[start] : char_offsets[end]]
 
         chunks.append(
             Chunk(

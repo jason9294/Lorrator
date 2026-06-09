@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { MessageSquareText } from 'lucide-vue-next'
-import type { DocumentProcessingLlmCall } from '@/types/document-processing'
+import type { LlmCall } from '@/types/llm-call'
 import { Button } from '@/components/ui/button'
 import PipelineLlmCallDialog from './PipelineLlmCallDialog.vue'
 
 const props = defineProps<{
-  call: DocumentProcessingLlmCall | null | undefined
+  call: LlmCall | null | undefined
   label?: string
 }>()
 

@@ -1,3 +1,4 @@
+from typing import Any
 from uuid import UUID
 
 from sqlmodel import asc, select
@@ -17,6 +18,7 @@ class RoomMessageRepository(BaseRepository):
         content: str,
         type: RoomMessageType = RoomMessageType.CHAT,
         detail: str | None = None,
+        llm_calls: list[dict[str, Any]] | None = None,
     ) -> RoomMessageModel:
         msg = RoomMessageModel(
             room_id=room_id,
@@ -25,6 +27,7 @@ class RoomMessageRepository(BaseRepository):
             type=type,
             content=content,
             detail=detail,
+            llm_calls=llm_calls or [],
         )
         self.session.add(msg)
         await self.session.flush()

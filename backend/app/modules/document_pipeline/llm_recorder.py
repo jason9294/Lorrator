@@ -1,4 +1,5 @@
 import asyncio
+from dataclasses import dataclass
 from typing import Any, Protocol, runtime_checkable
 from uuid import UUID
 
@@ -6,6 +7,7 @@ from app.models import DocumentProcessingLlmCallModel
 from app.repositories.document_processing_llm_call_repo import (
     DocumentProcessingLlmCallRepository,
 )
+from app.shared.utils import uuid7
 
 
 @runtime_checkable
@@ -69,3 +71,50 @@ class PipelineLlmCallRecorder:
 
         if pending:
             await self._repo.create_many(pending)
+
+
+@dataclass
+class RecordedLlmCall:
+    id: UUID
+    step_id: str
+    call_key: str
+    label: str
+    model: str
+    request: list[dict[str, Any]]
+    response: dict[str, Any] | str
+    sequence: int
+
+
+class InMemoryLlmCallRecorder:
+    def __init__(self) -> None:
+        self.calls: list[RecordedLlmCall] = []
+        self._sequence = 0
+
+    async def record(
+        self,
+        *,
+        step_id: str,
+        call_key: str,
+        label: str,
+        model: str,
+        request: list[dict[str, Any]],
+        response: dict[str, Any] | str,
+    ) -> UUID:
+        self._sequence += 1
+        call_id = uuid7()
+        self.calls.append(
+            RecordedLlmCall(
+                id=call_id,
+                step_id=step_id,
+                call_key=call_key,
+                label=label,
+                model=model,
+                request=request,
+                response=response,
+                sequence=self._sequence,
+            )
+        )
+        return call_id
+
+    async def flush(self) -> None:
+        return None

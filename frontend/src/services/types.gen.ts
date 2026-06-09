@@ -1362,6 +1362,48 @@ export type JoinRoomRequest = {
 };
 
 /**
+ * LlmCallResponse
+ */
+export type LlmCallResponse = {
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Step Id
+     */
+    step_id: string;
+    /**
+     * Call Key
+     */
+    call_key: string;
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Model
+     */
+    model: string;
+    /**
+     * Request
+     */
+    request: Array<{
+        [key: string]: unknown;
+    }>;
+    /**
+     * Response
+     */
+    response: {
+        [key: string]: unknown;
+    } | string;
+    /**
+     * Sequence
+     */
+    sequence: number;
+};
+
+/**
  * LoginRequest
  */
 export type LoginRequest = {
@@ -1626,6 +1668,10 @@ export type RoomMessageResponse = {
      * Detail
      */
     detail?: string | null;
+    /**
+     * Llm Calls
+     */
+    llm_calls?: Array<LlmCallResponse>;
     /**
      * Created At
      */

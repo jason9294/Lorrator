@@ -1,7 +1,8 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Any, Optional
 from uuid import UUID
 
 from sqlalchemy import Column, Index, String, Text
+from sqlalchemy.dialects.postgresql.json import JSONB
 from sqlmodel import Field, Relationship, SQLModel
 
 from app.shared.enums import RoomMessageRole, RoomMessageType
@@ -29,6 +30,10 @@ class RoomMessageModel(TimestampMixin, SQLModel, table=True):
     )
     content: str = Field(sa_column=Column(Text, nullable=False))
     detail: str | None = Field(default=None, sa_column=Column(Text, nullable=True))
+    llm_calls: list[dict[str, Any]] = Field(
+        default_factory=list,
+        sa_column=Column(JSONB, nullable=False, server_default="[]"),
+    )
 
     room: Optional["RoomModel"] = Relationship()
     sender: Optional["UserModel"] = Relationship()

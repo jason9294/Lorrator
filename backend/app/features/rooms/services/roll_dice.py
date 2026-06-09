@@ -66,59 +66,49 @@ class RollDiceService:
             )
         return room, participants, participant_ids
 
-    def _schedule_agent_reply(
+    async def _deliver_agent_reply(
         self,
         participant_ids: list[UUID],
         room_id: UUID,
         ai_response: str,
         round_history: list[dict[str, str]],
-        added_count: int,
     ) -> None:
-        async def _delayed_reply() -> None:
-            logger.info(
-                "_delayed_reply started: room_id=%s participants=%s response_len=%d",
-                room_id,
-                participant_ids,
-                len(ai_response),
-            )
-            try:
-                async with AsyncSession(
-                    async_engine, expire_on_commit=False
-                ) as session:
-                    repo = RoomMessageRepository(session)
-                    agent_msg = await repo.create(
-                        room_id=room_id,
-                        sender_id=None,
-                        role=RoomMessageRole.AGENT,
-                        content=ai_response,
-                    )
-                    logger.info(
-                        "created agent_msg: id=%s type=%s",
-                        agent_msg.id,
-                        agent_msg.type,
-                    )
-                    await session.commit()
-                    logger.info("committed agent_msg=%s", agent_msg.id)
-                    await broadcast_room_message(agent_msg)
-                    logger.info("broadcast agent_msg done: id=%s", agent_msg.id)
-                await run_round_summarizer_debug(
-                    room_id, participant_ids, round_history
-                )
-            except Exception:
-                logger.exception("_delayed_reply failed: room_id=%s", room_id)
-                raise
-            finally:
-                logger.info(
-                    "_delayed_reply finally: clearing ai_thinking room_id=%s", room_id
-                )
-                await broadcast_ai_thinking(room_id, active=False)
-
         logger.info(
-            "scheduling _delayed_reply: room_id=%s participants=%s",
+            "_deliver_agent_reply started: room_id=%s participants=%s response_len=%d",
             room_id,
             participant_ids,
+            len(ai_response),
         )
-        self._bg_tasks.add_task(_delayed_reply)
+        try:
+            async with AsyncSession(async_engine, expire_on_commit=False) as session:
+                repo = RoomMessageRepository(session)
+                agent_msg = await repo.create(
+                    room_id=room_id,
+                    sender_id=None,
+                    role=RoomMessageRole.AGENT,
+                    content=ai_response,
+                )
+                logger.info(
+                    "created agent_msg: id=%s type=%s",
+                    agent_msg.id,
+                    agent_msg.type,
+                )
+                await session.commit()
+                logger.info("committed agent_msg=%s", agent_msg.id)
+                await broadcast_room_message(agent_msg)
+                logger.info("broadcast agent_msg done: id=%s", agent_msg.id)
+            await run_round_summarizer_debug(
+                room_id, participant_ids, round_history
+            )
+        except Exception:
+            logger.exception("_deliver_agent_reply failed: room_id=%s", room_id)
+            raise
+        finally:
+            logger.info(
+                "_deliver_agent_reply finally: clearing ai_thinking room_id=%s",
+                room_id,
+            )
+            await broadcast_ai_thinking(room_id, active=False)
 
     def _schedule_agent_turn(
         self,
@@ -136,6 +126,7 @@ class RollDiceService:
                     room = await room_repo.find_by_id(room_id)
                     if room is None:
                         logger.error("room not found room_id=%s", room_id)
+                        await broadcast_ai_thinking(room_id, active=False)
                         return
 
                     logger.info(
@@ -155,20 +146,23 @@ class RollDiceService:
                         {"role": "assistant", "content": response.output_text}
                     )
 
-                    round_history, added_count = append_round_summarizer_history(
+                    round_history, _ = append_round_summarizer_history(
                         room, player_content, response.output_text
                     )
 
                     attributes.flag_modified(room, "agent_history")
                     await room_repo.save(room)
                     await session.commit()
+                    logger.info(
+                        "_schedule_agent_turn: room history saved room_id=%s",
+                        room_id,
+                    )
 
-                self._schedule_agent_reply(
+                await self._deliver_agent_reply(
                     participant_ids,
                     room_id,
                     response.output_text,
                     round_history,
-                    added_count,
                 )
             except Exception:
                 logger.exception(
@@ -209,9 +203,12 @@ class RollDiceService:
         room.agent_history["kp"].append({"role": "user", "content": user_prompt})
         attributes.flag_modified(room, "agent_history")
         await self._uow.room_repo.save(room)
+        response = RoomMessageResponse.model_validate(msg)
+        # Release row locks before the background task updates the same room row.
+        await self._uow.session.commit()
 
         self._schedule_agent_turn(room_id, participant_ids, player_content=content)
-        return RoomMessageResponse.model_validate(msg)
+        return response
 
     async def skill_check(
         self, room_id: UUID, body: SkillCheckRequest, sender_id: UUID
@@ -245,6 +242,8 @@ class RollDiceService:
         room.agent_history["kp"].append({"role": "user", "content": user_prompt})
         attributes.flag_modified(room, "agent_history")
         await self._uow.room_repo.save(room)
+        response = RoomMessageResponse.model_validate(msg)
+        await self._uow.session.commit()
 
         self._schedule_agent_turn(room_id, participant_ids, player_content=content)
-        return RoomMessageResponse.model_validate(msg)
+        return response

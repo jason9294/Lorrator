@@ -700,6 +700,7 @@ useSocketOnType('rooms.create_message', (payload) => {
     type: data.type,
     content: data.content,
     detail: data.detail ?? null,
+    llm_calls: data.llm_calls ?? [],
     created_at: data.created_at,
     updated_at: data.updated_at,
   })

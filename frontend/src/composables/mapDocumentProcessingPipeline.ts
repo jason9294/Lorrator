@@ -1,4 +1,5 @@
 import type { DocumentProcessingPipelineResponse } from '@/services'
+import { mapLlmCallResponse } from '@/types/llm-call'
 import type {
   ChunkExtractionResult,
   ChunkItem,
@@ -275,14 +276,8 @@ function mapLlmCall(
   call: NonNullable<DocumentProcessingPipelineResponse['llm_calls']>[number],
 ): DocumentProcessingLlmCall {
   return {
-    id: call.id,
+    ...mapLlmCallResponse(call),
     stepId: call.step_id as ProcessingStepId,
-    callKey: call.call_key,
-    label: call.label,
-    model: call.model,
-    request: call.request,
-    response: call.response,
-    sequence: call.sequence,
   }
 }
 

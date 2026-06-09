@@ -86,6 +86,7 @@ class RoomsCreateMessageEnvelope(BaseEnvelope):
     type: RoomMessageType
     content: str
     detail: str | None = None
+    llm_calls: list[dict[str, object]] = []
     created_at: str
     updated_at: str
 
@@ -99,6 +100,7 @@ class RoomsCreateMessageEnvelope(BaseEnvelope):
             type=msg.type,
             content=msg.content,
             detail=msg.detail,
+            llm_calls=msg.llm_calls,
             created_at=msg.created_at.isoformat(),
             updated_at=msg.updated_at.isoformat(),
         )
