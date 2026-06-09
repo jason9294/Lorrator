@@ -4,7 +4,7 @@ import cytoscape from 'cytoscape'
 import fcose from 'cytoscape-fcose'
 
 import type { Graph, GraphEdgeDetail, GraphNode, GraphSelection, NodeType } from '@/types/graph'
-import { NODE_COLORS } from '@/types/graph'
+import { getNodeTypeColor } from '@/types/graph'
 
 // Icons
 import { ZoomIn, ZoomOut, Maximize2, RefreshCw } from 'lucide-vue-next'
@@ -43,7 +43,7 @@ let isSelected = false
 
 // ─── 顏色工具 ──────────────────────────────────────────────────────────────────
 function getColor(type: string): string {
-  return NODE_COLORS[type as NodeType] ?? '#6b7280'
+  return getNodeTypeColor(type)
 }
 
 // ─── 主題色彩 Token ────────────────────────────────────────────────────────────
@@ -64,6 +64,16 @@ function themeTokens(dark: boolean) {
 function buildStylesheet(dark: boolean) {
   const t = themeTokens(dark)
   return [
+    // ── Chunk 節點 ────────────────────────────────────────────────────────
+    {
+      selector: 'node[type = "CHUNK"]',
+      style: {
+        shape: 'round-rectangle',
+        width: 72,
+        height: 40,
+        'font-size': 10,
+      } as cytoscape.Css.Node,
+    },
     // ── 節點 ──────────────────────────────────────────────────────────────
     {
       selector: 'node',
@@ -244,6 +254,24 @@ function nodeLabel(id: string): string {
   return props.graph.nodes.find((n) => n.id === id)?.label ?? id
 }
 
+function resolveGraphNode(id: string, fallback: Partial<GraphNode> & { id: string }): GraphNode {
+  const node = props.graph.nodes.find((n) => n.id === id)
+  if (node) return { ...node }
+  return {
+    id,
+    type: fallback.type ?? 'Entity',
+    label: fallback.label ?? id,
+    description: fallback.description ?? '',
+    aliases: fallback.aliases ?? [],
+    descriptions:
+      fallback.descriptions && fallback.descriptions.length > 0
+        ? fallback.descriptions
+        : fallback.description
+          ? [fallback.description]
+          : [],
+  }
+}
+
 function buildEdgeDetail(edge: cytoscape.EdgeSingular): GraphEdgeDetail {
   const source = edge.data('source') as string
   const target = edge.data('target') as string
@@ -362,12 +390,12 @@ function bindEvents() {
     isSelected = true
     selection.value = {
       kind: 'node',
-      data: {
+      data: resolveGraphNode(node.id(), {
         id: node.id(),
         type: node.data('type') as NodeType,
         label: node.data('label'),
         description: node.data('description'),
-      },
+      }),
     }
     clearHighlight()
     applyHighlight(node, 'select')
@@ -462,12 +490,12 @@ function focusNode(id: string) {
   isSelected = true
   selection.value = {
     kind: 'node',
-    data: {
+    data: resolveGraphNode(node.id(), {
       id: node.id(),
       type: node.data('type') as NodeType,
       label: node.data('label'),
       description: node.data('description'),
-    },
+    }),
   }
   clearHighlight()
   applyHighlight(node, 'select')

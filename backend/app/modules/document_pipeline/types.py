@@ -63,6 +63,43 @@ class EntityEmbeddingStepResult(BaseModel):
     similarity_edges_created: int
 
 
+class EntityGroupingInputEntityResult(BaseModel):
+    temp_id: str
+    name: str
+    chunk_index: int
+    description: str
+
+
+class EntityGroupingInputChunkResult(BaseModel):
+    temp_id: str
+    chunk_index: int
+    content: str
+
+
+class EntityGroupingMergeRecord(BaseModel):
+    target_name: str
+    source_name: str
+    source_chunk_index: int
+    source_description: str
+    aliases_added: list[str]
+
+
+class EntityGroupingIterationResult(BaseModel):
+    iteration: int
+    seed_name: str
+    seed_similarity_degree: int
+    input_entities: list[EntityGroupingInputEntityResult]
+    input_chunks: list[EntityGroupingInputChunkResult]
+    llm_groups: list[list[str]]
+    merges: list[EntityGroupingMergeRecord]
+
+
+class EntityGroupingStepResult(BaseModel):
+    total_iterations: int
+    total_merges: int
+    iterations: list[EntityGroupingIterationResult]
+
+
 class GraphNodeCreatedResult(BaseModel):
     id: str
     name: str

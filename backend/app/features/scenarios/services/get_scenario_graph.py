@@ -6,6 +6,7 @@ from neo4j.graph import Node, Relationship
 from app.db.graph import neo4j_driver
 from app.db.uow import UnitOfWorkDependency
 from app.repositories.graph_repo import GraphRepo
+from app.shared.enums import GraphEntityType
 
 from ..schemas.responses import (
     ScenarioGraphEdgeResponse,
@@ -31,10 +32,16 @@ class GetScenarioGraphService:
             # element_id is stable-ish across drivers and unique within DB
             return getattr(n, "element_id", None) or str(getattr(n, "id", ""))
 
+        def _is_chunk_node(n: Node) -> bool:
+            labels = list(getattr(n, "labels", []) or [])
+            return "Chunk" in labels
+
         def _node_type(n: Node) -> str:
+            if _is_chunk_node(n):
+                return GraphEntityType.CHUNK.value
             labels = list(getattr(n, "labels", []) or [])
             for lb in labels:
-                if lb != "Entity":
+                if lb not in {"Entity", "Chunk"}:
                     return str(lb)
             props = dict(n)
             t = props.get("type") or props.get("entity_type")
@@ -48,10 +55,42 @@ class GetScenarioGraphService:
                     return v
             return _node_id(n)
 
-        def _node_description(n: Node) -> str:
+        def _node_aliases(n: Node) -> list[str]:
             props = dict(n)
-            v = props.get("description")
-            return v if isinstance(v, str) else ""
+            value = props.get("alias")
+            if isinstance(value, list):
+                return [str(item) for item in value if item]
+            return []
+
+        def _node_descriptions(n: Node) -> list[str]:
+            props = dict(n)
+            if _is_chunk_node(n):
+                descriptions: list[str] = []
+                index = props.get("index")
+                start_token = props.get("start_token")
+                end_token = props.get("end_token")
+                token_count = props.get("token_count")
+                if index is not None:
+                    descriptions.append(f"Chunk #{index}")
+                if start_token is not None and end_token is not None:
+                    descriptions.append(f"tokens [{start_token}:{end_token}]")
+                if token_count is not None:
+                    descriptions.append(f"{token_count} tokens")
+                content = props.get("content")
+                if isinstance(content, str) and content.strip():
+                    descriptions.append(content.strip())
+                return descriptions
+
+            value = props.get("description")
+            if isinstance(value, list):
+                return [str(item) for item in value if item]
+            if isinstance(value, str) and value.strip():
+                return [value]
+            return []
+
+        def _node_description(n: Node) -> str:
+            descriptions = _node_descriptions(n)
+            return " / ".join(descriptions)
 
         # get graph
         async with neo4j_driver.session() as session:
@@ -70,6 +109,8 @@ class GetScenarioGraphService:
                             type=_node_type(n),
                             label=_node_label(n),
                             description=_node_description(n),
+                            aliases=_node_aliases(n),
+                            descriptions=_node_descriptions(n),
                         )
                 if m is not None:
                     bid = _node_id(m)
@@ -79,15 +120,18 @@ class GetScenarioGraphService:
                             type=_node_type(m),
                             label=_node_label(m),
                             description=_node_description(m),
+                            aliases=_node_aliases(m),
+                            descriptions=_node_descriptions(m),
                         )
                 if n is not None and m is not None and r is not None:
                     rid = getattr(r, "element_id", None) or str(getattr(r, "id", ""))
                     if rid and rid not in edges_by_id:
+                        rel_type = getattr(r, "type", "") or ""
                         edges_by_id[rid] = ScenarioGraphEdgeResponse(
                             id=rid,
                             source=_node_id(n),
                             target=_node_id(m),
-                            type=str(getattr(r, "type", "") or ""),
+                            type=str(rel_type),
                             directed=True,
                         )
 

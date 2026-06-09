@@ -1,8 +1,12 @@
 from fastapi import APIRouter, Depends
 
-from .schemas.requests import ChunkTextRequest
+from .schemas.requests import ChunkTextRequest, EntityGroupRequest
 from .schemas.responses import ChunkTextResponse
-from .services import ChunkPlainTextService, EntityExtractToolService
+from .services import (
+    ChunkPlainTextService,
+    EntityExtractToolService,
+    EntityGroupToolService,
+)
 
 router = APIRouter(prefix="/tools", tags=["tools"])
 
@@ -28,3 +32,14 @@ async def entity_extract_tool(
     svc: EntityExtractToolService = Depends(),
 ):
     return await svc.execute(text)
+
+
+@router.post(
+    path="/entity-group",
+    summary="實體分群",
+)
+async def entity_group_tool(
+    body: EntityGroupRequest,
+    svc: EntityGroupToolService = Depends(),
+):
+    return await svc.execute(body.chunks, body.entities)

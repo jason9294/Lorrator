@@ -24,23 +24,30 @@ import LandingShell from '@/components/layout/landing/LandingShell.vue'
         </h2>
 
         <p class="mx-auto max-w-[500px] font-sans text-body-lg text-on-surface-variant">
-          在流暢、現代的環境中管理劇本、追蹤線索，體驗沉浸式的克蘇魯 TRPG 會話。
+          在流暢、現代的環境中管理劇本與角色卡，體驗由 LLM 進行的 TRPG。
         </p>
 
         <div class="mt-stack-sm flex items-center gap-stack-sm">
-          <button
-            type="button"
-            class="flex items-center gap-2 rounded bg-primary-container px-6 py-3 font-mono text-label-md text-primary-foreground transition-colors hover:bg-primary"
-          >
-            登入
-            <LogIn class="size-4" />
-          </button>
-          <button
-            type="button"
-            class="rounded border border-secondary px-6 py-3 font-mono text-label-md text-secondary transition-colors hover:bg-secondary-fixed/10"
-          >
-            註冊
-          </button>
+          <!-- Login Button -->
+          <RouterLink to="/login">
+            <button
+              type="button"
+              class="flex items-center gap-2 rounded bg-primary-container px-6 py-3 font-mono text-label-md text-primary-foreground transition-colors hover:bg-primary"
+            >
+              登入
+              <LogIn class="size-4" />
+            </button>
+          </RouterLink>
+
+          <!-- Register Button -->
+          <RouterLink to="/register">
+            <button
+              type="button"
+              class="rounded border border-secondary px-6 py-3 font-mono text-label-md text-secondary transition-colors hover:bg-secondary-fixed/10"
+            >
+              註冊
+            </button>
+          </RouterLink>
         </div>
       </div>
     </section>

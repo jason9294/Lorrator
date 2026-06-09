@@ -9,10 +9,14 @@ from app.db.sql import async_engine
 from app.db.uow import UnitOfWorkDependency
 from app.models import RoomParticipantLink
 from app.modules.rag.client import client
-from app.modules.room_messages import broadcast_ai_thinking, broadcast_room_message
+from app.helpers.room_message_broadcast import (
+    broadcast_ai_thinking,
+    broadcast_room_message,
+)
 from app.repositories.room_message_repo import RoomMessageRepository
 from app.shared.enums import RoomMessageRole, RoomMessageType
 
+# API Schema
 from ..schemas.requests import SendMessageRequest
 from ..schemas.responses import RoomMessageResponse
 from ._round_summarizer import (
@@ -32,10 +36,7 @@ class SendRoomMessageService:
         body: SendMessageRequest,
         sender_id: UUID,
     ) -> RoomMessageResponse:
-        # validate room exists
         room = await self._uow.room_repo.get_by_id(room_id)
-        if room is None:
-            raise HTTPException(status_code=404, detail="Room not found")
 
         # validate sender is a participant of the room
         participants = await self._uow.room_repo.list_participants_with_details(room_id)
@@ -53,9 +54,12 @@ class SendRoomMessageService:
             type=RoomMessageType.CHAT,
             content=body.content,
         )
-        await broadcast_room_message(participant_ids, msg)
+
+        # broadcast player message to all participants
+        await broadcast_room_message(msg)
+
         # 通知所有人 AI 思考中，鎖住輸入框
-        await broadcast_ai_thinking(participant_ids, room_id, active=True)
+        await broadcast_ai_thinking(room_id, active=True)
 
         current_participant: RoomParticipantLink = next(  # type: ignore
             (p for p in participants if p.user_id == sender_id), None
@@ -70,7 +74,7 @@ class SendRoomMessageService:
                 input=room.agent_history["kp"],
             )
         except Exception:
-            await broadcast_ai_thinking(participant_ids, room_id, active=False)
+            await broadcast_ai_thinking(room_id, active=False)
             raise
 
         room.agent_history["kp"].append(
@@ -98,12 +102,12 @@ class SendRoomMessageService:
                     )
                     await session.commit()
 
-                    await broadcast_room_message(participant_ids, agent_msg)
+                    await broadcast_room_message(agent_msg)
                 await run_round_summarizer_debug(
                     room_id, participant_ids, round_history
                 )
             finally:
-                await broadcast_ai_thinking(participant_ids, room_id, active=False)
+                await broadcast_ai_thinking(room_id, active=False)
 
         self._bg_tasks.add_task(_delayed_ws_reply)
         return RoomMessageResponse.model_validate(msg)

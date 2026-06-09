@@ -1,15 +1,16 @@
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
-class WsTicketResponse(BaseModel):
-    ticket: str
-    expires_in_seconds: int
+class ClientMessageType(StrEnum):
+    SUBSCRIBE = "subscribe"
+    UNSUBSCRIBE = "unsubscribe"
 
 
-class WsMessageEnvelope(BaseModel):
-    """WebSocket 傳輸訊息外層格式：{ \"type\": \"...\", \"payload\": { ... } }。"""
+class ClientMessage(BaseModel):
+    """Client → server WebSocket frame: { \"type\": \"...\", \"payload\": { ... } }."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -22,3 +23,7 @@ class WsMessageEnvelope(BaseModel):
         if not isinstance(v, dict):
             raise ValueError("payload 必須為 JSON object")
         return v
+
+
+class TopicPayload(BaseModel):
+    topic: str = Field(min_length=1)

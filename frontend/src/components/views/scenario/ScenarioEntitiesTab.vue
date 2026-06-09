@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { List } from 'lucide-vue-next'
-import type { Graph, NodeType } from '@/types/graph'
-import { NODE_COLORS, NODE_TYPE_LABELS } from '@/types/graph'
+import type { Graph } from '@/types/graph'
+import { getNodeTypeColor, getNodeTypeLabel } from '@/types/graph'
 import { Badge } from '@/components/ui/badge'
 
 const props = defineProps<{
@@ -11,11 +11,20 @@ const props = defineProps<{
 
 const entityFilter = ref('')
 
+const entityNodes = computed(() => props.graph.nodes.filter((node) => node.type !== 'CHUNK'))
+
 const filteredNodes = computed(() =>
   entityFilter.value
-    ? props.graph.nodes.filter((n) => n.type === entityFilter.value)
-    : props.graph.nodes,
+    ? entityNodes.value.filter((n) => n.type === entityFilter.value)
+    : entityNodes.value,
 )
+
+const typeOptions = computed(() => {
+  const types = new Set(entityNodes.value.map((node) => node.type))
+  return [...types].sort((a, b) =>
+    getNodeTypeLabel(a).localeCompare(getNodeTypeLabel(b), 'zh-TW'),
+  )
+})
 </script>
 
 <template>
@@ -23,11 +32,11 @@ const filteredNodes = computed(() =>
     <div class="max-w-4xl mx-auto p-6 space-y-4">
       <div class="flex items-center justify-between">
         <h3 class="font-semibold">實體清單</h3>
-        <Badge variant="secondary">{{ graph.nodes.length }} 個實體</Badge>
+        <Badge variant="secondary">{{ entityNodes.length }} 個實體</Badge>
       </div>
 
       <div
-        v-if="graph.nodes.length === 0"
+        v-if="entityNodes.length === 0"
         class="flex flex-col items-center justify-center py-16 text-center border rounded-lg border-dashed text-muted-foreground"
       >
         <List class="size-10 opacity-40 mb-3" />
@@ -48,7 +57,7 @@ const filteredNodes = computed(() =>
             全部
           </button>
           <button
-            v-for="(label, type) in NODE_TYPE_LABELS"
+            v-for="type in typeOptions"
             :key="type"
             class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border transition-colors"
             :class="
@@ -60,9 +69,9 @@ const filteredNodes = computed(() =>
           >
             <span
               class="w-1.5 h-1.5 rounded-full"
-              :style="{ backgroundColor: NODE_COLORS[type as NodeType] }"
+              :style="{ backgroundColor: getNodeTypeColor(type) }"
             />
-            {{ label }}
+            {{ getNodeTypeLabel(type) }}
           </button>
         </div>
 
@@ -75,6 +84,9 @@ const filteredNodes = computed(() =>
                 </th>
                 <th class="text-left px-4 py-2.5 text-xs text-muted-foreground font-medium w-36">
                   名稱
+                </th>
+                <th class="text-left px-4 py-2.5 text-xs text-muted-foreground font-medium w-32">
+                  別名
                 </th>
                 <th class="text-left px-4 py-2.5 text-xs text-muted-foreground font-medium">
                   描述
@@ -91,14 +103,32 @@ const filteredNodes = computed(() =>
                   <span class="inline-flex items-center gap-1.5 text-xs">
                     <span
                       class="w-2 h-2 rounded-full shrink-0"
-                      :style="{ backgroundColor: NODE_COLORS[node.type] }"
+                      :style="{ backgroundColor: getNodeTypeColor(node.type) }"
                     />
-                    {{ NODE_TYPE_LABELS[node.type] }}
+                    {{ getNodeTypeLabel(node.type) }}
                   </span>
                 </td>
                 <td class="px-4 py-3 font-medium">{{ node.label }}</td>
                 <td class="px-4 py-3 text-muted-foreground text-xs">
-                  {{ node.description }}
+                  <template v-if="node.aliases.length > 0">
+                    <ul class="space-y-1">
+                      <li v-for="alias in node.aliases" :key="alias">{{ alias }}</li>
+                    </ul>
+                  </template>
+                  <template v-else>—</template>
+                </td>
+                <td class="px-4 py-3 text-muted-foreground text-xs">
+                  <template v-if="node.descriptions.length > 0">
+                    <ul class="space-y-1">
+                      <li
+                        v-for="(description, index) in node.descriptions"
+                        :key="`${node.id}-desc-${index}`"
+                      >
+                        {{ description }}
+                      </li>
+                    </ul>
+                  </template>
+                  <template v-else>—</template>
                 </td>
               </tr>
             </tbody>

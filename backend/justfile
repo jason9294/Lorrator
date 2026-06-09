@@ -2,7 +2,7 @@ set shell := ["powershell", "-c"]
 set dotenv-load := true
 
 dev:
-    uv run fastapi dev --host 0.0.0.0 --port 8000
+    uv run fastapi dev --host 0.0.0.0 --port 8213
 
 lint:
     uv run ruff check . # 檢查程式碼

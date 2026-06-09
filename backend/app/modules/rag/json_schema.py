@@ -21,3 +21,19 @@ class ExtractedEntities(BaseModel):
 
 class SummaryRound(BaseModel):
     summaries: list[str] | None
+
+
+class EntityGroupChunk(BaseModel):
+    chunk_id: str
+    content: str
+
+
+class EntityGroupEntity(BaseModel):
+    entity_id: str
+    chunk_id: str
+    name: str
+    description: str
+
+
+class EntityGroup(BaseModel):
+    entity_groups: list[list[str]]

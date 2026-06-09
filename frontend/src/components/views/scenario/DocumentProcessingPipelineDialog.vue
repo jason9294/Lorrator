@@ -6,9 +6,11 @@ import {
   Circle,
   Clock,
   FileText,
+  GitMerge,
   Loader2,
   Network,
   Scissors,
+  Sparkles,
   Trash2,
   XCircle,
 } from 'lucide-vue-next'
@@ -18,7 +20,6 @@ import type {
   ProcessingStepId,
   ProcessingStepStatus,
 } from '@/types/document-processing'
-import { NODE_TYPE_LABELS, type NodeType } from '@/types/graph'
 import {
   Dialog,
   DialogContent,
@@ -28,9 +29,9 @@ import {
 } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
 import { Spinner } from '@/components/ui/spinner'
 import { cn } from '@/lib/utils'
+import PipelineStepDetail from './document-pipeline/PipelineStepDetail.vue'
 
 const open = defineModel<boolean>('open', { required: true })
 
@@ -92,6 +93,8 @@ function stepIcon(id: ProcessingStepId) {
   if (id === 'clear_graph') return Trash2
   if (id === 'chunk') return Scissors
   if (id === 'entity_extraction') return Bot
+  if (id === 'entity_embedding') return Sparkles
+  if (id === 'entity_grouping') return GitMerge
   return Network
 }
 
@@ -100,10 +103,6 @@ function stepStatusIcon(status: ProcessingStepStatus) {
   if (status === 'failed') return XCircle
   if (status === 'running') return Loader2
   return Circle
-}
-
-function entityTypeLabel(type: string) {
-  return NODE_TYPE_LABELS[type as NodeType] ?? type
 }
 
 function selectStep(step: ProcessingStep) {
@@ -208,340 +207,7 @@ function selectStep(step: ProcessingStep) {
           </aside>
 
           <ScrollArea class="flex-1 min-h-0">
-            <div v-if="selectedStep" class="p-6 space-y-6">
-              <div class="space-y-2">
-                <h3 class="text-base font-semibold">{{ selectedStep.title }}</h3>
-                <p class="text-sm text-muted-foreground">{{ selectedStep.description }}</p>
-                <p v-if="selectedStep.error" class="text-sm text-destructive whitespace-pre-wrap">
-                  {{ selectedStep.error }}
-                </p>
-              </div>
-
-              <Separator />
-
-              <p
-                v-if="!selectedStep.result && selectedStep.status !== 'skipped'"
-                class="text-sm text-muted-foreground"
-              >
-                此步驟尚無可顯示的結果。
-              </p>
-              <p
-                v-else-if="selectedStep.status === 'skipped'"
-                class="text-sm text-muted-foreground"
-              >
-                此步驟已略過。
-              </p>
-
-              <!-- Prepare step -->
-              <div v-else-if="selectedStep.id === 'prepare' && selectedStep.result" class="space-y-4">
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  <div class="rounded-lg border bg-muted/30 px-4 py-3">
-                    <p class="text-xs text-muted-foreground">字元數</p>
-                    <p class="text-lg font-semibold mt-1">
-                      {{ selectedStep.result.characterCount.toLocaleString() }}
-                    </p>
-                  </div>
-                  <div class="rounded-lg border bg-muted/30 px-4 py-3">
-                    <p class="text-xs text-muted-foreground">行數</p>
-                    <p class="text-lg font-semibold mt-1">{{ selectedStep.result.lineCount }}</p>
-                  </div>
-                  <div class="rounded-lg border bg-muted/30 px-4 py-3 col-span-2 sm:col-span-1">
-                    <p class="text-xs text-muted-foreground">檔案路徑</p>
-                    <p class="text-xs font-mono mt-1 break-all">{{ selectedStep.result.mdPath }}</p>
-                  </div>
-                </div>
-                <div class="space-y-2">
-                  <p class="text-sm font-medium">Markdown 預覽</p>
-                  <pre
-                    class="text-xs leading-relaxed whitespace-pre-wrap rounded-lg border bg-muted/20 p-4 max-h-96 overflow-y-auto font-mono"
-                  >{{ selectedStep.result.preview }}</pre>
-                </div>
-              </div>
-
-              <!-- Clear graph step -->
-              <div
-                v-else-if="selectedStep.id === 'clear_graph' && selectedStep.result"
-                class="space-y-4"
-              >
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  <div class="rounded-lg border bg-muted/30 px-4 py-3">
-                    <p class="text-xs text-muted-foreground">刪除 Chunk</p>
-                    <p class="text-lg font-semibold mt-1">
-                      {{ selectedStep.result.chunksDeleted }}
-                    </p>
-                  </div>
-                  <div class="rounded-lg border bg-muted/30 px-4 py-3">
-                    <p class="text-xs text-muted-foreground">刪除舊 Chunk</p>
-                    <p class="text-lg font-semibold mt-1">
-                      {{ selectedStep.result.legacyChunksDeleted }}
-                    </p>
-                  </div>
-                  <div class="rounded-lg border bg-muted/30 px-4 py-3">
-                    <p class="text-xs text-muted-foreground">刪除孤立實體</p>
-                    <p class="text-lg font-semibold mt-1">
-                      {{ selectedStep.result.orphanEntitiesDeleted }}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Chunk step -->
-              <div v-else-if="selectedStep.id === 'chunk' && selectedStep.result" class="space-y-4">
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  <div class="rounded-lg border bg-muted/30 px-4 py-3">
-                    <p class="text-xs text-muted-foreground">Chunk 大小</p>
-                    <p class="text-lg font-semibold mt-1">{{ selectedStep.result.chunkSize }} tokens</p>
-                  </div>
-                  <div class="rounded-lg border bg-muted/30 px-4 py-3">
-                    <p class="text-xs text-muted-foreground">重疊</p>
-                    <p class="text-lg font-semibold mt-1">{{ selectedStep.result.overlap }} tokens</p>
-                  </div>
-                  <div class="rounded-lg border bg-muted/30 px-4 py-3">
-                    <p class="text-xs text-muted-foreground">總 tokens</p>
-                    <p class="text-lg font-semibold mt-1">
-                      {{ selectedStep.result.totalTokens.toLocaleString() }}
-                    </p>
-                  </div>
-                  <div class="rounded-lg border bg-muted/30 px-4 py-3">
-                    <p class="text-xs text-muted-foreground">Chunk 數量</p>
-                    <p class="text-lg font-semibold mt-1">{{ selectedStep.result.chunks.length }}</p>
-                  </div>
-                </div>
-                <div class="space-y-3">
-                  <p class="text-sm font-medium">分塊結果</p>
-                  <div
-                    v-for="chunk in selectedStep.result.chunks"
-                    :key="chunk.index"
-                    class="rounded-lg border overflow-hidden"
-                  >
-                    <div class="flex flex-wrap items-center gap-2 px-4 py-2.5 bg-muted/40 border-b text-xs">
-                      <Badge variant="outline">Chunk #{{ chunk.index }}</Badge>
-                      <span class="text-muted-foreground">
-                        tokens [{{ chunk.startToken }}:{{ chunk.endToken }}]
-                      </span>
-                      <span class="text-muted-foreground">{{ chunk.tokenCount }} tokens</span>
-                    </div>
-                    <pre class="text-xs leading-relaxed whitespace-pre-wrap p-4 font-mono">{{ chunk.text }}</pre>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Entity extraction step -->
-              <div
-                v-else-if="selectedStep.id === 'entity_extraction' && selectedStep.result"
-                class="space-y-4"
-              >
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  <div class="rounded-lg border bg-muted/30 px-4 py-3">
-                    <p class="text-xs text-muted-foreground">模型</p>
-                    <p class="text-sm font-semibold mt-1 font-mono">{{ selectedStep.result.model }}</p>
-                  </div>
-                  <div class="rounded-lg border bg-muted/30 px-4 py-3">
-                    <p class="text-xs text-muted-foreground">處理 chunk</p>
-                    <p class="text-lg font-semibold mt-1">
-                      {{ selectedStep.result.chunkResults.length }}
-                    </p>
-                  </div>
-                  <div class="rounded-lg border bg-muted/30 px-4 py-3">
-                    <p class="text-xs text-muted-foreground">實體總數</p>
-                    <p class="text-lg font-semibold mt-1">{{ selectedStep.result.totalEntities }}</p>
-                  </div>
-                  <div class="rounded-lg border bg-muted/30 px-4 py-3">
-                    <p class="text-xs text-muted-foreground">關係總數</p>
-                    <p class="text-lg font-semibold mt-1">
-                      {{ selectedStep.result.totalRelationships }}
-                    </p>
-                  </div>
-                </div>
-                <div
-                  v-for="chunkResult in selectedStep.result.chunkResults"
-                  :key="chunkResult.chunkIndex"
-                  class="rounded-lg border overflow-hidden space-y-0"
-                >
-                  <div class="px-4 py-2.5 bg-muted/40 border-b">
-                    <p class="text-sm font-medium">Chunk #{{ chunkResult.chunkIndex }} 抽取結果</p>
-                  </div>
-                  <div class="p-4 space-y-4">
-                    <div class="space-y-2">
-                      <p class="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                        實體 ({{ chunkResult.entities.length }})
-                      </p>
-                      <div class="border rounded-lg overflow-hidden">
-                        <table class="w-full text-sm">
-                          <thead>
-                            <tr class="bg-muted/50 border-b">
-                              <th class="text-left px-3 py-2 text-xs text-muted-foreground font-medium w-24">
-                                類型
-                              </th>
-                              <th class="text-left px-3 py-2 text-xs text-muted-foreground font-medium w-32">
-                                名稱
-                              </th>
-                              <th class="text-left px-3 py-2 text-xs text-muted-foreground font-medium">
-                                描述
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr
-                              v-for="entity in chunkResult.entities"
-                              :key="`${chunkResult.chunkIndex}-${entity.name}`"
-                              class="border-b last:border-b-0"
-                            >
-                              <td class="px-3 py-2 text-xs">{{ entityTypeLabel(entity.type) }}</td>
-                              <td class="px-3 py-2 font-medium">{{ entity.name }}</td>
-                              <td class="px-3 py-2 text-muted-foreground">{{ entity.description }}</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                    <div class="space-y-2">
-                      <p class="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                        關係 ({{ chunkResult.relationships.length }})
-                      </p>
-                      <div
-                        v-if="chunkResult.relationships.length === 0"
-                        class="text-sm text-muted-foreground border rounded-lg px-3 py-4 text-center"
-                      >
-                        此 chunk 未抽取到關係
-                      </div>
-                      <div v-else class="border rounded-lg overflow-hidden">
-                        <table class="w-full text-sm">
-                          <thead>
-                            <tr class="bg-muted/50 border-b">
-                              <th class="text-left px-3 py-2 text-xs text-muted-foreground font-medium w-28">
-                                來源
-                              </th>
-                              <th class="text-left px-3 py-2 text-xs text-muted-foreground font-medium w-24">
-                                類型
-                              </th>
-                              <th class="text-left px-3 py-2 text-xs text-muted-foreground font-medium w-28">
-                                目標
-                              </th>
-                              <th class="text-left px-3 py-2 text-xs text-muted-foreground font-medium">
-                                描述
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr
-                              v-for="rel in chunkResult.relationships"
-                              :key="`${chunkResult.chunkIndex}-${rel.sourceName}-${rel.targetName}-${rel.type}`"
-                              class="border-b last:border-b-0"
-                            >
-                              <td class="px-3 py-2">{{ rel.sourceName }}</td>
-                              <td class="px-3 py-2 font-mono text-xs">{{ rel.type }}</td>
-                              <td class="px-3 py-2">{{ rel.targetName }}</td>
-                              <td class="px-3 py-2 text-muted-foreground">{{ rel.description }}</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Graph build step -->
-              <div
-                v-else-if="selectedStep.id === 'graph_build' && selectedStep.result"
-                class="space-y-4"
-              >
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  <div class="rounded-lg border bg-muted/30 px-4 py-3">
-                    <p class="text-xs text-muted-foreground">Chunk 節點</p>
-                    <p class="text-lg font-semibold mt-1">{{ selectedStep.result.chunksCreated }}</p>
-                  </div>
-                  <div class="rounded-lg border bg-muted/30 px-4 py-3">
-                    <p class="text-xs text-muted-foreground">實體節點</p>
-                    <p class="text-lg font-semibold mt-1">{{ selectedStep.result.entitiesCreated }}</p>
-                  </div>
-                  <div class="rounded-lg border bg-muted/30 px-4 py-3">
-                    <p class="text-xs text-muted-foreground">合併實體</p>
-                    <p class="text-lg font-semibold mt-1">{{ selectedStep.result.entitiesMerged }}</p>
-                  </div>
-                  <div class="rounded-lg border bg-muted/30 px-4 py-3">
-                    <p class="text-xs text-muted-foreground">關係邊</p>
-                    <p class="text-lg font-semibold mt-1">
-                      {{ selectedStep.result.relationshipsCreated }}
-                    </p>
-                  </div>
-                </div>
-                <div class="space-y-2">
-                  <p class="text-sm font-medium">寫入的節點</p>
-                  <div class="border rounded-lg overflow-hidden">
-                    <table class="w-full text-sm">
-                      <thead>
-                        <tr class="bg-muted/50 border-b">
-                          <th class="text-left px-3 py-2 text-xs text-muted-foreground font-medium w-24">
-                            類型
-                          </th>
-                          <th class="text-left px-3 py-2 text-xs text-muted-foreground font-medium w-36">
-                            名稱
-                          </th>
-                          <th class="text-left px-3 py-2 text-xs text-muted-foreground font-medium w-24">
-                            來源 Chunk
-                          </th>
-                          <th class="text-left px-3 py-2 text-xs text-muted-foreground font-medium">
-                            描述
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr
-                          v-for="node in selectedStep.result.nodes"
-                          :key="node.id"
-                          class="border-b last:border-b-0"
-                        >
-                          <td class="px-3 py-2 text-xs">{{ entityTypeLabel(node.type) }}</td>
-                          <td class="px-3 py-2 font-medium">{{ node.name }}</td>
-                          <td class="px-3 py-2 text-muted-foreground">
-                            <template v-if="node.type === 'CHUNK'">—</template>
-                            <template v-else>#{{ node.sourceChunkIndex }}</template>
-                          </td>
-                          <td class="px-3 py-2 text-muted-foreground">{{ node.description }}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-                <div class="space-y-2">
-                  <p class="text-sm font-medium">寫入的關係</p>
-                  <div class="border rounded-lg overflow-hidden">
-                    <table class="w-full text-sm">
-                      <thead>
-                        <tr class="bg-muted/50 border-b">
-                          <th class="text-left px-3 py-2 text-xs text-muted-foreground font-medium w-28">
-                            來源
-                          </th>
-                          <th class="text-left px-3 py-2 text-xs text-muted-foreground font-medium w-24">
-                            類型
-                          </th>
-                          <th class="text-left px-3 py-2 text-xs text-muted-foreground font-medium w-28">
-                            目標
-                          </th>
-                          <th class="text-left px-3 py-2 text-xs text-muted-foreground font-medium">
-                            描述
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr
-                          v-for="edge in selectedStep.result.edges"
-                          :key="edge.id"
-                          class="border-b last:border-b-0"
-                        >
-                          <td class="px-3 py-2">{{ edge.sourceName }}</td>
-                          <td class="px-3 py-2 font-mono text-xs">{{ edge.type }}</td>
-                          <td class="px-3 py-2">{{ edge.targetName }}</td>
-                          <td class="px-3 py-2 text-muted-foreground">{{ edge.description }}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <PipelineStepDetail v-if="selectedStep" :step="selectedStep" />
           </ScrollArea>
         </div>
       </template>

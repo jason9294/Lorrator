@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import type { GraphNode, GraphSelection, NodeType } from '@/types/graph'
-import { NODE_TYPE_LABELS, NODE_COLORS } from '@/types/graph'
+import type { GraphNode, GraphSelection } from '@/types/graph'
+import { getNodeTypeColor, getNodeTypeLabel } from '@/types/graph'
 
 // Icons
 import {
@@ -9,6 +9,7 @@ import {
   Save,
   RotateCcw,
   Tag,
+  Tags,
   Type,
   AlignLeft,
   ArrowRight,
@@ -20,14 +21,6 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 
 // Props / Emits
 const props = defineProps<{
@@ -62,10 +55,7 @@ watch(
   (newVal) => {
     if (!newVal || props.selection?.kind !== 'node') return
     const node = props.selection.data
-    isDirty.value =
-      newVal.label !== node.label ||
-      newVal.type !== node.type ||
-      newVal.description !== node.description
+    isDirty.value = newVal.label !== node.label
   },
   { deep: true },
 )
@@ -82,8 +72,8 @@ function reset() {
   isDirty.value = false
 }
 
-function nodeColor(type: NodeType): string {
-  return NODE_COLORS[type] ?? '#6b7280'
+function nodeColor(type: string): string {
+  return getNodeTypeColor(type)
 }
 </script>
 
@@ -106,7 +96,7 @@ function nodeColor(type: NodeType): string {
                   :style="{ backgroundColor: nodeColor(draft.type) }"
                 />
                 <span class="text-xs font-medium text-muted-foreground">
-                  {{ NODE_TYPE_LABELS[draft.type] ?? draft.type }}
+                  {{ getNodeTypeLabel(draft.type) }}
                 </span>
               </div>
               <h3 class="text-sm font-semibold leading-tight truncate">{{ draft.label }}</h3>
@@ -172,22 +162,29 @@ function nodeColor(type: NodeType): string {
               <Tag class="size-3" />
               類型
             </Label>
-            <Select v-model="draft.type">
-              <SelectTrigger class="w-full">
-                <SelectValue placeholder="選擇類型" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem v-for="(typeLabel, val) in NODE_TYPE_LABELS" :key="val" :value="val">
-                  <span class="flex items-center gap-2">
-                    <span
-                      class="inline-block size-2 rounded-full shrink-0"
-                      :style="{ backgroundColor: nodeColor(val as NodeType) }"
-                    />
-                    {{ typeLabel }}
-                  </span>
-                </SelectItem>
-              </SelectContent>
-            </Select>
+            <p class="text-sm px-3 py-2 rounded-md bg-muted/50 border flex items-center gap-2">
+              <span
+                class="inline-block size-2 rounded-full shrink-0"
+                :style="{ backgroundColor: nodeColor(draft.type) }"
+              />
+              <span>{{ getNodeTypeLabel(draft.type) }}</span>
+            </p>
+          </div>
+
+          <div v-if="draft.aliases.length > 0" class="space-y-1.5">
+            <Label class="text-xs text-muted-foreground">
+              <Tags class="size-3" />
+              別名
+            </Label>
+            <ul class="rounded-md border bg-muted/30 divide-y text-sm">
+              <li
+                v-for="alias in draft.aliases"
+                :key="alias"
+                class="px-3 py-2 text-foreground"
+              >
+                {{ alias }}
+              </li>
+            </ul>
           </div>
 
           <div class="space-y-1.5">
@@ -195,11 +192,21 @@ function nodeColor(type: NodeType): string {
               <AlignLeft class="size-3" />
               描述
             </Label>
-            <Textarea
-              v-model="draft.description"
-              placeholder="輸入節點描述..."
-              class="resize-none min-h-32"
-            />
+            <ul
+              v-if="draft.descriptions.length > 0"
+              class="rounded-md border bg-muted/30 divide-y text-sm"
+            >
+              <li
+                v-for="(item, index) in draft.descriptions"
+                :key="`${draft.id}-desc-${index}`"
+                class="px-3 py-2 text-muted-foreground whitespace-pre-wrap"
+              >
+                {{ item }}
+              </li>
+            </ul>
+            <p v-else class="text-sm px-3 py-2 rounded-md bg-muted/50 border text-muted-foreground">
+              —
+            </p>
           </div>
         </div>
 

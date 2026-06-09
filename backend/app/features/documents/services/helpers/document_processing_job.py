@@ -3,7 +3,7 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.websocket.manager import get_ws_connection_manager
+from app.core.realtime import get_ws_connection_manager
 from app.db.sql import async_engine
 from app.modules.document_pipeline.runner import PipelineRunner
 from app.modules.document_pipeline.types import PipelineOptions

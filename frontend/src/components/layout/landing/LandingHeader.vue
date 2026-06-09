@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { Bell, LogOut, PanelLeftClose, PanelLeftOpen, Search, Settings } from 'lucide-vue-next'
+import { LogOut, PanelLeftClose, PanelLeftOpen, Settings } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import { onClickOutside } from '@vueuse/core'
 import { useLandingDrawer } from '@/composables/useLandingDrawer'

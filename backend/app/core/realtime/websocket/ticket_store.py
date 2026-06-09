@@ -13,7 +13,7 @@ class _TicketRecord:
     expires_at: datetime
 
 
-class WsTicketStore:
+class WebSocketTicketStore:
     """MVP：記憶體一次性連線票證，之後可換成 Redis。"""
 
     def __init__(self) -> None:

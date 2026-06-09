@@ -13,7 +13,7 @@ class GetRoomService:
         self._uow = uow
 
     async def execute(self, room_id: UUID, current_user_id: UUID) -> RoomDetailResponse:
-        room = await self._uow.room_repo.get_by_id(room_id)
+        room = await self._uow.room_repo.find_by_id(room_id)
         if room is None:
             raise HTTPException(status_code=404, detail="Room not found")
 

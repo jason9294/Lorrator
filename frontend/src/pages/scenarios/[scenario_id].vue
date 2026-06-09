@@ -205,7 +205,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { useAsyncState, useToggle, whenever } from '@vueuse/core'
@@ -225,13 +225,12 @@ import {
 } from 'lucide-vue-next'
 
 // Types
-import type { NodeType } from '@/types/graph'
-import { NODE_TYPE_LABELS } from '@/types/graph'
+import { normalizeNodeType } from '@/types/graph'
 import type { Graph } from '@/types/graph'
 
 // Composables
 import { useColorMode } from '@/composables/useColorMode'
-import { useAppWebSocket } from '@/composables/useAppWebSocket'
+import { useSocketOnType } from '@/composables/websocket'
 
 // Low-level Components
 import { Button } from '@/components/ui/button'
@@ -329,14 +328,26 @@ function normalizeGraphPayload(data: unknown): Graph {
       const type = typeof x.type === 'string' ? x.type : null
       const label = typeof x.label === 'string' ? x.label : null
       const description = typeof x.description === 'string' ? x.description : ''
+      const aliases = Array.isArray(x.aliases)
+        ? x.aliases.filter((item): item is string => typeof item === 'string' && item.length > 0)
+        : []
+      const descriptions = Array.isArray(x.descriptions)
+        ? x.descriptions.filter((item): item is string => typeof item === 'string' && item.length > 0)
+        : description
+          ? [description]
+          : []
       if (!id || !type || !label) {
         console.error('Invalid node:', n)
         return null
       }
-      if (!NODE_TYPE_LABELS[type as NodeType]) {
-        return { id, type: 'UNKNOWN' as NodeType, label, description }
+      return {
+        id,
+        type: normalizeNodeType(type),
+        label,
+        description,
+        aliases,
+        descriptions,
       }
-      return { id, type: type as NodeType, label, description }
     })
     .filter((n): n is NonNullable<typeof n> => n !== null)
 
@@ -488,33 +499,19 @@ async function onFileChange(e: Event) {
   }
 }
 
-// WebSocket：文件處理完成後刷新文件與圖譜
-const ws = useAppWebSocket()
-let unsubscribeWs: (() => void) | null = null
-
-onMounted(async () => {
-  try {
-    await ws.connect()
-  } catch {
-    // ignore
+// WebSocket：文件處理完成後刷新文件與圖譜（連線後伺服器自動訂閱 documents topic）
+useSocketOnType('documents.process_updated', (payload) => {
+  const sid = String(payload.scenario_id ?? '')
+  if (!sid || sid !== String(scenarioId.value ?? '')) return
+  void loadDocuments()
+  const st = String(payload.status ?? '')
+  if (st === 'COMPLETED') {
+    void loadGraph()
+    toast.success('文件處理完成', { description: '知識圖譜已更新。' })
+  } else if (st === 'FAILED') {
+    const errMsg = typeof payload.error === 'string' ? payload.error : '請重新嘗試處理。'
+    toast.error('文件處理失敗', { description: errMsg })
   }
-  unsubscribeWs = ws.onType('documents.process_updated', (payload) => {
-    const sid = String(payload.scenario_id ?? '')
-    if (!sid || sid !== String(scenarioId.value ?? '')) return
-    void loadDocuments()
-    const st = String(payload.status ?? '')
-    if (st === 'COMPLETED') {
-      void loadGraph()
-      toast.success('文件處理完成', { description: '知識圖譜已更新。' })
-    } else if (st === 'FAILED') {
-      const errMsg = typeof payload.error === 'string' ? payload.error : '請重新嘗試處理。'
-      toast.error('文件處理失敗', { description: errMsg })
-    }
-  })
-})
-
-onUnmounted(() => {
-  unsubscribeWs?.()
 })
 
 async function handlePublish() {

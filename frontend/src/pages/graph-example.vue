@@ -58,7 +58,7 @@
           >
             <span
               class="inline-block size-2 rounded-full shrink-0"
-              :style="{ backgroundColor: NODE_COLORS[type as NodeType] }"
+              :style="{ backgroundColor: getNodeTypeColor(type) }"
             />
             {{ label }}
           </ToggleGroupItem>
@@ -127,7 +127,7 @@
           >
             <span
               class="inline-block size-2.5 rounded-full shrink-0"
-              :style="{ backgroundColor: NODE_COLORS[type as NodeType] }"
+              :style="{ backgroundColor: getNodeTypeColor(type) }"
             />
             <span class="font-medium">{{ node.label }}</span>
             <span class="text-muted-foreground text-xs truncate">{{ node.description }}</span>
@@ -140,7 +140,12 @@
 
 <script setup lang="ts">
 import type { Graph, GraphNode, NodeType } from '@/types/graph'
-import { NODE_COLORS, NODE_TYPE_LABELS } from '@/types/graph'
+import {
+  getNodeTypeColor,
+  getNodeTypeLabel,
+  NODE_TYPE_LABELS,
+  withGraphNodeLists,
+} from '@/types/graph'
 import KnowledgeGraph from '@/components/graph/KnowledgeGraph.vue'
 import { useColorMode } from '@/composables/useColorMode'
 import { Moon, Sun, Search } from 'lucide-vue-next'
@@ -217,8 +222,7 @@ const nodesByType = computed(() => {
 })
 
 // ─── 示範資料：COC「失落的藝術家」劇本片段 ─────────────────────────────────────
-const graph = ref<Graph>({
-  nodes: [
+const demoNodes = [
     {
       id: 'c1',
       type: 'character',
@@ -296,7 +300,10 @@ const graph = ref<Graph>({
       description:
         '一套描述超越人類理解的古老神靈與宇宙體系的神話框架，閱讀相關典籍可能導致理智崩潰。',
     },
-  ],
+] as Array<Omit<GraphNode, 'aliases' | 'descriptions'>>
+
+const graph = ref<Graph>({
+  nodes: demoNodes.map((node) => withGraphNodeLists(node)),
   edges: [
     { id: 'e-c1-l1', source: 'c1', target: 'l1', type: '調查', directed: true },
     { id: 'e-c1-l1-2', source: 'c1', target: 'l1', type: '調查2', directed: true },

@@ -380,7 +380,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { useAppWebSocket } from '@/composables/useAppWebSocket'
+import { useSocketOnType, useSocketTopic } from '@/composables/websocket'
 import {
   CharactersService,
   RoomsService,
@@ -389,7 +389,6 @@ import {
   type RoomDetailResponse,
   type RoomParticipantResponse,
 } from '@/services'
-import { useSocketOnType } from '@/composables/useSocketOnType'
 import { useMeStore } from '@/stores/me'
 
 import MessageRenderer from '@/components/rooms/messages/MessageRenderer.vue'
@@ -651,7 +650,7 @@ async function handleDiceRolled(message: RoomMessageResponse) {
 }
 
 // WebSocket
-const ws = useAppWebSocket()
+useSocketTopic(() => `rooms:${roomId}`)
 
 useSocketOnType('rooms.join_room', async (payload) => {
   console.log('join room', payload)
@@ -796,7 +795,6 @@ useSocketOnType('rooms.kick', (payload) => {
 
 onMounted(async () => {
   await bootstrap()
-  await ws.connect()
 })
 </script>
 

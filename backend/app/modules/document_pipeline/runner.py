@@ -6,7 +6,12 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
-from app.core.websocket.manager import WebSocketConnectionManager
+from app.core.realtime.websocket.manager import WebSocketConnectionManager
+from app.core.realtime.websocket.envelopes import (
+    DocumentsProcessUpdatedEnvelope,
+    DocumentsProcessingStepUpdatedEnvelope,
+)
+from app.core.realtime.websocket.topics import WsTopic
 from app.models import DocumentModel
 from app.modules.document_pipeline.persistence import (
     PipelinePersistence,
@@ -237,17 +242,14 @@ class PipelineRunner:
         status: DocumentStatus,
         error: str | None = None,
     ) -> None:
-        payload: dict = {
-            "document_id": str(document_id),
-            "scenario_id": str(self._scenario_id),
-            "status": status.value,
-        }
-        if error is not None:
-            payload["error"] = error
-        await self._ws_manager.send_to_user(
-            self._notify_user_id,
-            message_type="documents.process_updated",
-            payload=payload,
+        await self._ws_manager.send_to_topic(
+            WsTopic.user_documents(self._notify_user_id),
+            DocumentsProcessUpdatedEnvelope.for_document(
+                document_id=document_id,
+                scenario_id=self._scenario_id,
+                status=status,
+                error=error,
+            ),
         )
 
     async def _notify_step_updated(
@@ -258,18 +260,14 @@ class PipelineRunner:
         summary: str | None = None,
         error: str | None = None,
     ) -> None:
-        payload: dict = {
-            "document_id": str(self._persistence.document_id),
-            "run_id": str(self._persistence.run_id),
-            "step_id": step_id,
-            "status": status.value,
-        }
-        if summary is not None:
-            payload["summary"] = summary
-        if error is not None:
-            payload["error"] = error
-        await self._ws_manager.send_to_user(
-            self._notify_user_id,
-            message_type="documents.processing_step_updated",
-            payload=payload,
+        await self._ws_manager.send_to_topic(
+            WsTopic.user_documents(self._notify_user_id),
+            DocumentsProcessingStepUpdatedEnvelope(
+                document_id=str(self._persistence.document_id),
+                run_id=str(self._persistence.run_id),
+                step_id=step_id,
+                status=status,
+                summary=summary,
+                error=error,
+            ),
         )

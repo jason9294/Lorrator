@@ -7,7 +7,7 @@ from sqlalchemy.orm import attributes
 from app.db.sql import async_engine
 from app.models import RoomModel
 from app.modules.rag.round_summarizer import summary_round
-from app.modules.room_messages import broadcast_room_message
+from app.helpers.room_message_broadcast import broadcast_room_message
 from app.repositories.room_message_repo import RoomMessageRepository
 from app.shared.enums import RoomMessageRole, RoomMessageType
 
@@ -89,6 +89,6 @@ async def run_round_summarizer_debug(
                 detail=formatted_detail,
             )
             await session.commit()
-            await broadcast_room_message(participant_ids, debug_msg)
+            await broadcast_room_message(debug_msg)
     except Exception:
         logger.exception("round summarizer debug message failed: room_id=%s", room_id)

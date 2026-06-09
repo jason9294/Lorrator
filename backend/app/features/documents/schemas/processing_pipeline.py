@@ -9,6 +9,7 @@ from app.modules.document_pipeline.types import (
     ClearGraphStepResult,
     EntityEmbeddingStepResult,
     EntityExtractionStepResult,
+    EntityGroupingStepResult,
     GraphBuildStepResult,
     PrepareStepResult,
 )
@@ -54,13 +55,19 @@ class EntityEmbeddingStepResponse(ProcessingStepBaseResponse):
     result: EntityEmbeddingStepResult | None = None
 
 
+class EntityGroupingStepResponse(ProcessingStepBaseResponse):
+    id: Literal[ProcessingStepId.ENTITY_GROUPING] = ProcessingStepId.ENTITY_GROUPING
+    result: EntityGroupingStepResult | None = None
+
+
 ProcessingStepResponse = Annotated[
     PrepareStepResponse
     | ClearGraphStepResponse
     | ChunkStepResponse
     | EntityExtractionStepResponse
     | GraphBuildStepResponse
-    | EntityEmbeddingStepResponse,
+    | EntityEmbeddingStepResponse
+    | EntityGroupingStepResponse,
     Field(discriminator="id"),
 ]
 

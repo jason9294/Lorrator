@@ -5,7 +5,10 @@ import type {
   ChunkStepResult,
   ClearGraphStepResult,
   DocumentProcessingPipeline,
+  EntityEmbeddingStepResult,
   EntityExtractionStepResult,
+  EntityGroupingIteration,
+  EntityGroupingStepResult,
   ExtractedEntity,
   ExtractedRelationship,
   GraphBuildStepResult,
@@ -19,6 +22,40 @@ import type {
 } from '@/types/document-processing'
 
 type ApiStep = DocumentProcessingPipelineResponse['steps'][number]
+
+type EntityGroupingApiResult = {
+  total_iterations: number
+  total_merges: number
+  iterations: Array<{
+    iteration: number
+    seed_name: string
+    seed_similarity_degree: number
+    input_entities: Array<{
+      temp_id: string
+      name: string
+      chunk_index: number
+      description: string
+    }>
+    input_chunks: Array<{
+      temp_id: string
+      chunk_index: number
+      content: string
+    }>
+    llm_groups: string[][]
+    merges: Array<{
+      target_name: string
+      source_name: string
+      source_chunk_index: number
+      source_description: string
+      aliases_added: string[]
+    }>
+  }>
+}
+
+type EntityGroupingApiStep = ProcessingStepBase & {
+  id: 'entity_grouping'
+  result?: EntityGroupingApiResult
+}
 
 function mapStepBase(step: ApiStep): ProcessingStepBase {
   return {
@@ -112,6 +149,72 @@ function mapEntityExtractionStep(
   return { ...base, id: 'entity_extraction', result }
 }
 
+function mapEntityEmbeddingStep(
+  step: Extract<ApiStep, { id: 'entity_embedding' }>,
+): ProcessingStep {
+  const base = mapStepBase(step)
+  const result: EntityEmbeddingStepResult | undefined = step.result
+    ? {
+        modelKey: step.result.model_key,
+        entitiesEmbedded: step.result.entities_embedded,
+        cacheHits: step.result.cache_hits,
+        cacheMisses: step.result.cache_misses,
+        similarityEdgesCreated: step.result.similarity_edges_created,
+      }
+    : undefined
+  return { ...base, id: 'entity_embedding', result }
+}
+
+function mapEntityGroupingApiStep(rawStep: Record<string, unknown>): EntityGroupingApiStep {
+  return {
+    id: 'entity_grouping',
+    title: String(rawStep.title ?? ''),
+    description: String(rawStep.description ?? ''),
+    status: rawStep.status as ProcessingStepStatus,
+    durationMs: Number(rawStep.duration_ms ?? 0),
+    summary: rawStep.summary ? String(rawStep.summary) : undefined,
+    error: rawStep.error ? String(rawStep.error) : undefined,
+    result: rawStep.result as EntityGroupingApiResult | undefined,
+  }
+}
+
+function mapEntityGroupingStep(step: EntityGroupingApiStep): ProcessingStep {
+  const base = step
+  const result: EntityGroupingStepResult | undefined = step.result
+    ? {
+        totalIterations: step.result.total_iterations,
+        totalMerges: step.result.total_merges,
+        iterations: step.result.iterations.map(
+          (iteration): EntityGroupingIteration => ({
+            iteration: iteration.iteration,
+            seedName: iteration.seed_name,
+            seedSimilarityDegree: iteration.seed_similarity_degree,
+            inputEntities: iteration.input_entities.map((entity) => ({
+              tempId: entity.temp_id,
+              name: entity.name,
+              chunkIndex: entity.chunk_index,
+              description: entity.description,
+            })),
+            inputChunks: iteration.input_chunks.map((chunk) => ({
+              tempId: chunk.temp_id,
+              chunkIndex: chunk.chunk_index,
+              content: chunk.content,
+            })),
+            llmGroups: iteration.llm_groups,
+            merges: iteration.merges.map((merge) => ({
+              targetName: merge.target_name,
+              sourceName: merge.source_name,
+              sourceChunkIndex: merge.source_chunk_index,
+              sourceDescription: merge.source_description,
+              aliasesAdded: merge.aliases_added,
+            })),
+          }),
+        ),
+      }
+    : undefined
+  return { ...base, id: 'entity_grouping', result }
+}
+
 function mapGraphBuildStep(step: Extract<ApiStep, { id: 'graph_build' }>): ProcessingStep {
   const base = mapStepBase(step)
   const result: GraphBuildStepResult | undefined = step.result
@@ -155,7 +258,14 @@ function mapStep(step: ApiStep): ProcessingStep {
       return mapEntityExtractionStep(step)
     case 'graph_build':
       return mapGraphBuildStep(step)
+    case 'entity_embedding':
+      return mapEntityEmbeddingStep(step)
     default:
+      if ((step as { id?: string }).id === 'entity_grouping') {
+        return mapEntityGroupingStep(
+          mapEntityGroupingApiStep(step as Record<string, unknown>),
+        )
+      }
       return mapStepBase(step) as ProcessingStep
   }
 }

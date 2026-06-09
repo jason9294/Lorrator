@@ -2,7 +2,9 @@ from uuid import UUID
 
 from fastapi import HTTPException
 
-from app.core.websocket.manager import get_ws_connection_manager
+from app.core.realtime import get_ws_connection_manager
+from app.core.realtime.websocket.envelopes import RoomsJoinEnvelope
+from app.core.realtime.websocket.topics import WsTopic
 from app.db.uow import UnitOfWorkDependency
 from app.features.rooms.schemas.requests import JoinRoomRequest
 from app.features.rooms.schemas.responses import RoomDetailResponse
@@ -43,17 +45,15 @@ class JoinRoomService:
         )
 
         ws_manager = get_ws_connection_manager()
-        for participant in participants:
-            await ws_manager.send_to_user(
-                participant.user_id,
-                message_type="rooms.join_room",
-                payload={
-                    "room_id": str(room.id),
-                    "user_id": str(current_user.id),
-                    "role": "PLAYER",
-                    "is_ready": current_participant.is_ready,
-                    "joined_at": current_participant.joined_at.isoformat(),
-                },
-            )
+        await ws_manager.send_to_topic(
+            WsTopic.room(room.id),
+            RoomsJoinEnvelope(
+                room_id=str(room.id),
+                user_id=str(current_user.id),
+                role="PLAYER",
+                is_ready=current_participant.is_ready,
+                joined_at=current_participant.joined_at.isoformat(),
+            ),
+        )
 
         return await build_room_detail(self._uow, room)

@@ -48,6 +48,8 @@ class ScenarioGraphNodeResponse(BaseModel):
     type: GraphEntityType | str
     label: str
     description: str = ""
+    aliases: list[str] = []
+    descriptions: list[str] = []
 
 
 class ScenarioGraphEdgeResponse(BaseModel):

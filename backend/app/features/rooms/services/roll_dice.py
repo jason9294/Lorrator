@@ -12,7 +12,10 @@ from app.db.uow import UnitOfWorkDependency
 from app.models import RoomModel
 from app.models.links.room_participant_link import RoomParticipantLink
 from app.modules.rag.client import client
-from app.modules.room_messages import broadcast_ai_thinking, broadcast_room_message
+from app.helpers.room_message_broadcast import (
+    broadcast_ai_thinking,
+    broadcast_room_message,
+)
 from app.repositories.room_message_repo import RoomMessageRepository
 from app.shared.enums import RoomMessageRole, RoomMessageType, RoomStatus
 
@@ -47,7 +50,7 @@ class RollDiceService:
     async def _validate_and_load(
         self, room_id: UUID, user_id: UUID
     ) -> tuple[RoomModel, list[RoomParticipantLink], list[UUID]]:
-        room = await self._uow.room_repo.get_by_id(room_id)
+        room = await self._uow.room_repo.find_by_id(room_id)
         if room is None:
             raise HTTPException(status_code=404, detail="Room not found")
 
@@ -95,7 +98,7 @@ class RollDiceService:
                     )
                     await session.commit()
                     logger.info("committed agent_msg=%s", agent_msg.id)
-                    await broadcast_room_message(participant_ids, agent_msg)
+                    await broadcast_room_message(agent_msg)
                     logger.info("broadcast agent_msg done: id=%s", agent_msg.id)
                 await run_round_summarizer_debug(
                     room_id, participant_ids, round_history
@@ -107,7 +110,7 @@ class RollDiceService:
                 logger.info(
                     "_delayed_reply finally: clearing ai_thinking room_id=%s", room_id
                 )
-                await broadcast_ai_thinking(participant_ids, room_id, active=False)
+                await broadcast_ai_thinking(room_id, active=False)
 
         logger.info(
             "scheduling _delayed_reply: room_id=%s participants=%s",
@@ -134,7 +137,7 @@ class RollDiceService:
             )
         except Exception:
             logger.exception("_run_agent_turn: AI call failed room_id=%s", room_id)
-            await broadcast_ai_thinking(participant_ids, room_id, active=False)
+            await broadcast_ai_thinking(room_id, active=False)
             raise
 
         logger.info(
@@ -179,8 +182,8 @@ class RollDiceService:
             type=RoomMessageType.DICE,
             content=content,
         )
-        await broadcast_room_message(participant_ids, msg)
-        await broadcast_ai_thinking(participant_ids, room_id, active=True)
+        await broadcast_room_message(msg)
+        await broadcast_ai_thinking(room_id, active=True)
 
         current_participant: RoomParticipantLink = next(  # type: ignore
             (p for p in participants if p.user_id == sender_id), None
@@ -213,8 +216,8 @@ class RollDiceService:
             type=RoomMessageType.DICE,
             content=content,
         )
-        await broadcast_room_message(participant_ids, msg)
-        await broadcast_ai_thinking(participant_ids, room_id, active=True)
+        await broadcast_room_message(msg)
+        await broadcast_ai_thinking(room_id, active=True)
 
         current_participant: RoomParticipantLink = next(  # type: ignore
             (p for p in participants if p.user_id == sender_id), None

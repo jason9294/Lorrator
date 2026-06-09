@@ -4,6 +4,8 @@ export type ProcessingStepId =
   | 'chunk'
   | 'entity_extraction'
   | 'graph_build'
+  | 'entity_embedding'
+  | 'entity_grouping'
 
 export type ProcessingStepStatus = 'pending' | 'running' | 'completed' | 'failed' | 'skipped'
 
@@ -96,12 +98,59 @@ export interface GraphBuildStepResult {
   edges: GraphEdgeCreated[]
 }
 
+export interface EntityEmbeddingStepResult {
+  modelKey: string
+  entitiesEmbedded: number
+  cacheHits: number
+  cacheMisses: number
+  similarityEdgesCreated: number
+}
+
+export interface EntityGroupingInputEntity {
+  tempId: string
+  name: string
+  chunkIndex: number
+  description: string
+}
+
+export interface EntityGroupingInputChunk {
+  tempId: string
+  chunkIndex: number
+  content: string
+}
+
+export interface EntityGroupingMergeRecord {
+  targetName: string
+  sourceName: string
+  sourceChunkIndex: number
+  sourceDescription: string
+  aliasesAdded: string[]
+}
+
+export interface EntityGroupingIteration {
+  iteration: number
+  seedName: string
+  seedSimilarityDegree: number
+  inputEntities: EntityGroupingInputEntity[]
+  inputChunks: EntityGroupingInputChunk[]
+  llmGroups: string[][]
+  merges: EntityGroupingMergeRecord[]
+}
+
+export interface EntityGroupingStepResult {
+  totalIterations: number
+  totalMerges: number
+  iterations: EntityGroupingIteration[]
+}
+
 export type ProcessingStep =
   | (ProcessingStepBase & { id: 'prepare'; result?: PrepareStepResult })
   | (ProcessingStepBase & { id: 'clear_graph'; result?: ClearGraphStepResult })
   | (ProcessingStepBase & { id: 'chunk'; result?: ChunkStepResult })
   | (ProcessingStepBase & { id: 'entity_extraction'; result?: EntityExtractionStepResult })
   | (ProcessingStepBase & { id: 'graph_build'; result?: GraphBuildStepResult })
+  | (ProcessingStepBase & { id: 'entity_embedding'; result?: EntityEmbeddingStepResult })
+  | (ProcessingStepBase & { id: 'entity_grouping'; result?: EntityGroupingStepResult })
 
 export interface DocumentProcessingPipeline {
   documentId: string

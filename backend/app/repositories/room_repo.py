@@ -1,6 +1,7 @@
 import secrets
 from uuid import UUID
 
+from fastapi import HTTPException
 from sqlalchemy.orm import selectinload
 from sqlmodel import col, select, update
 
@@ -13,10 +14,19 @@ from ._base_repo import BaseRepository
 
 
 class RoomRepository(BaseRepository):
-    async def get_by_id(self, room_id: UUID) -> RoomModel | None:
+    async def find_by_id(self, room_id: UUID) -> RoomModel | None:
         statement = select(RoomModel).where(RoomModel.id == room_id)
         result = await self.session.execute(statement)
         return result.scalars().first()
+
+    async def get_by_id(self, room_id: UUID) -> RoomModel:
+        room = await self.find_by_id(room_id)
+        if room is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Room with id {room_id} not found",
+            )
+        return room
 
     async def get_by_invite_code(self, invite_code: str) -> RoomModel | None:
         statement = select(RoomModel).where(

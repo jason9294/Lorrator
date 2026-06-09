@@ -74,3 +74,4 @@ class ProcessingStepId(StrEnum):
     ENTITY_EXTRACTION = "entity_extraction"
     GRAPH_BUILD = "graph_build"
     ENTITY_EMBEDDING = "entity_embedding"
+    ENTITY_GROUPING = "entity_grouping"

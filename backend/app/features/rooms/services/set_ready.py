@@ -2,7 +2,9 @@ from uuid import UUID
 
 from fastapi import HTTPException
 
-from app.core.websocket.manager import get_ws_connection_manager
+from app.core.realtime import get_ws_connection_manager
+from app.core.realtime.websocket.envelopes import RoomsSetReadyEnvelope
+from app.core.realtime.websocket.topics import WsTopic
 from app.db.uow import UnitOfWorkDependency
 from app.features.rooms.schemas.responses import RoomDetailResponse
 from app.shared.enums import RoomStatus
@@ -19,7 +21,7 @@ class SetReadyService:
         self, room_id: UUID, is_ready: bool, current_user_id: UUID
     ) -> RoomDetailResponse:
         # validate room id
-        room = await self._uow.room_repo.get_by_id(room_id)
+        room = await self._uow.room_repo.find_by_id(room_id)
         if room is None:
             raise HTTPException(status_code=404, detail="Room not found")
 
@@ -42,19 +44,13 @@ class SetReadyService:
             room_id, current_user_id, is_ready
         )
 
-        # broadcast ready status
-        for user_id in participant_ids:
-            try:
-                await self._ws_manager.send_to_user(
-                    user_id,
-                    message_type="rooms.set_ready",
-                    payload={
-                        "room_id": str(room_id),
-                        "user_id": str(current_user_id),
-                        "is_ready": is_ready,
-                    },
-                )
-            finally:
-                pass
+        await self._ws_manager.send_to_topic(
+            WsTopic.room(room_id),
+            RoomsSetReadyEnvelope(
+                room_id=str(room_id),
+                user_id=str(current_user_id),
+                is_ready=is_ready,
+            ),
+        )
 
         return await build_room_detail(self._uow, room)

@@ -9,6 +9,7 @@ from app.features.documents.schemas.processing_pipeline import (
     DocumentProcessingPipelineResponse,
     EntityEmbeddingStepResponse,
     EntityExtractionStepResponse,
+    EntityGroupingStepResponse,
     GraphBuildStepResponse,
     PrepareStepResponse,
     ProcessingStepResponse,
@@ -25,6 +26,7 @@ _STEP_RESPONSE_BY_ID: dict[ProcessingStepId, type] = {
     ProcessingStepId.ENTITY_EXTRACTION: EntityExtractionStepResponse,
     ProcessingStepId.GRAPH_BUILD: GraphBuildStepResponse,
     ProcessingStepId.ENTITY_EMBEDDING: EntityEmbeddingStepResponse,
+    ProcessingStepId.ENTITY_GROUPING: EntityGroupingStepResponse,
 }
 
 

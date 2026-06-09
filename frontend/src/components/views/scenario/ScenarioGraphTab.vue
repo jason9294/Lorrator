@@ -4,7 +4,7 @@ import { computed, ref, watch } from 'vue'
 import { Filter, Network } from 'lucide-vue-next'
 
 import type { Graph, NodeType } from '@/types/graph'
-import { NODE_COLORS, NODE_TYPE_LABELS } from '@/types/graph'
+import { getNodeTypeColor, getNodeTypeLabel } from '@/types/graph'
 
 import KnowledgeGraph from '@/components/graph/KnowledgeGraph.vue'
 
@@ -32,10 +32,10 @@ const typeOptions = computed(() => {
     counts.set(node.type, (counts.get(node.type) ?? 0) + 1)
   }
   return [...counts.entries()]
-    .sort(([a], [b]) => (NODE_TYPE_LABELS[a] ?? a).localeCompare(NODE_TYPE_LABELS[b] ?? b, 'zh-TW'))
+    .sort(([a], [b]) => getNodeTypeLabel(a).localeCompare(getNodeTypeLabel(b), 'zh-TW'))
     .map(([type, count]) => ({
       type,
-      label: `${NODE_TYPE_LABELS[type] ?? type} (${count})`,
+      label: `${getNodeTypeLabel(type)} (${count})`,
     }))
 })
 
@@ -75,7 +75,7 @@ watch(
               <span class="flex items-center gap-2">
                 <span
                   class="inline-block size-2 rounded-full shrink-0"
-                  :style="{ backgroundColor: NODE_COLORS[opt.type] }"
+                  :style="{ backgroundColor: getNodeTypeColor(opt.type) }"
                 />
                 {{ opt.label }}
               </span>
