@@ -730,6 +730,45 @@ export type DocumentMarkdownResponse = {
 };
 
 /**
+ * DocumentProcessingLlmCallResponse
+ */
+export type DocumentProcessingLlmCallResponse = {
+    /**
+     * Id
+     */
+    id: string;
+    step_id: ProcessingStepId;
+    /**
+     * Call Key
+     */
+    call_key: string;
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Model
+     */
+    model: string;
+    /**
+     * Request
+     */
+    request: Array<{
+        [key: string]: unknown;
+    }>;
+    /**
+     * Response
+     */
+    response: {
+        [key: string]: unknown;
+    } | string;
+    /**
+     * Sequence
+     */
+    sequence: number;
+};
+
+/**
  * DocumentProcessingPipelineResponse
  */
 export type DocumentProcessingPipelineResponse = {
@@ -771,6 +810,10 @@ export type DocumentProcessingPipelineResponse = {
     } & EntityEmbeddingStepResponse) | ({
         id: 'entity_grouping';
     } & EntityGroupingStepResponse)>;
+    /**
+     * Llm Calls
+     */
+    llm_calls?: Array<DocumentProcessingLlmCallResponse>;
 };
 
 /**
@@ -1439,6 +1482,11 @@ export type ProcessDocumentResponse = {
 };
 
 /**
+ * ProcessingStepId
+ */
+export type ProcessingStepId = 'prepare' | 'clear_graph' | 'chunk' | 'entity_extraction' | 'graph_build' | 'entity_embedding' | 'entity_grouping';
+
+/**
  * ProcessingStepStatus
  */
 export type ProcessingStepStatus = 'pending' | 'running' | 'completed' | 'failed' | 'skipped';
@@ -1722,6 +1770,14 @@ export type ScenarioGraphNodeResponse = {
      * Description
      */
     description?: string;
+    /**
+     * Aliases
+     */
+    aliases?: Array<string>;
+    /**
+     * Descriptions
+     */
+    descriptions?: Array<string>;
 };
 
 /**

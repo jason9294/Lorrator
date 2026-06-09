@@ -18,21 +18,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Spinner } from '@/components/ui/spinner'
-import { RoomsService, type RoomMessageResponse } from '@/services'
+import { RoomsService } from '@/services'
 
 const props = defineProps<{
   roomId: string
   disabled?: boolean
 }>()
 
-const emit = defineEmits<{
-  rolled: [message: RoomMessageResponse]
-}>()
-
 const open = ref(false)
 const mode = ref<'normal' | 'skill'>('normal')
-const isRolling = ref(false)
 const error = ref<string | null>(null)
 
 // 普通擲骰
@@ -45,38 +39,42 @@ const skillValue = ref<number | null>(null)
 
 const PRESET_FACES = [4, 6, 8, 10, 12, 20, 100]
 
-async function handleRoll() {
+function handleRoll() {
   error.value = null
-  isRolling.value = true
-  try {
-    let res: Awaited<ReturnType<typeof RoomsService.rollDice>>
-    if (mode.value === 'normal') {
-      res = await RoomsService.rollDice({
-        path: { room_id: props.roomId },
-        body: { count: diceCount.value, faces: diceFaces.value },
-      })
-    } else {
-      if (!skillName.value.trim()) {
-        error.value = '請輸入技能名稱'
-        return
-      }
-      if (!skillValue.value || skillValue.value < 1 || skillValue.value > 100) {
-        error.value = '技能數值需介於 1–100'
-        return
-      }
-      res = await RoomsService.skillCheck({
-        path: { room_id: props.roomId },
-        body: { skill_name: skillName.value.trim(), skill_value: skillValue.value },
-      })
+
+  if (mode.value === 'skill') {
+    if (!skillName.value.trim()) {
+      error.value = '請輸入技能名稱'
+      return
     }
-    open.value = false
-    emit('rolled', res.data)
-  } catch (e) {
-    const detail = (e as { response?: { data?: { detail?: unknown } } })?.response?.data?.detail
-    error.value = typeof detail === 'string' ? detail : '擲骰失敗，請稍後再試'
-  } finally {
-    isRolling.value = false
+    if (!skillValue.value || skillValue.value < 1 || skillValue.value > 100) {
+      error.value = '技能數值需介於 1–100'
+      return
+    }
   }
+
+  open.value = false
+
+  const request =
+    mode.value === 'normal'
+      ? RoomsService.rollDice({
+          path: { room_id: props.roomId },
+          body: { count: diceCount.value, faces: diceFaces.value },
+        })
+      : RoomsService.skillCheck({
+          path: { room_id: props.roomId },
+          body: {
+            skill_name: skillName.value.trim(),
+            skill_value: skillValue.value!,
+          },
+        })
+
+  void request.catch((e) => {
+    const detail = (e as { response?: { data?: { detail?: unknown } } })?.response?.data
+      ?.detail
+    error.value = typeof detail === 'string' ? detail : '擲骰失敗，請稍後再試'
+    open.value = true
+  })
 }
 
 function switchMode(m: 'normal' | 'skill') {
@@ -197,10 +195,9 @@ function switchMode(m: 'normal' | 'skill') {
       <p v-if="error" class="text-sm text-destructive">{{ error }}</p>
 
       <!-- 確認按鈕 -->
-      <Button class="w-full gap-2" :disabled="isRolling" @click="handleRoll">
-        <Spinner v-if="isRolling" class="size-4" />
-        <Dices v-else class="size-4" />
-        {{ isRolling ? '擲骰中…' : '擲！' }}
+      <Button class="w-full gap-2" @click="handleRoll">
+        <Dices class="size-4" />
+        擲！
       </Button>
     </DialogContent>
   </Dialog>

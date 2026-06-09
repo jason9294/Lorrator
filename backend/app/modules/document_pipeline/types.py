@@ -1,10 +1,14 @@
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from pydantic import BaseModel
 
 from app.modules.rag.chunker import Chunk
 from app.modules.rag.json_schema import ExtractedEntities
+
+if TYPE_CHECKING:
+    from app.modules.document_pipeline.llm_recorder import LlmCallRecorder
 
 
 class PrepareStepResult(BaseModel):
@@ -171,6 +175,7 @@ class PipelineContextState:
     extractions: list[ExtractedEntities] | None = None
     graph_build_stats: GraphBuildStats | None = None
     clear_graph_stats: ClearGraphStats | None = None
+    llm_recorder: "LlmCallRecorder | None" = None
 
 
 class PipelineOptions(BaseModel):

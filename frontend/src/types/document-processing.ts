@@ -152,6 +152,17 @@ export type ProcessingStep =
   | (ProcessingStepBase & { id: 'entity_embedding'; result?: EntityEmbeddingStepResult })
   | (ProcessingStepBase & { id: 'entity_grouping'; result?: EntityGroupingStepResult })
 
+export interface DocumentProcessingLlmCall {
+  id: string
+  stepId: ProcessingStepId
+  callKey: string
+  label: string
+  model: string
+  request: Array<Record<string, unknown>>
+  response: Record<string, unknown> | string
+  sequence: number
+}
+
 export interface DocumentProcessingPipeline {
   documentId: string
   filename: string
@@ -159,4 +170,5 @@ export interface DocumentProcessingPipeline {
   completedAt: string
   totalDurationMs: number
   steps: ProcessingStep[]
+  llmCalls: DocumentProcessingLlmCall[]
 }

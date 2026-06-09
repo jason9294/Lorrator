@@ -4,6 +4,9 @@ from sqlalchemy.orm.attributes import flag_modified
 
 from app.models import DocumentProcessingRunModel
 from app.modules.document_pipeline.types import ProcessingStepSnapshot
+from app.repositories.document_processing_llm_call_repo import (
+    DocumentProcessingLlmCallRepository,
+)
 from app.repositories.document_processing_run_repo import DocumentProcessingRunRepository
 from app.shared.enums import ProcessingRunStatus, ProcessingStepStatus
 
@@ -24,8 +27,13 @@ def build_pending_steps(
 
 
 class PipelinePersistence:
-    def __init__(self, repo: DocumentProcessingRunRepository) -> None:
+    def __init__(
+        self,
+        repo: DocumentProcessingRunRepository,
+        llm_call_repo: DocumentProcessingLlmCallRepository,
+    ) -> None:
         self._repo = repo
+        self._llm_call_repo = llm_call_repo
         self._run: DocumentProcessingRunModel | None = None
         self._run_id: UUID | None = None
         self._document_id: UUID | None = None
@@ -64,6 +72,7 @@ class PipelinePersistence:
         self._run = await self._repo.upsert(run)
         self._run_id = self._run.id
         self._document_id = document_id
+        await self._llm_call_repo.delete_by_run_id(self._run.id)
         return self._run
 
     def _find_step_index(self, step_id: str) -> int:

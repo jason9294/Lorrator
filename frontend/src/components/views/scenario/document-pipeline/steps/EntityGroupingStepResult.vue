@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { ChevronRight } from 'lucide-vue-next'
-import type { EntityGroupingStepResult } from '@/types/document-processing'
+import type {
+  DocumentProcessingLlmCall,
+  EntityGroupingStepResult,
+} from '@/types/document-processing'
+import { findLlmCallForGroupingIteration } from '@/composables/documentProcessingLlmCalls'
 import { Badge } from '@/components/ui/badge'
+import PipelineLlmCallButton from '../PipelineLlmCallButton.vue'
 import PipelineStatCard from '../PipelineStatCard.vue'
 
 defineProps<{
   result: EntityGroupingStepResult
+  llmCalls: DocumentProcessingLlmCall[]
 }>()
 
 const expandedChunkKeys = ref<Set<string>>(new Set())
@@ -47,13 +53,17 @@ function toggleChunkExpanded(roundIteration: number, tempId: string) {
       :key="round.iteration"
       class="rounded-lg border overflow-hidden space-y-0"
     >
-      <div class="px-4 py-2.5 bg-muted/40 border-b">
+      <div class="px-4 py-2.5 bg-muted/40 border-b flex flex-wrap items-center justify-between gap-2">
         <p class="text-sm font-medium">
           第 {{ round.iteration }} 輪 · 種子節點 {{ round.seedName }}
           <span class="text-muted-foreground font-normal">
             （{{ round.seedSimilarityDegree }} 條相似邊）
           </span>
         </p>
+        <PipelineLlmCallButton
+          :call="findLlmCallForGroupingIteration(llmCalls, round.iteration)"
+          label="查看分群 LLM"
+        />
       </div>
       <div class="p-4 space-y-4">
         <div class="space-y-2">

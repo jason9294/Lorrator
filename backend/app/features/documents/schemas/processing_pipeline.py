@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -72,6 +72,17 @@ ProcessingStepResponse = Annotated[
 ]
 
 
+class DocumentProcessingLlmCallResponse(BaseModel):
+    id: UUID
+    step_id: ProcessingStepId
+    call_key: str
+    label: str
+    model: str
+    request: list[dict[str, Any]]
+    response: dict[str, Any] | str
+    sequence: int
+
+
 class DocumentProcessingPipelineResponse(BaseModel):
     document_id: UUID
     filename: str
@@ -79,3 +90,4 @@ class DocumentProcessingPipelineResponse(BaseModel):
     completed_at: datetime | None
     total_duration_ms: int | None
     steps: list[ProcessingStepResponse]
+    llm_calls: list[DocumentProcessingLlmCallResponse] = []

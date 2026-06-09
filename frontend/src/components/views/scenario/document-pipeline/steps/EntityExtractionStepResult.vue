@@ -1,10 +1,16 @@
 <script setup lang="ts">
-import type { EntityExtractionStepResult } from '@/types/document-processing'
+import type {
+  DocumentProcessingLlmCall,
+  EntityExtractionStepResult,
+} from '@/types/document-processing'
+import { findLlmCallsForChunk } from '@/composables/documentProcessingLlmCalls'
 import { getNodeTypeLabel } from '@/types/graph'
+import PipelineLlmCallButton from '../PipelineLlmCallButton.vue'
 import PipelineStatCard from '../PipelineStatCard.vue'
 
 defineProps<{
   result: EntityExtractionStepResult
+  llmCalls: DocumentProcessingLlmCall[]
 }>()
 
 function entityTypeLabel(type: string) {
@@ -33,8 +39,18 @@ function entityTypeLabel(type: string) {
       :key="chunkResult.chunkIndex"
       class="rounded-lg border overflow-hidden space-y-0"
     >
-      <div class="px-4 py-2.5 bg-muted/40 border-b">
+      <div class="px-4 py-2.5 bg-muted/40 border-b flex flex-wrap items-center justify-between gap-2">
         <p class="text-sm font-medium">Chunk #{{ chunkResult.chunkIndex }} 抽取結果</p>
+        <div class="flex flex-wrap items-center gap-2">
+          <PipelineLlmCallButton
+            :call="findLlmCallsForChunk(llmCalls, chunkResult.chunkIndex).initial"
+            label="初次抽取 LLM"
+          />
+          <PipelineLlmCallButton
+            :call="findLlmCallsForChunk(llmCalls, chunkResult.chunkIndex).continueCall"
+            label="補充抽取 LLM"
+          />
+        </div>
       </div>
       <div class="p-4 space-y-4">
         <div class="space-y-2">

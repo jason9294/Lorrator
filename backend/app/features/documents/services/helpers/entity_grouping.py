@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from uuid import UUID
 
+from app.modules.document_pipeline.llm_recorder import LlmCallRecorder
 from app.modules.document_pipeline.types import (
     EntityGroupingInputChunkResult,
     EntityGroupingInputEntityResult,
@@ -8,6 +9,7 @@ from app.modules.document_pipeline.types import (
     EntityGroupingMergeRecord,
     EntityGroupingStepResult,
 )
+from app.shared.enums import ProcessingStepId
 from app.modules.rag.entity_grouper import entity_group
 from app.modules.rag.json_schema import EntityGroupChunk, EntityGroupEntity
 from app.repositories.graph_repo import GraphRepo
@@ -31,6 +33,7 @@ async def run_entity_grouping(
     *,
     graph_group_id: str,
     document_id: UUID,
+    llm_recorder: LlmCallRecorder | None = None,
 ) -> EntityGroupingStats:
     stats = EntityGroupingStats()
     iteration = 0
@@ -90,7 +93,14 @@ async def run_entity_grouping(
             for entity in entities
         ]
 
-        grouping = await entity_group(llm_chunks, llm_entities)
+        iteration += 1
+        grouping = await entity_group(
+            llm_chunks,
+            llm_entities,
+            recorder=llm_recorder,
+            step_id=ProcessingStepId.ENTITY_GROUPING.value,
+            iteration=iteration,
+        )
         resolved_groups = [
             [name_by_entity_id[temp_id] for temp_id in group if temp_id in name_by_entity_id]
             for group in grouping.entity_groups
@@ -145,7 +155,6 @@ async def run_entity_grouping(
                     )
                 )
 
-        iteration += 1
         stats.total_iterations = iteration
         stats.iterations.append(
             EntityGroupingIterationResult(

@@ -1,11 +1,27 @@
+from typing import Any
+
 from openai.types.responses import ResponseInputParam
+
+from app.modules.document_pipeline.llm_recorder import LlmCallRecorder
 
 from .client import client
 from .json_schema import ExtractedEntities
 from .prompts.entity_extraction import PROMPTS
 
+ENTITY_EXTRACT_MODEL = "gpt-5.4-mini"
 
-async def entity_extract(text: str) -> ExtractedEntities:
+
+def _serialize_messages(messages: ResponseInputParam) -> list[dict[str, Any]]:
+    return [dict(message) for message in messages]
+
+
+async def entity_extract(
+    text: str,
+    *,
+    recorder: LlmCallRecorder | None = None,
+    step_id: str | None = None,
+    chunk_index: int | None = None,
+) -> ExtractedEntities:
     messages: ResponseInputParam = [
         {
             "role": "system",
@@ -17,7 +33,7 @@ async def entity_extract(text: str) -> ExtractedEntities:
         },
     ]
     response = await client.responses.parse(
-        model="gpt-5.4-mini",
+        model=ENTITY_EXTRACT_MODEL,
         input=messages,
         store=False,
         text_format=ExtractedEntities,
@@ -27,6 +43,16 @@ async def entity_extract(text: str) -> ExtractedEntities:
         raise ValueError("No output parsed")
 
     result = response.output_parsed
+
+    if recorder is not None and step_id is not None and chunk_index is not None:
+        await recorder.record(
+            step_id=step_id,
+            call_key=f"chunk_{chunk_index}_initial",
+            label=f"Chunk #{chunk_index} 初次抽取",
+            model=ENTITY_EXTRACT_MODEL,
+            request=_serialize_messages(messages),
+            response=result.model_dump(mode="json"),
+        )
 
     # prepare the messages for the continue extraction
     messages.append(
@@ -43,7 +69,7 @@ async def entity_extract(text: str) -> ExtractedEntities:
     )
 
     response = await client.responses.parse(
-        model="gpt-5.4-mini",
+        model=ENTITY_EXTRACT_MODEL,
         input=messages,
         store=False,
         text_format=ExtractedEntities,
@@ -53,6 +79,16 @@ async def entity_extract(text: str) -> ExtractedEntities:
         raise ValueError("No output parsed")
 
     continue_result = response.output_parsed
+
+    if recorder is not None and step_id is not None and chunk_index is not None:
+        await recorder.record(
+            step_id=step_id,
+            call_key=f"chunk_{chunk_index}_continue",
+            label=f"Chunk #{chunk_index} 補充抽取",
+            model=ENTITY_EXTRACT_MODEL,
+            request=_serialize_messages(messages),
+            response=continue_result.model_dump(mode="json"),
+        )
 
     result.entities.extend(continue_result.entities)
     result.relationships.extend(continue_result.relationships)

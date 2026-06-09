@@ -4,6 +4,7 @@ import type {
   ChunkItem,
   ChunkStepResult,
   ClearGraphStepResult,
+  DocumentProcessingLlmCall,
   DocumentProcessingPipeline,
   EntityEmbeddingStepResult,
   EntityExtractionStepResult,
@@ -270,6 +271,21 @@ function mapStep(step: ApiStep): ProcessingStep {
   }
 }
 
+function mapLlmCall(
+  call: NonNullable<DocumentProcessingPipelineResponse['llm_calls']>[number],
+): DocumentProcessingLlmCall {
+  return {
+    id: call.id,
+    stepId: call.step_id as ProcessingStepId,
+    callKey: call.call_key,
+    label: call.label,
+    model: call.model,
+    request: call.request,
+    response: call.response,
+    sequence: call.sequence,
+  }
+}
+
 export function mapDocumentProcessingPipeline(
   response: DocumentProcessingPipelineResponse,
 ): DocumentProcessingPipeline {
@@ -280,5 +296,6 @@ export function mapDocumentProcessingPipeline(
     completedAt: response.completed_at ?? response.started_at,
     totalDurationMs: response.total_duration_ms ?? 0,
     steps: response.steps.map(mapStep),
+    llmCalls: (response.llm_calls ?? []).map(mapLlmCall),
   }
 }

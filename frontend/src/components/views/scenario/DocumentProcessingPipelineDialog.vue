@@ -207,7 +207,11 @@ function selectStep(step: ProcessingStep) {
           </aside>
 
           <ScrollArea class="flex-1 min-h-0">
-            <PipelineStepDetail v-if="selectedStep" :step="selectedStep" />
+            <PipelineStepDetail
+              v-if="selectedStep"
+              :step="selectedStep"
+              :llm-calls="pipeline.llmCalls"
+            />
           </ScrollArea>
         </div>
       </template>

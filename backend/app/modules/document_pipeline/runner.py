@@ -13,6 +13,7 @@ from app.core.realtime.websocket.envelopes import (
 )
 from app.core.realtime.websocket.topics import WsTopic
 from app.models import DocumentModel
+from app.modules.document_pipeline.llm_recorder import PipelineLlmCallRecorder
 from app.modules.document_pipeline.persistence import (
     PipelinePersistence,
     build_pending_steps,
@@ -20,6 +21,9 @@ from app.modules.document_pipeline.persistence import (
 from app.modules.document_pipeline.registry import DEFAULT_DOCUMENT_PIPELINE
 from app.modules.document_pipeline.steps.base import PipelineStep
 from app.modules.document_pipeline.types import PipelineContextState, PipelineOptions
+from app.repositories.document_processing_llm_call_repo import (
+    DocumentProcessingLlmCallRepository,
+)
 from app.repositories.document_processing_run_repo import DocumentProcessingRunRepository
 from app.shared.enums import (
     DocumentStatus,
@@ -44,7 +48,8 @@ class PipelineRunner:
         self._notify_user_id = notify_user_id
         self._scenario_id = scenario_id
         self._repo = DocumentProcessingRunRepository(session)
-        self._persistence = PipelinePersistence(self._repo)
+        self._llm_call_repo = DocumentProcessingLlmCallRepository(session)
+        self._persistence = PipelinePersistence(self._repo, self._llm_call_repo)
 
     async def run(
         self,
@@ -94,6 +99,11 @@ class PipelineRunner:
             document_id,
             self._persistence.run_id,
             len(definition.steps),
+        )
+
+        ctx.llm_recorder = PipelineLlmCallRecorder(
+            repo=self._llm_call_repo,
+            run_id=self._persistence.run_id,
         )
 
         await self._notify_document_status(
@@ -234,6 +244,9 @@ class PipelineRunner:
                 error=str(exc),
             )
             raise
+        finally:
+            if ctx.llm_recorder is not None:
+                await ctx.llm_recorder.flush()
 
     async def _notify_document_status(
         self,

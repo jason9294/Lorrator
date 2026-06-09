@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ProcessingStep } from '@/types/document-processing'
+import type { DocumentProcessingLlmCall, ProcessingStep } from '@/types/document-processing'
 import { Separator } from '@/components/ui/separator'
 import PrepareStepResult from './steps/PrepareStepResult.vue'
 import ClearGraphStepResult from './steps/ClearGraphStepResult.vue'
@@ -11,6 +11,7 @@ import GraphBuildStepResult from './steps/GraphBuildStepResult.vue'
 
 defineProps<{
   step: ProcessingStep
+  llmCalls: DocumentProcessingLlmCall[]
 }>()
 </script>
 
@@ -45,6 +46,7 @@ defineProps<{
     <EntityExtractionStepResult
       v-else-if="step.id === 'entity_extraction' && step.result"
       :result="step.result"
+      :llm-calls="llmCalls"
     />
     <EntityEmbeddingStepResult
       v-else-if="step.id === 'entity_embedding' && step.result"
@@ -53,6 +55,7 @@ defineProps<{
     <EntityGroupingStepResult
       v-else-if="step.id === 'entity_grouping' && step.result"
       :result="step.result"
+      :llm-calls="llmCalls"
     />
     <GraphBuildStepResult
       v-else-if="step.id === 'graph_build' && step.result"

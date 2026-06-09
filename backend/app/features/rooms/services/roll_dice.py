@@ -17,6 +17,7 @@ from app.helpers.room_message_broadcast import (
     broadcast_room_message,
 )
 from app.repositories.room_message_repo import RoomMessageRepository
+from app.repositories.room_repo import RoomRepository
 from app.shared.enums import RoomMessageRole, RoomMessageType, RoomStatus
 
 from ..schemas.requests import RollDiceRequest, SkillCheckRequest
@@ -119,49 +120,64 @@ class RollDiceService:
         )
         self._bg_tasks.add_task(_delayed_reply)
 
-    async def _run_agent_turn(
+    def _schedule_agent_turn(
         self,
-        room: RoomModel,
-        participant_ids: list[UUID],
         room_id: UUID,
-        user_prompt: str,
+        participant_ids: list[UUID],
         player_content: str,
     ) -> None:
-        room.agent_history["kp"].append({"role": "user", "content": user_prompt})
-        logger.info("_run_agent_turn: calling AI room_id=%s", room_id)
+        async def _task() -> None:
+            logger.info("_schedule_agent_turn started room_id=%s", room_id)
+            try:
+                async with AsyncSession(
+                    async_engine, expire_on_commit=False
+                ) as session:
+                    room_repo = RoomRepository(session)
+                    room = await room_repo.find_by_id(room_id)
+                    if room is None:
+                        logger.error("room not found room_id=%s", room_id)
+                        return
 
-        try:
-            response = await client.responses.create(
-                model="gpt-5.4",
-                input=room.agent_history["kp"],
-            )
-        except Exception:
-            logger.exception("_run_agent_turn: AI call failed room_id=%s", room_id)
-            await broadcast_ai_thinking(room_id, active=False)
-            raise
+                    logger.info(
+                        "_schedule_agent_turn: calling AI room_id=%s", room_id
+                    )
+                    response = await client.responses.create(
+                        model="gpt-5.4",
+                        input=room.agent_history["kp"],
+                    )
 
-        logger.info(
-            "_run_agent_turn: AI response received room_id=%s len=%d",
-            room_id,
-            len(response.output_text),
-        )
-        room.agent_history["kp"].append(
-            {"role": "assistant", "content": response.output_text}
-        )
+                    logger.info(
+                        "_schedule_agent_turn: AI response received room_id=%s len=%d",
+                        room_id,
+                        len(response.output_text),
+                    )
+                    room.agent_history["kp"].append(
+                        {"role": "assistant", "content": response.output_text}
+                    )
 
-        round_history, added_count = append_round_summarizer_history(
-            room, player_content, response.output_text
-        )
+                    round_history, added_count = append_round_summarizer_history(
+                        room, player_content, response.output_text
+                    )
 
-        attributes.flag_modified(room, "agent_history")
-        await self._uow.room_repo.save(room)
-        self._schedule_agent_reply(
-            participant_ids,
-            room_id,
-            response.output_text,
-            round_history,
-            added_count,
-        )
+                    attributes.flag_modified(room, "agent_history")
+                    await room_repo.save(room)
+                    await session.commit()
+
+                self._schedule_agent_reply(
+                    participant_ids,
+                    room_id,
+                    response.output_text,
+                    round_history,
+                    added_count,
+                )
+            except Exception:
+                logger.exception(
+                    "_schedule_agent_turn failed room_id=%s", room_id
+                )
+                await broadcast_ai_thinking(room_id, active=False)
+                raise
+
+        self._bg_tasks.add_task(_task)
 
     async def roll(
         self, room_id: UUID, body: RollDiceRequest, sender_id: UUID
@@ -190,9 +206,11 @@ class RollDiceService:
         )
 
         user_prompt = f'<Character name="{current_participant.character.name}"><dice>{content}</dice></Character>'
-        await self._run_agent_turn(
-            room, participant_ids, room_id, user_prompt, player_content=content
-        )
+        room.agent_history["kp"].append({"role": "user", "content": user_prompt})
+        attributes.flag_modified(room, "agent_history")
+        await self._uow.room_repo.save(room)
+
+        self._schedule_agent_turn(room_id, participant_ids, player_content=content)
         return RoomMessageResponse.model_validate(msg)
 
     async def skill_check(
@@ -224,7 +242,9 @@ class RollDiceService:
         )
 
         user_prompt = f'<Character name="{current_participant.character.name}"><dice>{content}</dice></Character>'
-        await self._run_agent_turn(
-            room, participant_ids, room_id, user_prompt, player_content=content
-        )
+        room.agent_history["kp"].append({"role": "user", "content": user_prompt})
+        attributes.flag_modified(room, "agent_history")
+        await self._uow.room_repo.save(room)
+
+        self._schedule_agent_turn(room_id, participant_ids, player_content=content)
         return RoomMessageResponse.model_validate(msg)

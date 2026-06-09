@@ -38,7 +38,15 @@ class EntityExtractionStep:
             )
 
         extractions = await asyncio.gather(
-            *[entity_extract(chunk.text) for chunk in ctx.chunks]
+            *[
+                entity_extract(
+                    chunk.text,
+                    recorder=ctx.llm_recorder,
+                    step_id=ProcessingStepId.ENTITY_EXTRACTION.value,
+                    chunk_index=chunk.index,
+                )
+                for chunk in ctx.chunks
+            ]
         )
         ctx.extractions = list(extractions)
 

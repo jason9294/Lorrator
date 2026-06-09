@@ -31,6 +31,7 @@ class EntityGroupingStep:
                 graph_repo,
                 graph_group_id=ctx.graph_group_id,
                 document_id=ctx.document_id,
+                llm_recorder=ctx.llm_recorder,
             )
 
         return build_entity_grouping_step_result(stats)

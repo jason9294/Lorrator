@@ -318,7 +318,7 @@
         <!-- 輸入區 -->
         <footer class="shrink-0 border-t bg-card/80 backdrop-blur-sm px-4 py-3">
           <div class="max-w-4xl mx-auto flex items-end gap-2">
-            <DiceRollerDialog :room-id="roomId" :disabled="isAiTyping" @rolled="handleDiceRolled" />
+            <DiceRollerDialog :room-id="roomId" :disabled="isAiTyping" />
             <div class="flex-1 min-w-0">
               <RoomMessageComposer
                 v-model="inputText"
@@ -643,12 +643,6 @@ async function sendMessage(text: string) {
   await scrollToBottom()
 }
 
-async function handleDiceRolled(message: RoomMessageResponse) {
-  messages.value.push(message)
-  await nextTick()
-  await scrollToBottom()
-}
-
 // WebSocket
 useSocketTopic(() => `rooms:${roomId}`)
 
@@ -689,8 +683,12 @@ useSocketOnType('rooms.create_message', (payload) => {
 
   const data = parsed.data
 
-  // 自己發的玩家訊息已透過 HTTP 回應加入，跳過避免重複
-  if (data.sender_id === meStore.id) {
+  if (messages.value.some((m) => m.id === data.id)) {
+    return
+  }
+
+  // 自己發的聊天訊息已透過 optimistic UI 加入，跳過避免重複
+  if (data.sender_id === meStore.id && data.role === 'PLAYER') {
     return
   }
 
